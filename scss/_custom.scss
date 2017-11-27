@@ -1,1 +1,10 @@
 // Here you can add other styles
+button{
+    margin-right: 5px;
+}
+
+div {
+    button:last-child{
+        margin-right: 0px;
+    }
+}

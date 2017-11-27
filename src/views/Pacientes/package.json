@@ -1,6 +1,6 @@
 {
-  "name": "Pacientes",
+  "name": "ListaPacientes",
   "version": "0.0.0",
   "private": true,
-  "main": "./Pacientes.js"
+  "main": "./ListaPacientes.js"
 }

@@ -1,4 +1,8 @@
 import firebase from 'firebase';
+
+// Required for side-effects
+require("firebase/firestore");
+
 var config = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
     apiKey: "AIzaSyBP2hcETIRSFvvFhgMabmDZ-RjShqDlX70",
     authDomain: "psicologapp-84.firebaseapp.com",
@@ -7,5 +11,8 @@ var config = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
     storageBucket: "psicologapp-84.appspot.com",
     messagingSenderId: "721791562259"
 };
-var fire = firebase.initializeApp(config);
-export default fire;
+firebase.initializeApp(config);
+
+let db = firebase.firestore();
+
+export default db;

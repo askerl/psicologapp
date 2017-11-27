@@ -8,6 +8,9 @@ import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
 import Dashboard from '../../views/Dashboard/';
+import ListaPacientes from '../../views/Pacientes/ListaPacientes';
+
+import {NotificationContainer} from 'react-notifications';
 
 class Full extends Component {
   render() {
@@ -21,8 +24,10 @@ class Full extends Component {
             <Container fluid>
               <Switch>
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
+                <Route path="/pacientes" name="Pacientes" component={ListaPacientes}/>
                 <Redirect from="/" to="/dashboard"/>
               </Switch>
+              <NotificationContainer/>
             </Container>
           </main>
         </div>

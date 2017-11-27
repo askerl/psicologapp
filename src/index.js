@@ -11,6 +11,8 @@ import 'simple-line-icons/css/simple-line-icons.css';
 import '../scss/style.scss'
 // Temp fix for reactstrap
 import '../scss/core/_dropdown-menu-right.scss'
+// CSS for notifications
+import 'react-notifications/lib/notifications.css';
 
 // Containers
 import Full from './containers/Full'
@@ -18,7 +20,7 @@ import Full from './containers/Full'
 ReactDOM.render((
   <HashRouter>
     <Switch>
-      <Route path="/" name="Home" component={Full}/>
+      <Route path="/" name="Inicio" component={Full}/>
     </Switch>
   </HashRouter>
 ), document.getElementById('root'));
