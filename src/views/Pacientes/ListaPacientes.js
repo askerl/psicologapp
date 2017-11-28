@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import {
 	Row,
 	Col,
@@ -21,8 +22,6 @@ import {
 	InputGroupButton
 } from 'reactstrap';
 
-import Paciente from './Paciente';
-
 import db from '../../fire';
 
 class ListaPacientes extends Component {
@@ -31,9 +30,11 @@ class ListaPacientes extends Component {
 		this.state = {
 			pacientes: []
 		};
+		this.nuevoPaciente = this.nuevoPaciente.bind(this);
 	}
 
 	loadPacientes(querySnapshot){
+		console.log('cargando lista de pacientes...');
 		let pacientes = [];
 		querySnapshot.docs.forEach( doc => {            
 			// console.log(doc.id, " => ", doc.data());
@@ -48,30 +49,34 @@ class ListaPacientes extends Component {
             this.loadPacientes(querySnapshot);
         });
 	}
-	
-	componentDidMount(){
-		db.collection("pacientes").onSnapshot( querySnapshot => {
-			this.loadPacientes(querySnapshot);
-		});
-	}
 
-	componentWillUnmount(){
-		console.log('unmounting lISTA pacientes');
-		let unsubscribe = db.collection("pacientes").onSnapshot(function () {});
-		// Stop listening to changes
-		unsubscribe();
+	nuevoPaciente(){
+		this.props.history.push(`/pacientes/new`);
 	}
+	
+	// componentDidMount(){
+	// 	db.collection("pacientes").onSnapshot( querySnapshot => {
+	// 		this.loadPacientes(querySnapshot);
+	// 	});
+	// }
+
+	// componentWillUnmount(){
+	// 	console.log('unmounting lISTA pacientes');
+	// 	let unsubscribe = db.collection("pacientes").onSnapshot(function () {});
+	// 	// Stop listening to changes
+	// 	unsubscribe();
+	// }
 
 	render() {
 		return (
 			<div className="animated fadeIn">
 				COMPONENTE DE PACIENTES (lista con acciones)
-				<hr/>
+				<Button onClick={this.nuevoPaciente}>Nuevo paciente</Button>
+				<hr/>				
 				<ul>
-					{this.state.pacientes.map( p => <li key={p.id}>{JSON.stringify(p)}</li>)}
+					{this.state.pacientes.map( p => <li key={p.id}><Link to={`/pacientes/${p.id}`}>{JSON.stringify(p)}</Link></li>)}
 				</ul>
 				<hr/>
-				<Paciente />
 			</div>
 		)
 	}

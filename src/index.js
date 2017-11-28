@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {HashRouter, Route, Switch} from 'react-router-dom';
+import {HashRouter, Route, Switch, BrowserRouter} from 'react-router-dom';
 
 // Styles
 // Import Font Awesome Icons Set

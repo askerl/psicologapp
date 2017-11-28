@@ -1,5 +1,5 @@
 const routes = {
   '/': 'Inicio',
-  '/pacientes': 'Pacientes'
+  '/pacientes': 'Pacientes',
 };
 export default routes;

@@ -9,6 +9,7 @@ import Footer from '../../components/Footer/';
 
 import Dashboard from '../../views/Dashboard/';
 import ListaPacientes from '../../views/Pacientes/ListaPacientes';
+import Paciente from '../../views/Pacientes/Paciente';
 
 import {NotificationContainer} from 'react-notifications';
 
@@ -24,10 +25,11 @@ class Full extends Component {
             <Container fluid>
               <Switch>
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
-                <Route path="/pacientes" name="Pacientes" component={ListaPacientes}/>
+                <Route exact path="/pacientes" name="Pacientes" component={ListaPacientes}/>
+                <Route path='/pacientes/:id' name="Paciente" component={Paciente}/>
                 <Redirect from="/" to="/dashboard"/>
               </Switch>
-              <NotificationContainer/>
+              <NotificationContainer enterTimeout={200}/>
             </Container>
           </main>
         </div>
