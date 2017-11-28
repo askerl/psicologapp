@@ -63,7 +63,7 @@ class Paciente extends Component {
         let auxPagos = [];
         this.state.prepagas.forEach( el => {
             if (el.id === selPrepaga) {
-                auxPagos = [...el.data.copagos].concat([]);
+                auxPagos = [...el.data.pagos].concat([]);
                 return;
             }
         })
@@ -157,7 +157,7 @@ class Paciente extends Component {
                                             <InputGroup>
                                                 <Input type="select" name="pago" id="pago" innerRef={ el => this.inputPago = el } required>
                                                     <option value="">Seleccione pago...</option>
-                                                    {this.state.pagos.map( item => <option key={item} value={item}>$ {item}</option>)}
+                                                    {this.state.pagos.map( (value,index) => <option key={index} value={index}>$ {value}</option>)}
                                                 </Input>
                                             </InputGroup>
                                         </Col>
@@ -171,7 +171,7 @@ class Paciente extends Component {
                                             </InputGroup>
                                         </Col>
                                     </FormGroup>
-                                    </Form>
+                                </Form>
                             </CardBody>
                             <CardFooter>
                                 <Button type="submit" size="sm" color="primary" onClick={(e) => this.savePacient(e)}><i className="fa fa-dot-circle-o"></i> Guardar</Button>
