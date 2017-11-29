@@ -27,7 +27,7 @@ class Full extends Component {
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                 <Route exact path="/pacientes" name="Pacientes" component={ListaPacientes}/>
                 <Route path='/pacientes/:id' name="Paciente" component={Paciente}/>
-                <Redirect from="/" to="/dashboard"/>
+                <Redirect from="/" to="/dashboard"/>                
               </Switch>
               <NotificationContainer enterTimeout={200}/>
             </Container>

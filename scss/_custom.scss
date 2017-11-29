@@ -14,3 +14,13 @@ div {
         display: block;
     }
 }
+
+.paciente{
+    .card-actions{
+        display: flex;
+        padding: 0.70rem 1.25rem;
+    }
+    #activo-label{
+        margin-right: 3px;
+    }
+}

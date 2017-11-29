@@ -9,9 +9,9 @@ class Dashboard extends Component {
 
   }
 
-  componentDidMount(){
+  componentWillMount(){
     this.countPac = 0;
-    db.collection("pacientes").get().then(function(querySnapshot) {
+    db.collection("pacientes").get().then((querySnapshot)=> {
       console.log('cantidad pacientes', querySnapshot.docs.length);
       this.countPac = querySnapshot.docs.length;
     });
@@ -27,8 +27,8 @@ class Dashboard extends Component {
       <div className="animated fadeIn">
         en construcción...
         <hr/>
-        <Widget04 icon="icon-people" color="info" header="2" value="2">Pacientes</Widget04>
-        <Widget04 icon="icon-bubbles" color="orange" header="385" value="25">Sesiones</Widget04>
+        <Widget04  color="info" header="2" value="2">Pacientes</Widget04>
+        <Widget04  color="orange" header="385" value="25">Sesiones</Widget04>
       </div>
     );
   }
