@@ -24,3 +24,7 @@ div {
         margin-right: 3px;
     }
 }
+
+td:focus{
+    outline: none;
+}

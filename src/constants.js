@@ -7,6 +7,11 @@ export const tipoPaciente = [
 export const pacientePrepaga = tipoPaciente[0].key; // código para obra social
 export const pacientePrivado = tipoPaciente[1].key; // código para paciente privado
 
+let auxfiltroTipoPaciente = {};
+auxfiltroTipoPaciente[pacientePrepaga] = tipoPaciente[0].name;
+auxfiltroTipoPaciente[pacientePrivado] = tipoPaciente[1].name;
+export const filtroTipoPaciente = auxfiltroTipoPaciente;
+
 export const errores = {
     nombreVacio: "Ingrese el nombre",
     apellidoVacio: "Ingrese el apellido",

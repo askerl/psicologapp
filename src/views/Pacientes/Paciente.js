@@ -275,7 +275,7 @@ class Paciente extends Component {
 
     render() {
         return (
-            <div>
+            <div className="animated fadeIn">
                 <Loader type="ball-scale-ripple-multiple" active={this.state.loading} />
                 <div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn paciente"}>                
                     <Row>
