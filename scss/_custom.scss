@@ -28,3 +28,10 @@ div {
 td:focus{
     outline: none;
 }
+
+span.thTitle{
+    display: inline-block;
+    line-height: initial;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

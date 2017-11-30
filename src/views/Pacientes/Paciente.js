@@ -22,7 +22,7 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, errores } from '../../constants';
+import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones } from '../../constants';
 import Widget01 from '../Widgets/Widget01';
 import Widget02 from '../Widgets/Widget02';
 import Toggle from 'react-toggle';
@@ -117,9 +117,8 @@ class Paciente extends Component {
     }
 
     porcentajesSesiones(sesionesAut, sesiones){
-        let porcUsadas = sesionesAut > 0 ? sesiones / sesionesAut * 100 : 0;
-        let porcRestantes = sesionesAut > 0 ? (sesionesAut - sesiones)/ sesionesAut * 100 : 0 ;
-        this.setState({porcUsadas, porcRestantes});
+        let porcs = calcPorcentajesSesiones(sesionesAut, sesiones);
+        this.setState({porcUsadas: porcs.porcUsadas, porcRestantes: porcs.porcRestantes});
     }
 
     changeNombre(){
@@ -439,7 +438,7 @@ class Paciente extends Component {
                                         }
                                     </Form>
                                 </CardBody>
-                                <CardFooter className="text-xs-left text-sm-right">
+                                <CardFooter>
                                     <Button type="submit" color="primary" onClick={ e => this.savePacient(e)}>Guardar</Button>
                                     <Button type="reset" color="secondary" onClick={this.goBack}>Cancelar</Button>
                                 </CardFooter>

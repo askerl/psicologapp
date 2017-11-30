@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, cloneElement} from 'react';
 import {Link} from 'react-router-dom';
 import {
 	Row,
@@ -7,45 +7,48 @@ import {
 	Card,
 	CardHeader,
 	CardFooter,
-	CardBody
+	CardBody,
+	Progress
 } from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga } from '../../constants';
-
-
-function tipoFormatter(cell, row) {
-	let badge;
-	switch (cell) {
-		case pacientePrivado:
-			badge = `<span class="badge badge-secondary">${filtroTipoPaciente[pacientePrivado]}</span>`;
-			break;
-		case pacientePrepaga:
-			badge = `<span class="badge badge-info">${filtroTipoPaciente[pacientePrepaga]}</span>`;
-			break;
-	}
-	return badge;
-}
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones } from '../../constants';
 
 class ListaPacientes extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			pacientes: [],
-			resultados: 0,
+			filtroPrepagas: {},
 			loading: false
 		};
+		this.actionsFormatter = this.actionsFormatter.bind(this);
+		this.prepagaFormatter = this.prepagaFormatter.bind(this);
+		this.priceFormatter = this.priceFormatter.bind(this);
+		this.tipoFormatter = this.tipoFormatter.bind(this);
+		this.restantesFormatter = this.restantesFormatter.bind(this);
 		this.nuevoPaciente = this.nuevoPaciente.bind(this);
 		this.loading = this.loading.bind(this);
 	}
 
 	componentWillMount(){
 		this.loading(true);
+
+		// cargo filtro
+		db.collection("prepagas").get().then( querySnapshot => {
+			let filtroPrepagas = {};
+			querySnapshot.docs.forEach( doc => {            
+				filtroPrepagas[doc.id] = doc.data().nombre;
+			});
+			this.setState({filtroPrepagas});
+		});
+
         db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
 			this.loadPacientes(querySnapshot);
 			this.loading(false);
 		});
+	
 	}
 
 	loadPacientes(querySnapshot){
@@ -53,6 +56,9 @@ class ListaPacientes extends Component {
 		querySnapshot.docs.forEach( doc => {            
 			let paciente = doc.data();
 			paciente.id = doc.id;
+			paciente.sesionesRestantes = paciente.sesionesAut ? (paciente.sesionesAut - paciente.sesiones) : '';
+			let porcs = calcPorcentajesSesiones(paciente.sesionesAut, paciente.sesiones);
+			paciente.porcRestantes = porcs.porcRestantes;
 			pacientes.push(paciente);
 		});
 		this.setState({pacientes: [...pacientes].concat([])});
@@ -66,6 +72,54 @@ class ListaPacientes extends Component {
 	nuevoPaciente(){
 		this.props.history.push(`/pacientes/new`);
 	}
+
+	actionsFormatter(cell, row) {
+		return (
+			<Link to={`/pacientes/${cell}`} title="Editar paciente"><i className="fa fa-edit fa-lg"></i></Link>
+		);
+	}
+	
+	tipoFormatter(cell, row) {
+		let badge;
+		switch (cell) {
+			case pacientePrivado:
+				badge = `<span class="badge badge-dark">${filtroTipoPaciente[pacientePrivado]}</span>`;
+				break;
+			case pacientePrepaga:
+				badge = `<span class="badge badge-primary">${filtroTipoPaciente[pacientePrepaga]}</span>`;
+				break;
+		}
+		return badge;
+	}
+	
+	priceFormatter(cell, row) {
+		let val = cell ? `<i class="fa fa-usd"></i> ${cell}` : '';
+		return val;
+	}
+	
+	prepagaFormatter(cell, row) {
+		return this.state.filtroPrepagas[cell];
+	}
+
+	restantesFormatter(cell, row){
+		let color;
+		if (row.porcRestantes > 50) {
+			color = "success";
+		} else if (row.porcRestantes > 10) {
+			color = "warning";
+		} else {
+			color = "danger";
+		}
+		let prog = cell == '' ? '': 
+			<div className="d-flex flex-column">
+				<div className="d-flex">
+					<strong>{cell}</strong>
+				</div>				
+				<Progress className="progress-xs" color={color} value={row.porcRestantes}/>
+			</div>;
+		return prog;
+	}
+	
 	
 	render() {
 
@@ -86,59 +140,59 @@ class ListaPacientes extends Component {
 								</CardHeader>
 								<CardBody>
 									<div className="d-flex flex-row mb-1">
-										{/* <div className="callout callout-info mb-0 mt-0">
-											<small className="text-muted">Resultados</small>
-											<br/>
-											<strong className="h4">{`${this.state.resultados}`}</strong>											
-										</div> */}
-										<div className="align-self-end ml-auto">
+										<div className="mr-auto">
 											<Button color="primary" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus"></i> Nuevo paciente</Button>
 										</div>
 									</div>
-									{/* 
-					<ul>
-						{this.state.pacientes.map( p => <li key={p.id}><Link to={`/pacientes/${p.id}`}>{JSON.stringify(p)}</Link></li>)}
-					</ul> */}
 									<BootstrapTable ref="table" version='4'
 										data={this.state.pacientes}
 										bordered={false}
-										striped hover condensed
-										options={options}>
-										<TableHeaderColumn
-											dataField='id'
-											isKey
-											hidden>
-											ID
+										striped hover
+										options={options}
+										>
+										<TableHeaderColumn 
+											dataField='id' isKey
+											dataFormat={ this.actionsFormatter}
+											dataAlign='center'
+											width="43">											
 										</TableHeaderColumn>										
 										<TableHeaderColumn
 											dataField='apellido'
-											filter={{ type: 'TextFilter', placeholder:"Ingrese apellido..."}}
+											filter={{ type: 'TextFilter', placeholder:"Apellido..."}}
 											dataSort>
-											Apellido
+											<span className="thTitle">Apellido</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='nombre'
-											filter={{ type: 'TextFilter', placeholder:"Ingrese nombre..."}}
+											filter={{ type: 'TextFilter', placeholder:"Nombre..."}}
 											dataSort>
-											Nombre
+											<span className="thTitle">Nombre</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn 
 											dataField='tipo'
 											width="130"
-											dataFormat={ tipoFormatter }
+											dataFormat={ this.tipoFormatter }
           									filter={ { type: 'SelectFilter', placeholder:"Todos", options: filtroTipoPaciente } }
 											dataSort>
-											Tipo
+											<span className="thTitle">Tipo</span>
 										</TableHeaderColumn>
-										{/* <TableHeaderColumn dataField='tipo' 
-											dataFormat={ tipoFormatter }
-											// formatExtraData={ filtroTipoPaciente }
-          									filter={ { type: 'SelectFilter', placeholder:"Todos", options: filtroTipoPaciente } }
-											dataSort>
-											Tipo
-										</TableHeaderColumn> */}
-
-										{/* <TableHeaderColumn width="20%"></TableHeaderColumn> */}
+										<TableHeaderColumn 
+											dataField='prepaga'
+											dataFormat={ this.prepagaFormatter } 											
+											filter={ { type: 'SelectFilter', placeholder:"Todas", options: this.state.filtroPrepagas } }
+											dataSort
+											>
+											<span className="thTitle">Prepaga</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='sesionesRestantes'
+											dataFormat= { this.restantesFormatter}											
+											filter={{ type: 'NumberFilter', placeholder:"...", numberComparators: [ '=', '>', '<=' ] }}
+											dataSort
+											>
+											<span className="thTitle">Sesiones restantes</span>
+										</TableHeaderColumn>
+										
 									</BootstrapTable>
 								</CardBody>
 							</Card>
