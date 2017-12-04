@@ -107,6 +107,7 @@ class Paciente extends Component {
         this.inputTelFlia.value     = p.telFlia;
         this.inputDir.value         = p.dir;
         this.inputFchNac.value      = p.fchNac;
+        this.inputNotas             = p.notas;
         this.inputTipo.value        = p.tipo;
         this.setState({activo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
         if (p.tipo === pacientePrivado){
