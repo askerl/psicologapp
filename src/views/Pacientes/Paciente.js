@@ -28,6 +28,9 @@ import Widget02 from '../Widgets/Widget02';
 import Toggle from 'react-toggle';
 import Loader from 'react-loaders';
 
+import moment from 'moment';
+moment.locale("es");
+
 class Paciente extends Component {
 
     constructor(props) {
@@ -101,6 +104,9 @@ class Paciente extends Component {
         this.inputApellido.value    = p.apellido;
         this.inputDNI.value         = p.dni;
         this.inputTel.value         = p.tel;
+        this.inputTelFlia.value     = p.telFlia;
+        this.inputDir.value         = p.dir;
+        this.inputFchNac.value      = p.fchNac;
         this.inputTipo.value        = p.tipo;
         this.setState({activo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
         if (p.tipo === pacientePrivado){
@@ -176,6 +182,10 @@ class Paciente extends Component {
                 "apellido": this.inputApellido.value || null,
                 "dni": this.inputDNI.value || null,
                 "tel": this.inputTel.value || null,
+                "fchNac": this.inputFchNac.value || null,
+                "telFlia": this.inputTelFlia.value || null,
+                "dir": this.inputDir.value || null,
+                "notas": this.inputNotas.value || null,
                 "tipo": this.inputTipo.value || null
             };
 
@@ -330,12 +340,45 @@ class Paciente extends Component {
                                             </Col>
                                             <Col xs="12" sm="6">
                                                 <FormGroup>
+                                                    <Label htmlFor="fchNac">Fecha de nacimiento</Label>
+                                                    <InputGroup>
+                                                        <InputGroupAddon><i className="fa fa-calendar"></i></InputGroupAddon>
+                                                        <Input type="date" id="fchNac" name="Fecha nacimiento" innerRef={el => this.inputFchNac = el} />
+                                                    </InputGroup>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col xs="12" sm="6">
+                                                <FormGroup>
                                                     <Label htmlFor="tel">Teléfono</Label>
                                                     <InputGroup>
                                                         <InputGroupAddon><i className="fa fa-phone"></i></InputGroupAddon>
                                                         <Input type="text" id="tel" innerRef={el => this.inputTel = el} />
                                                     </InputGroup>
                                                     <FormText>ej: 1134567890</FormText>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col xs="12" sm="6">
+                                                <FormGroup>
+                                                    <Label htmlFor="telFlia">Contacto familiar</Label>
+                                                    <InputGroup>
+                                                        <InputGroupAddon><i className="fa fa-phone-square"></i></InputGroupAddon>
+                                                        <Input type="text" id="telFlia" innerRef={el => this.inputTelFlia = el} />
+                                                    </InputGroup>
+                                                    <FormText>ej: 11123456780 - padre/madre</FormText>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col xs="12">
+                                                <FormGroup>
+                                                    <Label htmlFor="dir">Dirección</Label>
+                                                    <InputGroup>
+                                                        <InputGroupAddon><i className="fa fa-address-book-o"></i></InputGroupAddon>
+                                                        <Input type="text" id="dir" innerRef={el => this.inputDir = el} />
+                                                    </InputGroup>
+                                                    <FormText>ej: Rivadavia 3456</FormText>
                                                 </FormGroup>
                                             </Col>
                                         </Row>
@@ -436,6 +479,17 @@ class Paciente extends Component {
                                                 </Col>
                                             </Row>                                    
                                         }
+                                        <Row>
+                                            <Col xs="12">
+                                                <FormGroup>
+                                                    <Label htmlFor="notas">Notas</Label>
+                                                    <InputGroup>
+                                                        <InputGroupAddon><i className="fa fa-book"></i></InputGroupAddon>
+                                                        <Input type="textarea" id="notas" innerRef={el => this.inputNotas = el} rows="3" />
+                                                    </InputGroup>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>                      
                                     </Form>
                                 </CardBody>
                                 <CardFooter>

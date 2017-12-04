@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import {HashRouter, Route, Switch, BrowserRouter} from 'react-router-dom';
 
 // Styles
+
+// CSS for datepickers
+
 // Import Font Awesome Icons Set
 import 'font-awesome/css/font-awesome.min.css';
 // Import Simple Line Icons Set
