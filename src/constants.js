@@ -1,3 +1,5 @@
+import db from './fire';
+
 export const tipoPaciente = [
     { key: "O", name: "Obra social"},
     { key: "P", name: "Privado"}
@@ -26,3 +28,26 @@ export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
     let porcRestantes = sesionesAut > 0 ? (sesionesAut - sesiones)/ sesionesAut * 100 : 0 ;
     return {porcUsadas, porcRestantes};
 }
+
+export const cargarPrepagas = () => {
+    let promise = new Promise( (resolve, reject) => {
+        let prepagas = [], filtroPrepagas = {};
+        if (window.prepagas && window.filtroPrepagas){
+            resolve(console.log('variables from cache', window.prepagas, window.filtroPrepagas));
+        } else {
+            // query database
+            db.collection("prepagas").get().then( querySnapshot => {
+                querySnapshot.docs.forEach( doc => {            
+                    let prepaga = doc.data();
+                    prepaga.id = doc.id;          
+                    prepagas.push(prepaga);
+                    filtroPrepagas[prepaga.id] = prepaga.nombre;
+                });
+                window.prepagas = prepagas;
+                window.filtroPrepagas = filtroPrepagas;
+                resolve(console.log('cargo variables en window', window.prepagas, window.filtroPrepagas));
+            });
+        }
+    });
+    return promise;
+}    

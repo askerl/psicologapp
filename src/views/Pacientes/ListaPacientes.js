@@ -13,7 +13,7 @@ import {
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones } from '../../constants';
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas } from '../../constants';
 
 class ListaPacientes extends Component {
 	constructor(props) {
@@ -35,18 +35,12 @@ class ListaPacientes extends Component {
 	componentWillMount(){
 		this.loading(true);
 
-		// cargo filtro
-		db.collection("prepagas").get().then( querySnapshot => {
-			let filtroPrepagas = {};
-			querySnapshot.docs.forEach( doc => {            
-				filtroPrepagas[doc.id] = doc.data().nombre;
+		cargarPrepagas().then( () => {
+			this.setState({filtroPrepagas: window.filtroPrepagas});
+			db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
+				this.loadPacientes(querySnapshot);
+				this.loading(false);
 			});
-			this.setState({filtroPrepagas});
-		});
-
-        db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
-			this.loadPacientes(querySnapshot);
-			this.loading(false);
 		});
 	
 	}

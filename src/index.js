@@ -18,7 +18,7 @@ import '../scss/core/_dropdown-menu-right.scss'
 import 'react-notifications/lib/notifications.css';
 
 // Containers
-import Full from './containers/Full'
+import Full from './containers/Full';
 
 ReactDOM.render((
   <HashRouter>

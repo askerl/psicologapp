@@ -22,7 +22,7 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones } from '../../constants';
+import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, cargarPrepagas } from '../../constants';
 import Widget01 from '../Widgets/Widget01';
 import Widget02 from '../Widgets/Widget02';
 import Toggle from 'react-toggle';
@@ -75,24 +75,21 @@ class Paciente extends Component {
         let nuevo = id === 'new';
         this.setState({id, nuevo});
 
-        // cargo combos de prepagas
-        db.collection("prepagas").get().then( querySnapshot => {
-            let prepagas = [];
-            querySnapshot.docs.forEach( doc => {            
-                let prepaga = {id: doc.id, data: doc.data()}
-                prepagas.push(prepaga);
-            });
-            this.setState({prepagas: [...prepagas].concat([])});
-        });
+        this.loading(true);
 
-        if (!nuevo){
-            this.loading(true);
-            db.collection("pacientes").doc(id).get().then( pac => {
-                console.log(pac.id, pac.data());
-                this.loadPaciente(pac.data());
+        cargarPrepagas().then( () => {
+            this.setState({prepagas: window.prepagas});
+            if (!nuevo){                
+                db.collection("pacientes").doc(id).get().then( pac => {
+                    console.log(pac.id, pac.data());
+                    this.loadPaciente(pac.data());
+                    this.loading(false);
+                });
+            } else {
                 this.loading(false);
-            });
-        }
+            }
+        });
+        
     }
 
     loading(val){
@@ -159,7 +156,7 @@ class Paciente extends Component {
         let pagos = [];
         this.state.prepagas.forEach( el => {
             if (el.id === prepaga) {
-                pagos = [...el.data.pagos].concat([]);
+                pagos = [...el.pagos].concat([]);
                 return;
             }
         })
@@ -194,7 +191,7 @@ class Paciente extends Component {
                 paciente.valorConsulta = this.inputValorConsulta.value || null;
             } else {
                 paciente.prepaga = this.inputPrepaga.value || null;
-                paciente.pago = parseInt(this.inputPago.value) || null;
+                paciente.pago = parseInt(this.inputPago.value);
                 paciente.sesionesAut = parseInt(this.inputSesiones.value) || 0;
                 paciente.credencial = this.inputCredencial.value || null;
             }
@@ -428,7 +425,7 @@ class Paciente extends Component {
                                                         <Input type="select" name="prepaga" id="prepaga" innerRef={ el => this.inputPrepaga = el } required 
                                                             onChange={this.changePrepaga} className={this.state.errorPrepaga ? 'is-invalid' : ''}>
                                                             <option value="">Seleccione prepaga...</option>
-                                                            {this.state.prepagas.map( item => <option key={item.id} value={item.id}>{item.data.nombre}</option>)}
+                                                            {this.state.prepagas.map( item => <option key={item.id} value={item.id}>{item.nombre}</option>)}
                                                         </Input>
                                                         <FormFeedback>{errores.prepagaVacia}</FormFeedback>
                                                     </FormGroup>
@@ -486,7 +483,7 @@ class Paciente extends Component {
                                                     <Label htmlFor="notas">Notas</Label>
                                                     <InputGroup>
                                                         <InputGroupAddon><i className="fa fa-book"></i></InputGroupAddon>
-                                                        <Input type="textarea" id="notas" innerRef={el => this.inputNotas = el} rows="3" />
+                                                        <Input type="textarea" id="notas" innerRef={el => this.inputNotas = el} rows="2" />
                                                     </InputGroup>
                                                 </FormGroup>
                                             </Col>

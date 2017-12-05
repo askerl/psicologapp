@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, cloneElement} from 'react';
 import {Link, Switch, Route, Redirect} from 'react-router-dom';
 import {Container} from 'reactstrap';
 import Header from '../../components/Header/';
@@ -13,7 +13,10 @@ import Paciente from '../../views/Pacientes/Paciente';
 
 import {NotificationContainer} from 'react-notifications';
 
+import db from '../../fire';
+
 class Full extends Component {
+
   render() {
     return (
       <div className="app">
