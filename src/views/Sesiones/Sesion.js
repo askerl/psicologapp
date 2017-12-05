@@ -38,7 +38,7 @@ class Sesion extends Component {
             id: '',
             selectedOption: [],
             nuevo: true,
-            prepagas: [],
+            prepagasById: [],
             pacientes: [],
             errorFecha: false,
             errorPacientes: false
@@ -61,7 +61,7 @@ class Sesion extends Component {
         this.loading(true);
 
         cargarPrepagas().then( () => {
-            this.setState({prepagas: window.prepagas});            
+            this.setState({prepagasById: window.prepagasById});            
             db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
                 this.loadPacientes(querySnapshot);
                 this.loading(false);
@@ -73,7 +73,7 @@ class Sesion extends Component {
     loadPacientes(querySnapshot){
 		let pacientes = [];
 		querySnapshot.docs.forEach( doc => {            
-			let paciente = {};
+			let paciente = doc.data();
             paciente.value = doc.id;
             paciente.label = `${doc.data().apellido}, ${doc.data().nombre}`;			
 			pacientes.push(paciente);
@@ -84,30 +84,6 @@ class Sesion extends Component {
     
     loading(val){
         this.setState({loading: val});
-    }
-
-    loadPaciente(p){
-        this.inputNombre.value      = p.nombre;
-        this.inputApellido.value    = p.apellido;
-        this.inputDNI.value         = p.dni;
-        this.inputTel.value         = p.tel;
-        this.inputTelFlia.value     = p.telFlia;
-        this.inputDir.value         = p.dir;
-        this.inputFchNac.value      = p.fchNac;
-        this.inputNotas             = p.notas;
-        this.inputTipo.value        = p.tipo;
-        this.setState({activo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
-        if (p.tipo === pacientePrivado){
-            this.inputValorConsulta.value = p.valorConsulta; 
-        } else {
-            this.inputPrepaga.value     = p.prepaga;
-            this.setState({pagos: this.getPagosPrepaga(p.prepaga)});
-            this.inputPago.value        = p.pago;
-            this.inputCredencial.value  = p.credencial;
-            this.inputSesiones.value    = p.sesionesAut;
-            this.setState({sesionesAut: p.sesionesAut});
-            this.porcentajesSesiones(p.sesionesAut, p.sesiones);
-        }
     }
 
     saveSesion(e){
@@ -138,7 +114,7 @@ class Sesion extends Component {
                         if (sesionesFecha[pac.value]){
                             warning = true;
                         } else {
-                            batch.set(newSession, {fecha: this.inputFecha.value, paciente: pac.value});
+                            batch.set(newSession, this.createSesion());
                         }
                     });
     
@@ -169,6 +145,19 @@ class Sesion extends Component {
             this.loading(false);
         }
     
+    }
+
+    createSesion(p){
+
+        let sesion = {
+            fecha: this.inputFecha.value,
+            paciente: p.value,
+            // determinar campos por tipo de paciente (privado/prepaga)
+            
+        }
+
+        return sesion;
+
     }
 
     goBack(){

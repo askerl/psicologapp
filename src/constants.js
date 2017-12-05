@@ -33,7 +33,7 @@ export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
 
 export const cargarPrepagas = () => {
     let promise = new Promise( (resolve, reject) => {
-        let prepagas = [], filtroPrepagas = {};
+        let prepagas = [], filtroPrepagas = {}, prepagasById = {};
         if (window.prepagas && window.filtroPrepagas){
             resolve(console.log('variables from cache', window.prepagas, window.filtroPrepagas));
         } else {
@@ -44,10 +44,12 @@ export const cargarPrepagas = () => {
                     prepaga.id = doc.id;          
                     prepagas.push(prepaga);
                     filtroPrepagas[prepaga.id] = prepaga.nombre;
+                    prepagasById[prepaga.id] = prepaga;
                 });
                 window.prepagas = prepagas;
                 window.filtroPrepagas = filtroPrepagas;
-                resolve(console.log('cargo variables en window', window.prepagas, window.filtroPrepagas));
+                window.prepagasById = prepagasById;
+                resolve(console.log('cargo variables en window', window.prepagas, window.filtroPrepagas, window.prepagasById));
             });
         }
     });
