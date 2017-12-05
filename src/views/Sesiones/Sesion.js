@@ -117,7 +117,34 @@ class Sesion extends Component {
 
         if(this.validate()){
 
-            this.loading(false);
+            let selPacientes = this.state.selectedOption;
+
+
+            if (this.state.nuevo) {
+                // Get a new write batch
+                let batch = db.batch();
+                
+                let warning = false;
+
+                selPacientes.forEach( pac => {
+                    let newSession = db.collection("sesiones").doc();
+                    batch.set(newSession, {fecha: this.inputFecha.value, paciente: pac.value});
+                });
+
+                // Commit the batch
+                batch.commit().then(() => {
+                    this.loading(false);
+                    console.log("Sesiones generadas correctamente");
+                    NotificationManager.success('Los datos han sido guardados');
+                    this.goBack();
+                })
+                .catch((error) => {
+                    console.error("Error generando sesiones: ", error);
+                    NotificationManager.error(errores.errorGuardar, 'Error');
+                    this.loading(false);
+                });
+
+            }
        
         } else {
             this.loading(false);
