@@ -122,10 +122,8 @@ class Sesion extends Component {
 
             if (this.state.nuevo) {
                 // Get a new write batch
-                let batch = db.batch();
-                
+                let batch = db.batch();                
                 let warning = false;
-
                 let sesionesFecha = {};
 
                 db.collection("sesiones").where("fecha", "==", this.inputFecha.value)
@@ -161,9 +159,9 @@ class Sesion extends Component {
                 })
                 .catch(function(error) {
                     console.log("Error obteniendo sesiones en fecha: ", error);
+                    NotificationManager.error("Error al obtener las sesiones de la fecha", 'Error');
+                    this.loading(false);
                 });
-
-                
 
             }
        
