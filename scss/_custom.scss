@@ -45,6 +45,16 @@ span.thTitle{
     border-radius: 0;
 }
 
-.Select--multi .Select-value{
-    
+.Select.is-focused:not(.is-open) > .Select-control{
+    border-color: #8ad4ee;
+    box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.25);
+}
+
+.Select--multi{
+    &:focus{
+        outline: none;
+    }
+    .Select-value{
+        color: $dark;
+    }
 }
