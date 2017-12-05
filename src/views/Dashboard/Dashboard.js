@@ -124,29 +124,29 @@ class Dashboard extends Component {
 							<Card>
 								<CardBody>
 									<Row>
-										<Col>
-											<Widget02 header={`${data.total}`} mainText="Pacientes" icon="icon-people icons" color="primary" variant="1"/>
+										<Col xs="12" sm="6">
+											<Widget02 header={`${data.activos}`} mainText="Pacientes" icon="icon-people icons" color="success" variant="1"/>
+										</Col>
+										<Col xs="12" sm="6">
+											<Widget02 header={`${data.inactivos}`} mainText="Inactivos" icon="icon-user-unfollow icons" color="warning" variant="1"/>
 										</Col>
 									</Row>
-									<Row>
-										<Col xs="6" sm="3">
-											<Callout title="Privados" color="dark" value={data.privados}/>
-										</Col>
-										<Col xs="6" sm="3">
-											<Callout title="Obra social" color="primary" value={data.obraSocial}/>											
-										</Col>
-										<Col xs="6" sm="3">
+									<span className="h6">Estadísticas</span>
+									<Row className="d-none d-sm-flex">
+										<Col xs="4" sm="4">
 											<Callout title="Activos" color="success" value={data.activos}/>											
 										</Col>
-										<Col xs="6" sm="3">
-											<Callout title="Inactivos" color="danger" value={data.inactivos}/>											
+										<Col xs="4" sm="4">
+											<Callout title="Privados" color="dark" value={data.privadosActivos}/>
 										</Col>
+										<Col xs="4" sm="4">
+											<Callout title="Obra social" color="primary" value={data.obraSocialActivos}/>											
+										</Col>										
 									</Row>
 									<hr className="mt-0"/>
 									<Row>
-										<Col>
-											<span className="h6">Pacientes activos</span>
-											<ul className="horizontal-bars type-2">
+										<Col>											
+											<ul className="horizontal-bars type-2">																								
 												<li>
 													<StatItem title="Privados" icon="icon-user" value={data.privadosActivos} porc={data.porcPrivados} color="dark"/>
 												</li>
@@ -155,13 +155,6 @@ class Dashboard extends Component {
 												</li>
 												<li className="divider"></li>
 												{ data.prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon="icon-grid" value={data[item.id]} porc={item.porc} color="info"/></li>)}
-												<li className="divider"></li>
-												<li>
-													<StatItem title="Activos" icon="icon-user-following" value={data.activos} porc={data.porcActivos} color="success"/>
-												</li>
-												<li>
-													<StatItem title="Inactivos" icon="icon-user-unfollow" value={data.inactivos} porc={data.porcInactivos} color="danger"/>
-												</li>
 											</ul>
 										</Col>
 									</Row>
