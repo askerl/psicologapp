@@ -27,7 +27,6 @@ const Callout = ({title, color, value}) => {
 }
 
 const StatItem = ({title, porc, value, icon, color}) => {
-	console.log('value', value);
 	let legend = value !== undefined ? <span className="value">{value} <span className="text-muted small">{`(${porc}%)`}</span></span> : <span className="value">{`${porc}%`}</span>;
 	return(
 		<div>
@@ -53,7 +52,9 @@ class Dashboard extends Component {
 			activos: 0,
 			inactivos: 0,
 			privados: 0,
-			obraSocial: 0
+			obraSocial: 0,
+			privadosActivos: 0,
+			obraSocialActivos: 0
 		};
 
 	}
@@ -80,19 +81,28 @@ class Dashboard extends Component {
 					switch (pac.tipo) {
 						case pacientePrepaga:
 							data.obraSocial += 1;
-							data[pac.prepaga] += 1;
+							if (pac.activo) {
+								data.obraSocialActivos += 1 ;
+								data[pac.prepaga] += 1;
+							}
 							break;
 						case pacientePrivado:
 							data.privados += 1;
+							if (pac.activo) data.privadosActivos += 1 ;
 							break;
 					}
 				});
 				// percentages
-				data.porcPrivados = data.total > 0 ? (data.privados / data.total * 100) : 0;
-				data.porcObrasocial = data.total > 0 ? (data.obraSocial / data.total * 100) : 0;
 				data.porcActivos = data.total > 0 ? (data.activos / data.total * 100) : 0;
 				data.porcInactivos = data.total > 0 ? (data.inactivos / data.total * 100) : 0;
 
+				// porcentajes activos
+				data.porcPrivados = data.activos > 0 ? (data.privadosActivos / data.activos * 100) : 0;
+				data.porcObrasocial = data.activos > 0 ? (data.obraSocialActivos / data.activos * 100) : 0;
+
+				data.prepagas.forEach( i => {
+					i.porc = data.obraSocialActivos > 0 ? (data[i.id] / data.obraSocialActivos * 100) : 0;
+				});
 				console.log('data', data);
 
 				this.setState(data);
@@ -119,37 +129,38 @@ class Dashboard extends Component {
 										</Col>
 									</Row>
 									<Row>
-										<Col sm="3">
+										<Col xs="6" sm="3">
 											<Callout title="Privados" color="dark" value={data.privados}/>
 										</Col>
-										<Col sm="3">
+										<Col xs="6" sm="3">
 											<Callout title="Obra social" color="primary" value={data.obraSocial}/>											
 										</Col>
-										<Col sm="3">
+										<Col xs="6" sm="3">
 											<Callout title="Activos" color="success" value={data.activos}/>											
 										</Col>
-										<Col sm="3">
+										<Col xs="6" sm="3">
 											<Callout title="Inactivos" color="danger" value={data.inactivos}/>											
 										</Col>
 									</Row>
 									<hr className="mt-0"/>
 									<Row>
-										<Col>										
+										<Col>
+											<span className="h6">Pacientes activos</span>
 											<ul className="horizontal-bars type-2">
 												<li>
-													<StatItem title="Privados" icon="icon-user" porc={data.porcPrivados} color="dark"/>
+													<StatItem title="Privados" icon="icon-user" value={data.privadosActivos} porc={data.porcPrivados} color="dark"/>
 												</li>
 												<li>
-													<StatItem title="Obra social" icon="icon-user-follow" porc={data.porcObrasocial} color="primary"/>
+													<StatItem title="Obra social" icon="icon-user-follow" value={data.obraSocialActivos} porc={data.porcObrasocial} color="primary"/>
 												</li>
 												<li className="divider"></li>
-												{ data.prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon="icon-grid" value={data[item.id]} porc={70} color="info"/></li>)}
+												{ data.prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon="icon-grid" value={data[item.id]} porc={item.porc} color="info"/></li>)}
 												<li className="divider"></li>
 												<li>
-													<StatItem title="Activos" icon="icon-user-following" porc={data.porcActivos} color="success"/>
+													<StatItem title="Activos" icon="icon-user-following" value={data.activos} porc={data.porcActivos} color="success"/>
 												</li>
 												<li>
-													<StatItem title="Inactivos" icon="icon-user-unfollow" porc={data.porcInactivos} color="danger"/>
+													<StatItem title="Inactivos" icon="icon-user-unfollow" value={data.inactivos} porc={data.porcInactivos} color="danger"/>
 												</li>
 											</ul>
 										</Col>
