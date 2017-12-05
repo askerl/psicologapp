@@ -126,23 +126,44 @@ class Sesion extends Component {
                 
                 let warning = false;
 
-                selPacientes.forEach( pac => {
-                    let newSession = db.collection("sesiones").doc();
-                    batch.set(newSession, {fecha: this.inputFecha.value, paciente: pac.value});
+                let sesionesFecha = {};
+
+                db.collection("sesiones").where("fecha", "==", this.inputFecha.value)
+                .get()
+                .then((result) => {
+                    result.forEach((doc) =>{
+                        sesionesFecha[doc.data().paciente] = true;
+                    });
+
+                    selPacientes.forEach( pac => {
+                        let newSession = db.collection("sesiones").doc();
+                        if (sesionesFecha[pac.value]){
+                            warning = true;
+                        } else {
+                            batch.set(newSession, {fecha: this.inputFecha.value, paciente: pac.value});
+                        }
+                    });
+    
+                    //Commit the batch
+                    batch.commit().then(() => {
+                        this.loading(false);
+                        console.log("Sesiones generadas correctamente");
+                        NotificationManager.success('Los datos han sido guardados');
+                        NotificationManager.warning('Algunas sesiones ya estaban cargadas');
+                        this.goBack();
+                    })
+                    .catch((error) => {
+                        console.error("Error generando sesiones: ", error);
+                        NotificationManager.error(errores.errorGuardar, 'Error');
+                        this.loading(false);
+                    });
+
+                })
+                .catch(function(error) {
+                    console.log("Error obteniendo sesiones en fecha: ", error);
                 });
 
-                // Commit the batch
-                batch.commit().then(() => {
-                    this.loading(false);
-                    console.log("Sesiones generadas correctamente");
-                    NotificationManager.success('Los datos han sido guardados');
-                    this.goBack();
-                })
-                .catch((error) => {
-                    console.error("Error generando sesiones: ", error);
-                    NotificationManager.error(errores.errorGuardar, 'Error');
-                    this.loading(false);
-                });
+                
 
             }
        
