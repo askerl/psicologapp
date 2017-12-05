@@ -17,6 +17,8 @@ import '../scss/core/_dropdown-menu-right.scss'
 // CSS for notifications
 import 'react-notifications/lib/notifications.css';
 
+import 'react-select/dist/react-select.css';
+
 // Containers
 import Full from './containers/Full';
 

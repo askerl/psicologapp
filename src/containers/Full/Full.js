@@ -10,6 +10,8 @@ import Footer from '../../components/Footer/';
 import Dashboard from '../../views/Dashboard/';
 import ListaPacientes from '../../views/Pacientes/ListaPacientes';
 import Paciente from '../../views/Pacientes/Paciente';
+import ListaSesiones from '../../views/Sesiones/ListaSesiones';
+import Sesion from '../../views/Sesiones/Sesion';
 
 import {NotificationContainer} from 'react-notifications';
 
@@ -30,6 +32,8 @@ class Full extends Component {
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                 <Route exact path="/pacientes" name="Pacientes" component={ListaPacientes}/>
                 <Route path='/pacientes/:id' name="Paciente" component={Paciente}/>
+                <Route exact path="/sesiones" name="Sesiones" component={ListaSesiones}/>
+                <Route path='/sesiones/:id' name="Sesion" component={Sesion}/>
                 <Redirect from="/" to="/dashboard"/>                
               </Switch>
               <NotificationContainer enterTimeout={200}/>

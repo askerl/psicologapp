@@ -15,11 +15,11 @@ import Loader from 'react-loaders';
 import db from '../../fire';
 import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas } from '../../constants';
 
-class ListaPacientes extends Component {
+class ListaSesiones extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			pacientes: [],
+			sesiones: [],
 			filtroPrepagas: {},
 			loading: false
 		};
@@ -28,7 +28,7 @@ class ListaPacientes extends Component {
 		this.priceFormatter = this.priceFormatter.bind(this);
 		this.tipoFormatter = this.tipoFormatter.bind(this);
 		this.restantesFormatter = this.restantesFormatter.bind(this);
-		this.nuevoPaciente = this.nuevoPaciente.bind(this);
+		this.nuevaSesion = this.nuevaSesion.bind(this);
 		this.loading = this.loading.bind(this);
 	}
 
@@ -63,8 +63,8 @@ class ListaPacientes extends Component {
         this.setState({loading: val});
     }
 
-	nuevoPaciente(){
-		this.props.history.push('/pacientes/new');
+	nuevaSesion(){
+		this.props.history.push('/sesiones/new');
 	}
 
 	actionsFormatter(cell, row) {
@@ -118,30 +118,30 @@ class ListaPacientes extends Component {
 	render() {
 
 		const options = {
-			noDataText: 'No hay pacientes registrados',
+			noDataText: 'No hay sesiones registradas',
 			onFilterChange: this.onFilterChange
 		}
 
 		return (
 			<div className="animated fadeIn">
 				<Loader type="ball-scale-ripple-multiple" active={this.state.loading} />
-				<div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn listaPacientes"}>                
+				<div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn listaSesiones"}>                
 					<Row>
 						<Col>
 							<Card>
 								<CardHeader>
-									<i className="fa fa-address-book-o"></i> Pacientes
+									<i className="fa fa-comments"></i> Sesiones
 								</CardHeader>
 								<CardBody>
 									<div className="d-flex flex-row mb-1">
 										<div className="mr-auto">
-											<Button color="primary" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus"></i> Nuevo paciente</Button>
+											<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus"></i> Nueva sesion</Button>
 										</div>
 									</div>
 									<BootstrapTable ref="table" version='4'
-										data={this.state.pacientes}
+										data={this.state.sesiones}
 										bordered={false}
-										striped hover
+										striped hover condensed
 										options={options}
 										>
 										<TableHeaderColumn 
@@ -199,4 +199,4 @@ class ListaPacientes extends Component {
 
 }
 
-export default ListaPacientes;
+export default ListaSesiones;

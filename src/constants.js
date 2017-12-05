@@ -20,7 +20,9 @@ export const errores = {
     valorConsultaVacio: "Ingrese el valor de la consulta",
     prepagaVacia: "Seleccione la prepaga",
     pagoPrepagaVacio: "Seleccione el pago",
-    errorGuardar: "Ocurrió un error al guardar los datos"
+    errorGuardar: "Ocurrió un error al guardar los datos",
+    fechaVacia: "Ingrese la fecha",
+    pacientesVacios: "Seleccione algún paciente"
 }
 
 export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
