@@ -15,14 +15,13 @@ import {
     Label,
     Input,
     InputGroup,
-    InputGroupAddon,
-    InputGroupButton
+    InputGroupAddon
 } from 'reactstrap';
 
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, cargarPrepagas } from '../../constants';
+import { errores, cargarPrepagas, pacientePrepaga, pacientePrivado } from '../../constants';
 import Select from 'react-select';
 import Loader from 'react-loaders';
 
@@ -122,7 +121,9 @@ class Sesion extends Component {
                         this.loading(false);
                         console.log("Sesiones generadas correctamente");
                         NotificationManager.success('Los datos han sido guardados');
-                        NotificationManager.warning('Algunas sesiones ya estaban cargadas');
+                        if (warning) {
+                            NotificationManager.warning('Algunas sesiones ya estaban cargadas');
+                        }
                         this.goBack();
                     })
                     .catch((error) => {
@@ -157,6 +158,14 @@ class Sesion extends Component {
             anio: auxFecha.year(),
             paciente: p.value,
             // determinar campos por tipo de paciente (privado/prepaga)
+            tipo: p.tipo
+        }
+
+        if (p.tipo == pacientePrivado){
+            sesion.valor = p.valorConsulta;
+        } else {
+            sesion.prepaga = p.prepaga;
+            sesion.valor = prepagasById[p.prepaga].pagos[p.pago];
         }
 
         return sesion;
@@ -216,7 +225,7 @@ class Sesion extends Component {
                                             <Col xs="12" sm="6">
                                                 <FormGroup className="errorAddon">
                                                     <Label htmlFor="fchNac">Fecha</Label>
-                                                    <InputGroup>
+                                                    <InputGroup className="input-group-fecha">
                                                         <InputGroupAddon><i className="fa fa-calendar"></i></InputGroupAddon>
                                                         <Input type="date" id="fecha" name="Fecha" innerRef={el => this.inputFecha = el} onChange={this.changeFecha} />                                                        
                                                     </InputGroup>                                                    

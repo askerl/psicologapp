@@ -27,7 +27,7 @@ class Full extends Component {
           <Sidebar {...this.props}/>
           <main className="main">
             <Breadcrumb />
-            <Container fluid>
+            <Container fluid className="p-0 pl-sm-3 pr-sm-3">
               <Switch>
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                 <Route exact path="/pacientes" name="Pacientes" component={ListaPacientes}/>

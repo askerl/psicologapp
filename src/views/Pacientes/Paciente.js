@@ -188,7 +188,7 @@ class Paciente extends Component {
             };
 
             if (this.state.tipo === pacientePrivado){
-                paciente.valorConsulta = this.inputValorConsulta.value || null;
+                paciente.valorConsulta = this.inputValorConsulta.value || 0;
             } else {
                 paciente.prepaga = this.inputPrepaga.value || null;
                 paciente.pago = parseInt(this.inputPago.value);
