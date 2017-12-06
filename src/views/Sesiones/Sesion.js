@@ -95,7 +95,6 @@ class Sesion extends Component {
 
             let selPacientes = this.state.selectedOption;
 
-
             if (this.state.nuevo) {
                 // Get a new write batch
                 let batch = db.batch();                
@@ -133,7 +132,7 @@ class Sesion extends Component {
                     });
 
                 })
-                .catch(function(error) {
+                .catch((error) => {
                     console.log("Error obteniendo sesiones en fecha: ", error);
                     NotificationManager.error("Error al obtener las sesiones de la fecha", 'Error');
                     this.loading(false);
@@ -148,12 +147,16 @@ class Sesion extends Component {
     }
 
     createSesion(p){
+        let auxFecha = moment(this.inputFecha.value);
+        console.log('auxFecha', auxFecha.year(), auxFecha.month()+1, auxFecha.date());
 
         let sesion = {
             fecha: this.inputFecha.value,
+            dia: auxFecha.date(),
+            mes: auxFecha.month()+1,
+            anio: auxFecha.year(),
             paciente: p.value,
             // determinar campos por tipo de paciente (privado/prepaga)
-            
         }
 
         return sesion;
