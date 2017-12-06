@@ -113,7 +113,7 @@ class Sesion extends Component {
                         if (sesionesFecha[pac.value]){
                             warning = true;
                         } else {
-                            batch.set(newSession, this.createSesion());
+                            batch.set(newSession, this.createSesion(pac));
                         }
                     });
     
