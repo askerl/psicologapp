@@ -23,6 +23,13 @@ div {
     #activo-label{
         margin-right: 3px;
     }
+    .card{
+        margin-bottom: 1rem;
+    }
+    .reset-sesiones{
+        color: teal;
+        font-weight: bolder;
+    }
 }
 
 td:focus{
@@ -76,4 +83,23 @@ span.thTitle{
             width: 70px;
         }
     }
+}
+
+.input-toggle{
+    height: 35px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    .react-toggle--checked .react-toggle-track {
+        background-color: $info;
+    }
+
+    .react-toggle-track {
+        background-color: $warning;
+    }
+
+    .react-toggle--checked .react-toggle-thumb {        
+        border-color: $info;
+    }
+
 }

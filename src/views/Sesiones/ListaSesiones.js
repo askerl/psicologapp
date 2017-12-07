@@ -72,12 +72,15 @@ class ListaSesiones extends Component {
 	}
 
 	cargarSesiones(){
-		db.collection("sesiones")
-		.orderBy("anio","desc").orderBy("mes","desc").orderBy("dia","desc")
-		.get().then( querySnapshot => {			
-			this.loadSesiones(querySnapshot);
-			this.loading(false);
-		});
+		// db.collection("sesiones")
+		// .orderBy("anio","desc").orderBy("mes","desc").orderBy("dia","desc")
+		// .get().then( querySnapshot => {			
+		// 	this.loadSesiones(querySnapshot);
+		// 	this.loading(false);
+		// });
+
+		this.loading(false);
+
 	}
 
 	loadSesiones(querySnapshot){
@@ -203,87 +206,58 @@ class ListaSesiones extends Component {
 									<div className="d-flex flex-row mb-2 mr-auto">
 										<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus"></i> Nueva sesión</Button>
 										<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser"></i> Borrar sesiones</Button>
-										<Button color="dark" size="lg" onClick={()=>{
+										<Button color="dark" size="sm" onClick={()=>{
 										
-										let batch = db.batch();
+											let batch = db.batch();
+											this.loading(true);
 
-										this.loading(true);
-										for (let index = 0; index < 100; index++) {
-											let newSession = db.collection("sesiones").doc();
-											batch.set(newSession, {												
-												fecha: '2017-12-12',
-												paciente: 'CdnL0BZCCknL4Vkq4Bd0',
-												anio: 2017,
-												mes: 12,
-												dia: 12,
-												tipo: 'P',
-												valor: 100													
-											});
-										}
-										for (let index = 0; index < 100; index++) {
-											let newSession = db.collection("sesiones").doc();
-											batch.set(newSession, {
-												fecha: '2017-11-11',
-												paciente: 'CdnL0BZCCknL4Vkq4Bd0',
-												anio: 2017,
-												mes: 11,
-												dia: 11,
-												tipo: 'P',
-												valor: 100													
-											});											
-										}
-										for (let index = 0; index < 100; index++) {
-											let newSession = db.collection("sesiones").doc();
-											batch.set(newSession, {
-												fecha: '2017-10-10',
-												paciente: 'CdnL0BZCCknL4Vkq4Bd0',
-												anio: 2017,
-												mes: 10,
-												dia: 10,
-												tipo: 'P',
-												valor: 100														
-											});
-										}
-										for (let index = 0; index < 100; index++) {
-											let newSession = db.collection("sesiones").doc();
-											batch.set(newSession, {
-												fecha: '2017-09-09',
-												paciente: 'CdnL0BZCCknL4Vkq4Bd0',
-												anio: 2017,
-												mes: 9,
-												dia: 9,
-												tipo: 'P',
-												valor: 100													
+											let mes = 12;
+											let paciente = '1itK8nRb4nPcQYujIut6'; // alfredo
+											for (let dia = 1; dia <= 23; dia++) {
+												for (let index = 0; index < 10; index++) {
+													let newSession = db.collection("sesiones").doc();
+													batch.set(newSession, {												
+														fecha: `2017-${mes}-${dia}`,
+														paciente,
+														anio: 2017,
+														mes,
+														dia: 12,
+														tipo: 'P',
+														valor: 100										
+													});
+												}												
+											}
+											mes = 11;
+											paciente = 'wIdMqPhOydB7qzRF4CoM'; // ely
+											for (let dia = 1; dia <= 23; dia++) {
+												for (let index = 0; index < 10; index++) {
+													let newSession = db.collection("sesiones").doc();
+													batch.set(newSession, {												
+														fecha: `2017-${mes}-${dia}`,
+														paciente,
+														anio: 2017,
+														mes,
+														dia: 12,
+														tipo: 'P',
+														valor: 100										
+													});
+												}												
+											}
+											
+											//Commit the batch
+											batch.commit().then(() => {
+												this.loading(false);
+												console.log("Sesiones generadas correctamente");
+												NotificationManager.success('Los datos han sido guardados');
+												this.cargarSesiones();											
+											})
+											.catch((error) => {
+												console.error("Error generando sesiones: ", error);
+												NotificationManager.error(errores.errorGuardar, 'Error');
+												this.loading(false);
 											});
 
-										}
-										for (let index = 0; index < 100; index++) {
-											let newSession = db.collection("sesiones").doc();
-											batch.set(newSession, {
-												fecha: '2017-08-08',
-												paciente: 'CdnL0BZCCknL4Vkq4Bd0',
-												anio: 2017,
-												mes: 8,
-												dia: 8,
-												tipo: 'P',
-												valor: 100													
-											});
-										}
-						
-										//Commit the batch
-										batch.commit().then(() => {
-											this.loading(false);
-											console.log("Sesiones generadas correctamente");
-											NotificationManager.success('Los datos han sido guardados');
-											this.cargarSesiones();											
-										})
-										.catch((error) => {
-											console.error("Error generando sesiones: ", error);
-											NotificationManager.error(errores.errorGuardar, 'Error');
-											this.loading(false);
-										});
-
-										}}><i className="fa fa-eraser"></i> Cargar 500 sesiones</Button>
+										}}><i className="fa fa-eraser"></i> Cargar sesiones de prueba</Button>
 									</div>
 									<hr/>
 									<div className="filtros-sesiones mt-2 mb-2">

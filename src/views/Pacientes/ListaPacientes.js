@@ -73,7 +73,7 @@ class ListaPacientes extends Component {
 	
 	restantesFormatter(cell, row) {
 		let color;
-		if (row.porcRestantes > 50) {
+		if (row.porcRestantes > 80) {
 			color = "success";
 		} else if (row.porcRestantes > 10) {
 			color = "warning";
