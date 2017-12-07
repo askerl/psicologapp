@@ -75,6 +75,9 @@ span.thTitle{
 }    
 
 .listaSesiones {
+    tr{
+        cursor: pointer;
+    }
     hr{
         margin: 0;
     }

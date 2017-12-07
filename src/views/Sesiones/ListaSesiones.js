@@ -15,7 +15,7 @@ import {
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses } from '../../constants';
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter } from '../../constants';
 import { NotificationManager } from 'react-notifications';
 
 import moment from 'moment';
@@ -28,7 +28,7 @@ class ListaSesiones extends Component {
 			sesiones: [],
 			filtroPrepagas: {},
 			pacientesMap: {},
-			loading: false,
+			loading: true,
 			showDeleteModal: false,
 			selected: [],
 			filtroMes: '',
@@ -43,11 +43,11 @@ class ListaSesiones extends Component {
 		this.toggleDelete = this.toggleDelete.bind(this);
 		this.onSelectAll = this.onSelectAll.bind(this);
 		this.onRowSelect = this.onRowSelect.bind(this);
-		this.changeFiltros = this.changeFiltros.bind(this);
+		this.changePeriodo = this.changePeriodo.bind(this);
 		this.initFiltros = this.initFiltros.bind(this);
 	}
 
-	componentWillMount(){
+	componentDidMount(){
 		this.loading(true);
 		cargarPrepagas().then( () => {
 			this.initFiltros();
@@ -72,37 +72,32 @@ class ListaSesiones extends Component {
 	}
 
 	cargarSesiones(){
-		// db.collection("sesiones")
-		// .orderBy("anio","desc").orderBy("mes","desc").orderBy("dia","desc")
-		// .get().then( querySnapshot => {			
-		// 	this.loadSesiones(querySnapshot);
-		// 	this.loading(false);
-		// });
-
-		this.loading(false);
-
+		db.collection("sesiones")
+		.where("mes","==",parseInt(this.state.filtroMes))
+		.where("anio","==",parseInt(this.state.filtroAnio))		
+		.orderBy("dia","desc")
+		.get().then( querySnapshot => {			
+			this.loadSesiones(querySnapshot);
+			this.loading(false);
+		});
 	}
 
 	loadSesiones(querySnapshot){
-		console.log('querySnapshot', querySnapshot, querySnapshot.size);
 		let sesiones = [];
-		// let queryFilter = querySnapshot.docs.filter(e =>{
-		// 	return ( e.data().mes == this.state.filtroMes && e.data().anio == this.state.filtroAnio);
-		// });
-		// queryFilter.forEach( doc => {            
-		// 	let sesion = doc.data();
-		// 	sesion.id = doc.id;
-		// 	sesion.nombreCompleto = this.state.pacientesMap[sesion.paciente].nombreCompleto;
-		// 	sesiones.push(sesion);
-		// });
+		querySnapshot.docs.forEach( doc => {            
+			let sesion = doc.data();
+			sesion.id = doc.id;
+			sesion.nombreCompleto = this.state.pacientesMap[sesion.paciente].nombreCompleto;
+			sesiones.push(sesion);
+		});
 		this.setState({sesiones});
 		console.log('sesiones', this.state.sesiones);
 	}
 
 	loading(val){
         this.setState({loading: val});
-    }
-
+	}
+	
 	nuevaSesion(){
 		this.props.history.push('/sesiones/new');
 	}
@@ -165,22 +160,20 @@ class ListaSesiones extends Component {
 		return false;
 	}
 
-	changeFiltros(){
+	changePeriodo(){
 		this.setState({
 			filtroMes: this.inputMes.value,
-			filtroAnio: this.inputAnio.value
+			filtroAnio: this.inputAnio.value,
+			loading: true
 		}, () => {
-			console.log('Recargando sesiones...');
 			this.cargarSesiones();
 		});
-		
 	}
 	
 	render() {
 
 		const options = {
 			noDataText: 'No hay sesiones registradas',
-			onFilterChange: this.onFilterChange
 		}
 
 		const selectRowProp = {
@@ -200,12 +193,13 @@ class ListaSesiones extends Component {
 						<Col>
 							<Card>
 								<CardHeader>
-									<i className="fa fa-comments"></i> Sesiones
+									<i className="fa fa-comments fa-lg"></i> Sesiones
 								</CardHeader>
 								<CardBody>
 									<div className="d-flex flex-row mb-2 mr-auto">
 										<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus"></i> Nueva sesión</Button>
 										<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser"></i> Borrar sesiones</Button>
+										
 										<Button color="dark" size="sm" onClick={()=>{
 										
 											let batch = db.batch();
@@ -214,14 +208,14 @@ class ListaSesiones extends Component {
 											let mes = 12;
 											let paciente = '1itK8nRb4nPcQYujIut6'; // alfredo
 											for (let dia = 1; dia <= 23; dia++) {
-												for (let index = 0; index < 10; index++) {
+												for (let index = 0; index < 1; index++) {
 													let newSession = db.collection("sesiones").doc();
-													batch.set(newSession, {												
-														fecha: `2017-${mes}-${dia}`,
+													batch.set(newSession, {
+														fecha: moment(`${dia}/${mes}/${anio}`, 'D-M-YYYY').format('L'),
 														paciente,
 														anio: 2017,
 														mes,
-														dia: 12,
+														dia,
 														tipo: 'P',
 														valor: 100										
 													});
@@ -229,15 +223,15 @@ class ListaSesiones extends Component {
 											}
 											mes = 11;
 											paciente = 'wIdMqPhOydB7qzRF4CoM'; // ely
-											for (let dia = 1; dia <= 23; dia++) {
-												for (let index = 0; index < 10; index++) {
+											for (let dia = 5; dia <= 10; dia++) {
+												for (let index = 0; index < 1; index++) {
 													let newSession = db.collection("sesiones").doc();
-													batch.set(newSession, {												
-														fecha: `2017-${mes}-${dia}`,
+													batch.set(newSession, {	
+														fecha: moment(`${dia}/${mes}/${anio}`, 'D-M-YYYY').format('L'),
 														paciente,
 														anio: 2017,
 														mes,
-														dia: 12,
+														dia,
 														tipo: 'P',
 														valor: 100										
 													});
@@ -264,14 +258,14 @@ class ListaSesiones extends Component {
 										<Form inline>
 											<FormGroup>
 												<Label className="mr-1" htmlFor="mes">Mes</Label>
-												<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changeFiltros}>
+												<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
 													{ meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>)}						
 												</Input>
 											</FormGroup>
 											<FormGroup>
-												<Label className="mr-1" htmlFor="anio">Año</Label>
-												<Input type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changeFiltros} />
-											</FormGroup>
+												<Label className="ml-2" htmlFor="anio">Año</Label>
+												<Input className="ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
+											</FormGroup>											
 										</Form>
 									</div>
 									<BootstrapTable ref="table" version='4'
@@ -289,13 +283,14 @@ class ListaSesiones extends Component {
 										</TableHeaderColumn>										
 										<TableHeaderColumn
 											dataField='fecha'
-											dataFormat={ dateFormatter }
-											dataSort>
+											width="90"
+											>
 											<span className="thTitle">Fecha</span>
 										</TableHeaderColumn>										
 										<TableHeaderColumn
 											dataField='nombreCompleto'
-											dataSort>
+											dataSort
+											width="250">
 											<span className="thTitle">Paciente</span>
 										</TableHeaderColumn>										
 										<TableHeaderColumn 
@@ -312,13 +307,26 @@ class ListaSesiones extends Component {
 											<span className="thTitle">Prepaga</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn 
+											dataField='facturaPrepaga'
+											dataFormat={enumFormatter} formatExtraData={boolFormatter}
+											dataAlign="center"
+											>
+											<span className="thTitle">Factura</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn 
 											dataField='valor'
 											dataAlign='right'
 											dataFormat={ priceFormatter }
 											>
 											<span className="thTitle">Valor</span>
 										</TableHeaderColumn>
-										
+										<TableHeaderColumn 
+											dataField='copago'
+											dataAlign='right'
+											dataFormat={ priceFormatter }
+											>
+											<span className="thTitle">Copago</span>
+										</TableHeaderColumn>										
 									</BootstrapTable>
 								</CardBody>
 							</Card>

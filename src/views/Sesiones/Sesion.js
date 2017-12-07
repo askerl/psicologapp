@@ -21,7 +21,7 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { errores, cargarPrepagas, pacientePrepaga, pacientePrivado, tipoLoader } from '../../constants';
+import { errores, cargarPrepagas, pacientePrepaga, pacientePrivado, tipoLoader, createFechaSesion } from '../../constants';
 import Select from 'react-select';
 import Loader from 'react-loaders';
 
@@ -39,7 +39,6 @@ class Sesion extends Component {
             nuevo: true,
             prepagasById: [],
             pacientes: [],
-            fechaMoment: null,
             errorFecha: false,
             errorPacientes: false
         }; // <- set up react state
@@ -52,13 +51,15 @@ class Sesion extends Component {
         this.changeFecha = this.changeFecha.bind(this);
     }
 
-    componentWillMount(){
+    componentDidMount(){
         // id del paciente
         let id = this.props.match.params.id;
         let nuevo = id === 'new';
         this.setState({id, nuevo});
 
         this.loading(true);
+
+        this.inputFecha.value = moment().format('YYYY-MM-DD');
 
         cargarPrepagas().then( () => {
             this.setState({prepagasById: window.prepagasById});            
@@ -95,6 +96,8 @@ class Sesion extends Component {
 
             let selPacientes = this.state.selectedOption;
 
+            let fecha = createFechaSesion(this.inputFecha.value);
+
             if (this.state.nuevo) {
                 // Get a new write batch
                 let batch = db.batch();                
@@ -113,10 +116,10 @@ class Sesion extends Component {
                         if (sesionesFecha[pac.value]){
                             warning = true;
                         } else {
-                            batch.set(newSession, this.createSesion(pac));
+                            batch.set(newSession, this.createSesion(pac, fecha));
                         }
                     });
-    
+
                     //Commit the batch
                     batch.commit().then(() => {
                         this.loading(false);
@@ -148,15 +151,13 @@ class Sesion extends Component {
     
     }
 
-    createSesion(p){
-        let auxFecha = this.state.fechaMoment;
-        console.log('auxFecha', auxFecha.year(), auxFecha.month()+1, auxFecha.date());
-
+    createSesion(p,fecha){
+       
         let sesion = {
-            fecha: this.inputFecha.value,
-            dia: auxFecha.date(),
-            mes: auxFecha.month()+1,
-            anio: auxFecha.year(),
+            fecha: fecha.fechaString,
+            dia: fecha.dia,
+            mes: fecha.mes,
+            anio: fecha.anio,
             paciente: p.value,
             // determinar campos por tipo de paciente (privado/prepaga)
             tipo: p.tipo
@@ -167,6 +168,8 @@ class Sesion extends Component {
         } else {
             sesion.prepaga = p.prepaga;
             sesion.valor = prepagasById[p.prepaga].pagos[p.pago];
+            sesion.facturaPrepaga = p.facturaPrepaga;
+            sesion.copago = p.copago;
         }
 
         return sesion;
@@ -178,7 +181,12 @@ class Sesion extends Component {
     }
 
     changeFecha(){
-        this.setState({errorFecha: false, fechaMoment: moment(this.inputFecha.value) });
+        
+        
+
+        console.log('fecha', fecha);
+
+        this.setState({errorFecha: false });
         this.validate("fecha");
     }
 

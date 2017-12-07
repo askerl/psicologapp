@@ -21,7 +21,7 @@ class ListaPacientes extends Component {
 		this.state = {
 			pacientes: [],
 			filtroPrepagas: {},
-			loading: false
+			loading: true
 		};
 		this.actionsFormatter = this.actionsFormatter.bind(this);
 		this.restantesFormatter = this.restantesFormatter.bind(this);
@@ -29,7 +29,7 @@ class ListaPacientes extends Component {
 		this.loading = this.loading.bind(this);
 	}
 
-	componentWillMount(){
+	componentDidMount(){
 		this.loading(true);
 
 		cargarPrepagas().then( () => {
@@ -106,7 +106,7 @@ class ListaPacientes extends Component {
 						<Col>
 							<Card>
 								<CardHeader>
-									<i className="fa fa-address-book-o"></i> Pacientes
+									<i className="fa fa-address-book-o fa-lg"></i> Pacientes
 								</CardHeader>
 								<CardBody>
 									<div className="d-flex flex-row mb-1">
@@ -156,8 +156,7 @@ class ListaPacientes extends Component {
 											width="200"
 											>
 											<span className="thTitle">Sesiones restantes</span>
-										</TableHeaderColumn>
-										
+										</TableHeaderColumn>										
 									</BootstrapTable>
 								</CardBody>
 							</Card>

@@ -122,7 +122,7 @@ class Paciente extends Component {
         this.resetSesiones = this.resetSesiones.bind(this);
     }
 
-    componentWillMount(){
+    componentDidMount(){
         // id del paciente
         let id = this.props.match.params.id;
         let nuevo = id === 'new';
@@ -156,7 +156,7 @@ class Paciente extends Component {
         this.inputTel.value         = p.tel;
         this.inputTelFlia.value     = p.telFlia;
         this.inputDir.value         = p.dir;
-        this.inputFchNac.value      = p.fchNac;
+        this.inputFchNac.value      = moment(p.fchNac, "DD/MM/YYYY").format("YYYY-MM-DD");
         this.inputNotas.value       = p.notas;
         this.inputTipo.value        = p.tipo;
         this.setState({activo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
@@ -242,7 +242,7 @@ class Paciente extends Component {
                 "apellido": this.inputApellido.value || null,
                 "dni": this.inputDNI.value || null,
                 "tel": this.inputTel.value || null,
-                "fchNac": this.inputFchNac.value || null,
+                "fchNac": moment(this.inputFchNac.value).format('DD/MM/YYYY') || null,
                 "telFlia": this.inputTelFlia.value || null,
                 "dir": this.inputDir.value || null,
                 "notas": this.inputNotas.value || null,

@@ -84,6 +84,16 @@ export const pacientesMap = () => {
     return promise;
 }
 
+export const createFechaSesion = (value) =>{
+    let fecha = moment(value);
+    return {
+        fechaString: fecha.format('DD/MM/YYYY'),
+        dia: fecha.date(),
+        mes: fecha.month()+1,
+        anio: fecha.year()
+    }
+}
+
 // table formatters
 
 export const tipoFormatter = (cell, row) => {
@@ -108,7 +118,11 @@ export const prepagaFormatter = (cell, row) => {
     return window.filtroPrepagas[cell];
 }
 
-export const dateFormatter = (cell, row) => {
-    let fecha = moment(cell).format('L');
-    return fecha;
+export const enumFormatter = (cell, row, enumObject) =>{
+    return enumObject[cell];
+}
+
+export const boolFormatter = {
+    true: 'Sí',
+    false: 'No' 
 }
