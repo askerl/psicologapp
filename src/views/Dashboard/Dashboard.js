@@ -128,7 +128,7 @@ class Dashboard extends Component {
 											<Widget02 header={`${data.activos}`} mainText="Pacientes" icon="icon-people icons" color="success" variant="1"/>
 										</Col>
 										<Col xs="12" sm="6">
-											<Widget02 header={`${data.inactivos}`} mainText="Inactivos" icon="icon-user-unfollow icons" color="warning" variant="1"/>
+											<Widget02 header={`${data.inactivos}`} mainText="Inactivos" icon="icon-user-unfollow icons" color="danger" variant="1"/>
 										</Col>
 									</Row>
 									<span className="h6">Estadísticas</span>
@@ -137,7 +137,7 @@ class Dashboard extends Component {
 											<Callout title="Activos" color="success" value={data.activos}/>											
 										</Col>
 										<Col xs="4" sm="4">
-											<Callout title="Privados" color="dark" value={data.privadosActivos}/>
+											<Callout title="Privados" color="warning" value={data.privadosActivos}/>
 										</Col>
 										<Col xs="4" sm="4">
 											<Callout title="Obra social" color="primary" value={data.obraSocialActivos}/>											
@@ -148,13 +148,13 @@ class Dashboard extends Component {
 										<Col>											
 											<ul className="horizontal-bars type-2">																								
 												<li>
-													<StatItem title="Privados" icon="icon-user" value={data.privadosActivos} porc={data.porcPrivados} color="dark"/>
+													<StatItem title="Privados" icon="icon-user" value={data.privadosActivos} porc={data.porcPrivados} color="warning"/>
 												</li>
 												<li>
 													<StatItem title="Obra social" icon="icon-user-follow" value={data.obraSocialActivos} porc={data.porcObrasocial} color="primary"/>
 												</li>
 												<li className="divider"></li>
-												{ data.prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon="icon-grid" value={data[item.id]} porc={item.porc} color="info"/></li>)}
+												{ data.prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon="icon-plus" value={data[item.id]} porc={item.porc} color="info"/></li>)}
 											</ul>
 										</Col>
 									</Row>

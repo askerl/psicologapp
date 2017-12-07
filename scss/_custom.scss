@@ -66,3 +66,14 @@ span.thTitle{
 .breadcrumb {
     margin-bottom: 1rem;
 }    
+
+.listaSesiones {
+    hr{
+        margin: 0;
+    }
+    .filtros-sesiones{
+        input#anio{
+            width: 70px;
+        }
+    }
+}

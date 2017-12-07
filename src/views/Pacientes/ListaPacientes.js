@@ -13,7 +13,7 @@ import {
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas } from '../../constants';
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, prepagaFormatter, tipoLoader } from '../../constants';
 
 class ListaPacientes extends Component {
 	constructor(props) {
@@ -24,9 +24,6 @@ class ListaPacientes extends Component {
 			loading: false
 		};
 		this.actionsFormatter = this.actionsFormatter.bind(this);
-		this.prepagaFormatter = this.prepagaFormatter.bind(this);
-		this.priceFormatter = this.priceFormatter.bind(this);
-		this.tipoFormatter = this.tipoFormatter.bind(this);
 		this.restantesFormatter = this.restantesFormatter.bind(this);
 		this.nuevoPaciente = this.nuevoPaciente.bind(this);
 		this.loading = this.loading.bind(this);
@@ -53,6 +50,7 @@ class ListaPacientes extends Component {
 			paciente.sesionesRestantes = paciente.sesionesAut ? (paciente.sesionesAut - paciente.sesiones) : '';
 			let porcs = calcPorcentajesSesiones(paciente.sesionesAut, paciente.sesiones);
 			paciente.porcRestantes = porcs.porcRestantes;
+			paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;
 			pacientes.push(paciente);
 		});
 		this.setState({pacientes: [...pacientes].concat([])});
@@ -73,29 +71,7 @@ class ListaPacientes extends Component {
 		);
 	}
 	
-	tipoFormatter(cell, row) {
-		let badge;
-		switch (cell) {
-			case pacientePrivado:
-				badge = `<span class="badge badge-dark">${filtroTipoPaciente[pacientePrivado]}</span>`;
-				break;
-			case pacientePrepaga:
-				badge = `<span class="badge badge-primary">${filtroTipoPaciente[pacientePrepaga]}</span>`;
-				break;
-		}
-		return badge;
-	}
-	
-	priceFormatter(cell, row) {
-		let val = cell ? `<i class="fa fa-usd"></i> ${cell}` : '';
-		return val;
-	}
-	
-	prepagaFormatter(cell, row) {
-		return this.state.filtroPrepagas[cell];
-	}
-
-	restantesFormatter(cell, row){
+	restantesFormatter(cell, row) {
 		let color;
 		if (row.porcRestantes > 50) {
 			color = "success";
@@ -124,7 +100,7 @@ class ListaPacientes extends Component {
 
 		return (
 			<div className="animated fadeIn">
-				<Loader type="ball-scale-ripple-multiple" active={this.state.loading} />
+				<Loader type={tipoLoader} active={this.state.loading} />
 				<div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn listaPacientes"}>                
 					<Row>
 						<Col>
@@ -151,28 +127,22 @@ class ListaPacientes extends Component {
 											width="43">											
 										</TableHeaderColumn>										
 										<TableHeaderColumn
-											dataField='apellido'
-											filter={{ type: 'TextFilter', placeholder:"Apellido..."}}
+											dataField='nombreCompleto'
+											filter={{ type: 'TextFilter', placeholder:"..."}}
 											dataSort>
-											<span className="thTitle">Apellido</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='nombre'
-											filter={{ type: 'TextFilter', placeholder:"Nombre..."}}
-											dataSort>
-											<span className="thTitle">Nombre</span>
-										</TableHeaderColumn>
+											<span className="thTitle">Paciente</span>
+										</TableHeaderColumn>										
 										<TableHeaderColumn 
 											dataField='tipo'
 											width="130"
-											dataFormat={ this.tipoFormatter }
+											dataFormat={ tipoFormatter }
           									filter={ { type: 'SelectFilter', placeholder:"Todos", options: filtroTipoPaciente } }
 											dataSort>
 											<span className="thTitle">Tipo</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn 
 											dataField='prepaga'
-											dataFormat={ this.prepagaFormatter } 											
+											dataFormat={ prepagaFormatter } 											
 											filter={ { type: 'SelectFilter', placeholder:"Todas", options: this.state.filtroPrepagas } }
 											dataSort
 											>
@@ -180,9 +150,10 @@ class ListaPacientes extends Component {
 										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='sesionesRestantes'
-											dataFormat= { this.restantesFormatter}											
+											dataFormat= { this.restantesFormatter }											
 											filter={{ type: 'NumberFilter', placeholder:"...", numberComparators: [ '=', '>', '<=' ] }}
 											dataSort
+											width="200"
 											>
 											<span className="thTitle">Sesiones restantes</span>
 										</TableHeaderColumn>

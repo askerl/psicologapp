@@ -21,7 +21,7 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { errores, cargarPrepagas, pacientePrepaga, pacientePrivado } from '../../constants';
+import { errores, cargarPrepagas, pacientePrepaga, pacientePrivado, tipoLoader } from '../../constants';
 import Select from 'react-select';
 import Loader from 'react-loaders';
 
@@ -39,6 +39,7 @@ class Sesion extends Component {
             nuevo: true,
             prepagasById: [],
             pacientes: [],
+            fechaMoment: null,
             errorFecha: false,
             errorPacientes: false
         }; // <- set up react state
@@ -148,7 +149,7 @@ class Sesion extends Component {
     }
 
     createSesion(p){
-        let auxFecha = moment(this.inputFecha.value);
+        let auxFecha = this.state.fechaMoment;
         console.log('auxFecha', auxFecha.year(), auxFecha.month()+1, auxFecha.date());
 
         let sesion = {
@@ -177,12 +178,12 @@ class Sesion extends Component {
     }
 
     changeFecha(){
-        this.setState({errorFecha: false});
+        this.setState({errorFecha: false, fechaMoment: moment(this.inputFecha.value) });
         this.validate("fecha");
     }
 
     handleChange(selectedOption) {
-        console.log('You\'ve selected:', selectedOption);
+        console.log('Pacientes seleccionados:', selectedOption);
         this.setState({ selectedOption, errorPacientes: false } );
     }
 
@@ -207,14 +208,14 @@ class Sesion extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <Loader type="ball-scale-ripple-multiple" active={this.state.loading} />
+                <Loader type={tipoLoader} active={this.state.loading} />
                 <div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn sesion"}>                
                     <Row>
                         <Col>
                             <Card>
                                 <CardHeader>
                                     <i className="fa fa-comments-o fa-lg"></i>
-                                    <strong>Sesion</strong>                                
+                                    <strong>Sesión</strong>                                
                                     { this.state.nuevo &&
                                         <a><Badge color="warning" className="float-right mt-1">Nueva</Badge></a>
                                     }                                    

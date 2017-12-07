@@ -22,7 +22,7 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, cargarPrepagas } from '../../constants';
+import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, cargarPrepagas, tipoLoader } from '../../constants';
 import Widget01 from '../Widgets/Widget01';
 import Widget02 from '../Widgets/Widget02';
 import Toggle from 'react-toggle';
@@ -283,7 +283,7 @@ class Paciente extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <Loader type="ball-scale-ripple-multiple" active={this.state.loading} />
+                <Loader type={tipoLoader} active={this.state.loading} />
                 <div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn paciente"}>                
                     <Row>
                         <Col>

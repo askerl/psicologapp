@@ -1,4 +1,6 @@
 import db from './fire';
+import moment from 'moment';
+moment.locale("es");
 
 export const tipoPaciente = [
     { key: "O", name: "Obra social"},
@@ -21,9 +23,17 @@ export const errores = {
     prepagaVacia: "Seleccione la prepaga",
     pagoPrepagaVacio: "Seleccione el pago",
     errorGuardar: "Ocurrió un error al guardar los datos",
+    errorBorrar: "Ocurrió un error al borrar los datos",
     fechaVacia: "Ingrese la fecha",
-    pacientesVacios: "Seleccione algún paciente"
+    pacientesVacios: "Seleccione algún paciente",
+    sesionesVacias: "Seleccione alguna sesión"
 }
+
+export const tipoLoader = "ball-scale-ripple-multiple";
+
+export const meses = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
 
 export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
     let porcUsadas = sesionesAut > 0 ? sesiones / sesionesAut * 100 : 0;
@@ -55,3 +65,50 @@ export const cargarPrepagas = () => {
     });
     return promise;
 }    
+
+export const pacientesMap = () => {
+    let promise = new Promise( (resolve, reject) => {
+        let pacientes = [];
+        // query database
+        db.collection("pacientes").get().then( querySnapshot => {
+            querySnapshot.docs.forEach( doc => {            
+                let paciente = doc.data();
+                paciente.id = doc.id;
+                paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;          
+                pacientes[paciente.id] = paciente;                
+            });
+            window.pacientesMap = pacientes;
+            resolve(console.log('cargo map de pacientes en window', window.pacientesMap));
+        });
+    });
+    return promise;
+}
+
+// table formatters
+
+export const tipoFormatter = (cell, row) => {
+    let badge;
+    switch (cell) {
+        case pacientePrivado:
+            badge = `<span class="badge badge-warning">${filtroTipoPaciente[pacientePrivado]}</span>`;
+            break;
+        case pacientePrepaga:
+            badge = `<span class="badge badge-primary">${filtroTipoPaciente[pacientePrepaga]}</span>`;
+            break;
+    }
+    return badge;
+}
+
+export const priceFormatter = (cell, row) => {
+    let val = cell ? `<i class="fa fa-usd"></i> ${cell}` : '';
+    return val;
+}
+
+export const prepagaFormatter = (cell, row) => {
+    return window.filtroPrepagas[cell];
+}
+
+export const dateFormatter = (cell, row) => {
+    let fecha = moment(cell).format('L');
+    return fecha;
+}
