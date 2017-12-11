@@ -82,8 +82,11 @@ span.thTitle{
         margin: 0;
     }
     .filtros-sesiones{
-        input#anio{
+        #anio{
             width: 70px;
+        }
+        #mes{
+            width: 100px;
         }
     }
 }

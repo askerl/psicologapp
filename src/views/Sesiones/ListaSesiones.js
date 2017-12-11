@@ -12,7 +12,7 @@ import {
 	Modal, ModalHeader, ModalBody, ModalFooter,
 	Progress
 } from 'reactstrap';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import {BootstrapTable, TableHeaderColumn, SearchField} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
 import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates } from '../../constants';
@@ -20,6 +20,14 @@ import { NotificationManager } from 'react-notifications';
 
 import moment from 'moment';
 moment.locale("es");
+
+const createCustomSearchField = (props) => {
+	return (
+		<SearchField
+			className='form-control form-control-sm mt-2'			
+			placeholder='Buscar...'/>
+	);
+}
 
 class ListaSesiones extends Component {
 	constructor(props) {
@@ -47,7 +55,7 @@ class ListaSesiones extends Component {
 		this.changePeriodo = this.changePeriodo.bind(this);
 		this.initFiltros = this.initFiltros.bind(this);
 	}
-
+	
 	componentDidMount(){
 		this.loading(true);
 		cargarPrepagas().then( () => {
@@ -190,6 +198,8 @@ class ListaSesiones extends Component {
 
 		const options = {
 			noDataText: 'No hay sesiones registradas',
+			searchField: createCustomSearchField,
+			searchPosition: 'left'
 		}
 
 		const selectRowProp = {
@@ -199,7 +209,7 @@ class ListaSesiones extends Component {
 			onSelect: this.onRowSelect,
 			onSelectAll: this.onSelectAll,
 			selected: this.state.selected
-		  };
+		};
 
 		return (
 			<div className="animated fadeIn">
@@ -212,84 +222,46 @@ class ListaSesiones extends Component {
 									<i className="fa fa-comments fa-lg"></i> Sesiones
 								</CardHeader>
 								<CardBody>
-									<div className="d-flex flex-row mb-2 mr-auto">
-										<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus"></i> Nueva sesión</Button>
-										<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser"></i> Borrar sesiones</Button>
-										
-										<Button color="dark" size="sm" onClick={()=>{
-										
-											let batch = db.batch();
-											this.loading(true);
+									<Row>
+										<Col xs="12" sm="6">
+											<div className="d-flex flex-row mb-2 mr-auto">
+												<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus"></i> Nueva sesión</Button>
+												<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser"></i> Borrar sesiones</Button>
+											</div>
+										</Col>
+										<Col xs="12" sm="6">
 
-											let mes = 12;
-											let paciente = '1itK8nRb4nPcQYujIut6'; // alfredo
-											for (let dia = 1; dia <= 23; dia++) {
-												for (let index = 0; index < 1; index++) {
-													let newSession = db.collection("sesiones").doc();
-													batch.set(newSession, {
-														fecha: moment(`${dia}/${mes}/${anio}`, 'D-M-YYYY').format('L'),
-														paciente,
-														anio: 2017,
-														mes,
-														dia,
-														tipo: 'P',
-														valor: 100										
-													});
-												}												
-											}
-											mes = 11;
-											paciente = 'wIdMqPhOydB7qzRF4CoM'; // ely
-											for (let dia = 5; dia <= 10; dia++) {
-												for (let index = 0; index < 1; index++) {
-													let newSession = db.collection("sesiones").doc();
-													batch.set(newSession, {	
-														fecha: moment(`${dia}/${mes}/${anio}`, 'D-M-YYYY').format('L'),
-														paciente,
-														anio: 2017,
-														mes,
-														dia,
-														tipo: 'P',
-														valor: 100										
-													});
-												}												
-											}
-											
-											//Commit the batch
-											batch.commit().then(() => {
-												this.loading(false);
-												console.log("Sesiones generadas correctamente");
-												NotificationManager.success('Los datos han sido guardados');
-												this.cargarSesiones();											
-											})
-											.catch((error) => {
-												console.error("Error generando sesiones: ", error);
-												NotificationManager.error(errores.errorGuardar, 'Error');
-												this.loading(false);
-											});
-
-										}}><i className="fa fa-eraser"></i> Cargar sesiones de prueba</Button>
-									</div>
-									<hr/>
-									<div className="filtros-sesiones mt-2 mb-2">
-										<Form inline>
-											<FormGroup>
-												<Label className="mr-1" htmlFor="mes">Mes</Label>
+											<div className="filtros-sesiones d-flex flex-row mb-2 justify-content-sm-end">
 												<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
 													{ meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>)}						
 												</Input>
-											</FormGroup>
-											<FormGroup>
-												<Label className="ml-2" htmlFor="anio">Año</Label>
 												<Input className="ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
-											</FormGroup>											
-										</Form>
-									</div>
+											</div>
+
+											{/* <div className="filtros-sesiones mb-2">
+												<Form inline>
+													<FormGroup>
+														<Label className="mr-1" htmlFor="mes">Mes</Label>
+														<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
+															{ meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>)}						
+														</Input>
+													</FormGroup>
+													<FormGroup>
+														<Label className="ml-2" htmlFor="anio">Año</Label>
+														<Input className="ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
+													</FormGroup>											
+												</Form>
+											</div>	 */}
+										</Col>
+									</Row>
+									<hr/>
 									<BootstrapTable ref="table" version='4'
 										data={this.state.sesiones}
 										bordered={false}
 										striped hover condensed
 										options={options}
 										selectRow={selectRowProp}
+										search
 										>
 										<TableHeaderColumn 
 											hidden
