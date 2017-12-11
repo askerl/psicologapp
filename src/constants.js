@@ -35,6 +35,11 @@ export const meses = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+export const arrayRemoveDuplicates = (arr) => {
+    let unique_array = Array.from(new Set(arr))
+    return unique_array
+}
+
 export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
     let porcUsadas = sesionesAut > 0 ? sesiones / sesionesAut * 100 : 0;
     let porcRestantes = sesionesAut > 0 ? (sesionesAut - sesiones)/ sesionesAut * 100 : 0 ;
@@ -110,7 +115,7 @@ export const tipoFormatter = (cell, row) => {
 }
 
 export const priceFormatter = (cell, row) => {
-    let val = cell ? `<i class="fa fa-usd"></i> ${cell}` : '';
+    let val = cell > 0 ? `<i class="fa fa-usd"></i> ${cell}` : '';
     return val;
 }
 

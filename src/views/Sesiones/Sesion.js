@@ -104,7 +104,7 @@ class Sesion extends Component {
                 let warning = false;
                 let sesionesFecha = {};
 
-                db.collection("sesiones").where("fecha", "==", this.inputFecha.value)
+                db.collection("sesiones").where("fecha", "==", fecha.fechaString)
                 .get()
                 .then((result) => {
                     result.forEach((doc) =>{
@@ -116,7 +116,11 @@ class Sesion extends Component {
                         if (sesionesFecha[pac.value]){
                             warning = true;
                         } else {
+                            // creo sesion
                             batch.set(newSession, this.createSesion(pac, fecha));
+                            // actualizo sesiones del paciente
+                            let pacRef = db.collection("pacientes").doc(pac.value);
+                            batch.update(pacRef, {sesiones: pac.sesiones+1 });
                         }
                     });
 

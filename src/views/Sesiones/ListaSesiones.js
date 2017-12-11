@@ -15,7 +15,7 @@ import {
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter } from '../../constants';
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates } from '../../constants';
 import { NotificationManager } from 'react-notifications';
 
 import moment from 'moment';
@@ -31,6 +31,7 @@ class ListaSesiones extends Component {
 			loading: true,
 			showDeleteModal: false,
 			selected: [],
+			selectedPacientes: [],
 			filtroMes: '',
 			filtroAnio: ''
 		};
@@ -118,9 +119,22 @@ class ListaSesiones extends Component {
 		// Get a new write batch
 		let batch = db.batch();                
 		
-		this.state.selected.forEach( sesion => {
+		this.state.selected.forEach( sesion => {			
 			let refSession = db.collection("sesiones").doc(sesion);
+			// elimino sesion
 			batch.delete(refSession);
+		});
+
+		// resto 1 a los pocientes seleccionados
+		let selectedPacientes = arrayRemoveDuplicates(this.state.selectedPacientes);
+		selectedPacientes.forEach( pac => {			
+			// busco al paciente en la lista de sesiones y
+			// resto 1 sesion utilizada al paciente
+			let pacRef = db.collection("pacientes").doc(pac);
+			let sesionesPac = this.state.pacientesMap[pac].sesiones;
+			if (sesionesPac > 0){
+				batch.update(pacRef, { sesiones: sesionesPac -1 })
+			}
 		});
 
 		//Commit the batch
@@ -142,11 +156,13 @@ class ListaSesiones extends Component {
 		this.setState({showDeleteModal: !this.state.showDeleteModal});
 	}
 
-	onRowSelect({ id }, isSelected) {
+	onRowSelect({ id, paciente }, isSelected) {
 		if (isSelected) {
 			this.setState({selected: [...this.state.selected, id]});
+			this.setState({selectedPacientes: [...this.state.selectedPacientes, paciente]});
 		} else {
 			this.setState({ selected: this.state.selected.filter(it => it !== id) });
+			this.setState({ selectedPacientes: this.state.selectedPacientes.filter(it => it !== paciente) });
 		}
 		return false;
 	}
