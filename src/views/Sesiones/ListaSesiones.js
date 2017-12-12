@@ -230,28 +230,12 @@ class ListaSesiones extends Component {
 											</div>
 										</Col>
 										<Col xs="12" sm="6">
-
 											<div className="filtros-sesiones d-flex flex-row mb-2 justify-content-sm-end">
 												<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
 													{ meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>)}						
 												</Input>
 												<Input className="ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
-											</div>
-
-											{/* <div className="filtros-sesiones mb-2">
-												<Form inline>
-													<FormGroup>
-														<Label className="mr-1" htmlFor="mes">Mes</Label>
-														<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
-															{ meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>)}						
-														</Input>
-													</FormGroup>
-													<FormGroup>
-														<Label className="ml-2" htmlFor="anio">Año</Label>
-														<Input className="ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
-													</FormGroup>											
-												</Form>
-											</div>	 */}
+											</div>										
 										</Col>
 									</Row>
 									<hr/>
