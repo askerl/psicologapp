@@ -15,26 +15,17 @@ import {
 import {BootstrapTable, TableHeaderColumn, SearchField} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates } from '../../constants';
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates } from '../../constants';
 import { NotificationManager } from 'react-notifications';
 
 import moment from 'moment';
 moment.locale("es");
-
-const createCustomSearchField = (props) => {
-	return (
-		<SearchField
-			className='form-control form-control-sm mt-2'			
-			placeholder='Buscar...'/>
-	);
-}
 
 class ListaSesiones extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			sesiones: [],
-			filtroPrepagas: {},
 			pacientesMap: {},
 			loading: true,
 			showDeleteModal: false,
@@ -58,14 +49,11 @@ class ListaSesiones extends Component {
 	
 	componentDidMount(){
 		this.loading(true);
-		cargarPrepagas().then( () => {
-			this.initFiltros();
-			this.setState({filtroPrepagas: window.filtroPrepagas});
-			pacientesMap().then( () => {
-				this.setState({pacientesMap: window.pacientesMap});
-				this.cargarSesiones();
-			});			
-		});
+		this.initFiltros();
+		pacientesMap().then( () => {
+			this.setState({pacientesMap: window.pacientesMap});
+			this.cargarSesiones();
+		});			
 	}
 
 	initFiltros(){
@@ -193,7 +181,7 @@ class ListaSesiones extends Component {
 			this.cargarSesiones();
 		});
 	}
-	
+
 	render() {
 
 		const options = {
@@ -226,7 +214,7 @@ class ListaSesiones extends Component {
 										<Col xs="12" sm="6">
 											<div className="d-flex flex-row mb-2 mr-auto">
 												<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus"></i> Nueva sesión</Button>
-												<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser"></i> Borrar sesiones</Button>
+												<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser"></i> Borrar sesiones</Button>												
 											</div>
 										</Col>
 										<Col xs="12" sm="6">
@@ -319,6 +307,16 @@ class ListaSesiones extends Component {
 		)
 	}
 
+}
+
+// componente auxiliar
+
+const createCustomSearchField = (props) => {
+	return (
+		<SearchField
+			className='form-control form-control-sm mt-2'			
+			placeholder='Buscar...'/>
+	);
 }
 
 export default ListaSesiones;

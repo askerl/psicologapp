@@ -1,0 +1,6 @@
+{
+  "name": "Facturaciones",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Facturaciones.js"
+}

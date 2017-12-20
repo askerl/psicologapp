@@ -15,6 +15,33 @@ auxfiltroTipoPaciente[pacientePrepaga] = tipoPaciente[0].name;
 auxfiltroTipoPaciente[pacientePrivado] = tipoPaciente[1].name;
 export const filtroTipoPaciente = auxfiltroTipoPaciente;
 
+
+export const prepagasById = {
+    "galeno": {
+        nombre: "Galeno",
+        pagos: [15, 175, 452.36]
+    },
+    "ososs": {
+        nombre: "OSOSS",
+        pagos: [230]
+    },
+    "ospacp": {
+        nombre: "O.S.P.A.C.P",
+        pagos: [230]
+    }
+}
+// armo arrays auxiliares para filtrar y cargar combos
+let auxfiltroPrepagas = {}, auxprepagas = [];
+for (const prop in prepagasById) {
+    let prepaga = prepagasById[prop];
+    prepaga.id = prop; 
+    auxfiltroPrepagas[prop] = prepaga.nombre;
+    auxprepagas.push(prepaga);
+}
+export const filtroPrepagas = auxfiltroPrepagas;
+export const prepagas = auxprepagas;
+
+
 export const errores = {
     nombreVacio: "Ingrese el nombre",
     apellidoVacio: "Ingrese el apellido",
@@ -46,30 +73,30 @@ export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
     return {porcUsadas, porcRestantes};
 }
 
-export const cargarPrepagas = () => {
-    let promise = new Promise( (resolve, reject) => {
-        let prepagas = [], filtroPrepagas = {}, prepagasById = {};
-        if (window.prepagas && window.filtroPrepagas){
-            resolve(console.log('variables from cache', window.prepagas, window.filtroPrepagas));
-        } else {
-            // query database
-            db.collection("prepagas").get().then( querySnapshot => {
-                querySnapshot.docs.forEach( doc => {            
-                    let prepaga = doc.data();
-                    prepaga.id = doc.id;          
-                    prepagas.push(prepaga);
-                    filtroPrepagas[prepaga.id] = prepaga.nombre;
-                    prepagasById[prepaga.id] = prepaga;
-                });
-                window.prepagas = prepagas;
-                window.filtroPrepagas = filtroPrepagas;
-                window.prepagasById = prepagasById;
-                resolve(console.log('cargo variables en window', window.prepagas, window.filtroPrepagas, window.prepagasById));
-            });
-        }
-    });
-    return promise;
-}    
+// export const cargarPrepagas = () => {
+//     let promise = new Promise( (resolve, reject) => {
+//         let prepagas = [], filtroPrepagas = {}, prepagasById = {};
+//         if (window.prepagas && window.filtroPrepagas){
+//             resolve(console.log('variables from cache', window.prepagas, window.filtroPrepagas));
+//         } else {
+//             // query database
+//             db.collection("prepagas").get().then( querySnapshot => {
+//                 querySnapshot.docs.forEach( doc => {            
+//                     let prepaga = doc.data();
+//                     prepaga.id = doc.id;          
+//                     prepagas.push(prepaga);
+//                     filtroPrepagas[prepaga.id] = prepaga.nombre;
+//                     prepagasById[prepaga.id] = prepaga;
+//                 });
+//                 window.prepagas = prepagas;
+//                 window.filtroPrepagas = filtroPrepagas;
+//                 window.prepagasById = prepagasById;
+//                 resolve(console.log('cargo variables en window', window.prepagas, window.filtroPrepagas, window.prepagasById));
+//             });
+//         }
+//     });
+//     return promise;
+// }    
 
 export const pacientesMap = () => {
     let promise = new Promise( (resolve, reject) => {
@@ -99,6 +126,55 @@ export const createFechaSesion = (value) =>{
     }
 }
 
+// calculo de facturaciones
+export const getFacturacion = (mes, anio) => {
+    let promise = new Promise( (resolve, reject) => {
+        // query database
+        db.collection("sesiones")
+		.where("mes","==",parseInt(mes))
+		.where("anio","==",parseInt(anio))		
+		.orderBy("dia","desc")
+		.get().then( querySnapshot => {
+			resolve(calcularFacturacion(querySnapshot.docs, mes, anio))
+		});
+    });
+    return promise;
+}
+
+function calcularFacturacion(data, mes, anio) {
+    let fac = {
+        anio,
+        mes,
+        total: 0,
+        totalPrepaga: 0,
+        totalPrivado: 0,
+        totalCopago: 0,
+        // por prepaga
+        prepagas: {}
+    };
+    data.forEach( doc => {            
+        let sesion = doc.data();
+        let valor = parseFloat(sesion.valor);
+        console.log('sesion', sesion);
+        if (sesion.tipo === pacientePrivado) {
+            fac.totalPrivado += valor;
+        } else {
+            // sesion prepaga
+            fac.totalCopago += parseFloat(sesion.copago);
+            if (sesion.facturaPrepaga === true){
+                fac.totalPrepaga += valor;
+                fac.prepagas[sesion.prepaga] = fac.prepagas[sesion.prepaga] ? fac.prepagas[sesion.prepaga] += valor : valor;
+            }
+        }
+
+    });
+
+    fac.total = fac.totalPrepaga + fac.totalPrivado + fac.totalCopago;
+
+    return fac;
+}
+
+
 // table formatters
 
 export const tipoFormatter = (cell, row) => {
@@ -120,7 +196,7 @@ export const priceFormatter = (cell, row) => {
 }
 
 export const prepagaFormatter = (cell, row) => {
-    return window.filtroPrepagas[cell];
+    return cell ? prepagasById[cell].nombre : '';
 }
 
 export const enumFormatter = (cell, row, enumObject) =>{

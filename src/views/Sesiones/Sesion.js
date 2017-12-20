@@ -21,7 +21,7 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { errores, cargarPrepagas, pacientePrepaga, pacientePrivado, tipoLoader, createFechaSesion } from '../../constants';
+import { errores, pacientePrepaga, pacientePrivado, tipoLoader, createFechaSesion, prepagasById } from '../../constants';
 import Select from 'react-select';
 import Loader from 'react-loaders';
 
@@ -37,7 +37,6 @@ class Sesion extends Component {
             id: '',
             selectedOption: [],
             nuevo: true,
-            prepagasById: [],
             pacientes: [],
             errorFecha: false,
             errorPacientes: false
@@ -61,14 +60,11 @@ class Sesion extends Component {
 
         this.inputFecha.value = moment().format('YYYY-MM-DD');
 
-        cargarPrepagas().then( () => {
-            this.setState({prepagasById: window.prepagasById});            
-            db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
-                this.loadPacientes(querySnapshot);
-                this.loading(false);
-			});
+        db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
+            this.loadPacientes(querySnapshot);
+            this.loading(false);
         });
-        
+
     }
 
     loadPacientes(querySnapshot){
@@ -185,11 +181,6 @@ class Sesion extends Component {
     }
 
     changeFecha(){
-        
-        
-
-        console.log('fecha', fecha);
-
         this.setState({errorFecha: false });
         this.validate("fecha");
     }

@@ -13,14 +13,13 @@ import {
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, prepagaFormatter, tipoLoader } from '../../constants';
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, tipoFormatter, prepagaFormatter, tipoLoader, filtroPrepagas } from '../../constants';
 
 class ListaPacientes extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			pacientes: [],
-			filtroPrepagas: {},
 			loading: true
 		};
 		this.actionsFormatter = this.actionsFormatter.bind(this);
@@ -31,15 +30,10 @@ class ListaPacientes extends Component {
 
 	componentDidMount(){
 		this.loading(true);
-
-		cargarPrepagas().then( () => {
-			this.setState({filtroPrepagas: window.filtroPrepagas});
-			db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
-				this.loadPacientes(querySnapshot);
-				this.loading(false);
-			});
-		});
-	
+		db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
+			this.loadPacientes(querySnapshot);
+			this.loading(false);
+		});	
 	}
 
 	loadPacientes(querySnapshot){
@@ -143,7 +137,7 @@ class ListaPacientes extends Component {
 										<TableHeaderColumn 
 											dataField='prepaga'
 											dataFormat={ prepagaFormatter } 											
-											filter={ { type: 'SelectFilter', placeholder:"Todas", options: this.state.filtroPrepagas } }
+											filter={ { type: 'SelectFilter', placeholder:"Todas", options: filtroPrepagas } }
 											dataSort
 											>
 											<span className="thTitle">Prepaga</span>

@@ -23,63 +23,16 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, cargarPrepagas, tipoLoader } from '../../constants';
+import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, tipoLoader, prepagasById, prepagas } from '../../constants';
 import Widget01 from '../Widgets/Widget01';
 import Widget02 from '../Widgets/Widget02';
+import WidgetSesionesUsadas from '../Widgets/WidgetsAuxiliares';
+import WidgetSesionesRestantes from '../Widgets/WidgetsAuxiliares';
 import Toggle from 'react-toggle';
 import Loader from 'react-loaders';
 
 import moment from 'moment';
 moment.locale("es");
-
-const WidgetSesionesUsadas = ({title, color, value, porc, resetAction}) => {
-
-    let progressColor;
-    if (porc < 80) {
-        progressColor = "info";
-    } else if (porc < 90) {
-        progressColor = "warning";
-    } else {
-        progressColor = "danger";
-    }
-
-	return (
-		
-        <div className={"card " + (color ? `bg-${color}` : '')}>
-            <div className="card-body">
-                <a href="javascript:void(0);" className="reset-sesiones float-right" onClick={() => resetAction()}>
-                    <i className="icon-reload"></i>{' '}Reiniciar
-                </a>
-                <h4 className="mb-0">{value}</h4>
-                <p>{title}</p>
-                <Progress className="progress-xs" color={progressColor} value={porc} />
-            </div>
-        </div>
-
-	);
-}
-
-const WidgetSesionesRestantes = ({title, color, value, porc}) => {
-
-    let progressColor;
-    if (porc > 80) {
-        progressColor = "success";
-    } else if (porc > 10) {
-        progressColor = "warning";
-    } else {
-        progressColor = "danger";
-    }
-
-	return (
-        <div className={"card " + (color ? `bg-${color}` : '')}>
-            <div className="card-body">
-                <h4 className="mb-0">{value}</h4>
-                <p>{title}</p>
-                <Progress className="progress-xs" color={progressColor} value={porc} />
-            </div>
-        </div>
-	);
-}
 
 class Paciente extends Component {
 
@@ -92,7 +45,6 @@ class Paciente extends Component {
             tipo: '',
             activo: true,
             facturaPrepaga: true,
-            prepagas: [],
             pagos: [],
             sesiones: 0,
             sesionesAut: 0,
@@ -130,18 +82,15 @@ class Paciente extends Component {
 
         this.loading(true);
 
-        cargarPrepagas().then( () => {
-            this.setState({prepagas: window.prepagas});
-            if (!nuevo){                
-                db.collection("pacientes").doc(id).get().then( pac => {
-                    console.log(pac.id, pac.data());
-                    this.loadPaciente(pac.data());
-                    this.loading(false);
-                });
-            } else {
+        if (!nuevo){                
+            db.collection("pacientes").doc(id).get().then( pac => {
+                console.log(pac.id, pac.data());
+                this.loadPaciente(pac.data());
                 this.loading(false);
-            }
-        });
+            });
+        } else {
+            this.loading(false);
+        }
         
     }
 
@@ -211,14 +160,7 @@ class Paciente extends Component {
     }
 
     getPagosPrepaga(prepaga){
-        let pagos = [];
-        this.state.prepagas.forEach( el => {
-            if (el.id === prepaga) {
-                pagos = [...el.pagos].concat([]);
-                return;
-            }
-        })
-        return pagos;
+        return prepagasById[prepaga].pagos;
     }
 
     changePago(){
@@ -490,7 +432,7 @@ class Paciente extends Component {
                                                         <Input type="select" name="prepaga" id="prepaga" innerRef={ el => this.inputPrepaga = el } required 
                                                             onChange={this.changePrepaga} className={this.state.errorPrepaga ? 'is-invalid' : ''}>
                                                             <option value="">Seleccione prepaga...</option>
-                                                            {this.state.prepagas.map( item => <option key={item.id} value={item.id}>{item.nombre}</option>)}
+                                                            {prepagas.map( item => <option key={item.id} value={item.id}>{item.nombre}</option>)}
                                                         </Input>
                                                         <FormFeedback>{errores.prepagaVacia}</FormFeedback>
                                                     </FormGroup>

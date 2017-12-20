@@ -12,10 +12,12 @@ import ListaPacientes from '../../views/Pacientes/ListaPacientes';
 import Paciente from '../../views/Pacientes/Paciente';
 import ListaSesiones from '../../views/Sesiones/ListaSesiones';
 import Sesion from '../../views/Sesiones/Sesion';
+import Facturaciones from '../../views/Facturaciones/Facturaciones';
 
 import {NotificationContainer} from 'react-notifications';
 
 import db from '../../fire';
+
 
 class Full extends Component {
 
@@ -34,6 +36,7 @@ class Full extends Component {
                 <Route path='/pacientes/:id' name="Paciente" component={Paciente}/>
                 <Route exact path="/sesiones" name="Sesiones" component={ListaSesiones}/>
                 <Route path='/sesiones/:id' name="Sesion" component={Sesion}/>
+                <Route exact path="/facturaciones" name="Facturaciones" component={Facturaciones}/>
                 <Redirect from="/" to="/dashboard"/>                
               </Switch>
               <NotificationContainer enterTimeout={200}/>
