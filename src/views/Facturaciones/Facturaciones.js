@@ -15,8 +15,9 @@ import {
 import {BootstrapTable, TableHeaderColumn, SearchField} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates, getFacturacion, prepagas, getFacturacionesPeriodo } from '../../constants';
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates, getFacturacion, prepagas, getFacturacionesPeriodo, prepagasById, round } from '../../constants';
 import { NotificationManager } from 'react-notifications';
+import { StatItem } from '../Widgets/WidgetsAuxiliares';
 
 import moment from 'moment';
 moment.locale("es");
@@ -98,7 +99,21 @@ class Facturaciones extends Component {
 		}
 		return true;
 	}
+
+	isExpandableRow(row) {
+		if (row.totalPrepaga > 0) {
+			return true;		
+		} else {
+			return false;
+		}
+	}
 	
+	expandComponent(row) {
+		return (
+			<ExpandRowComp rowData={row}/>
+		);
+	}
+
 	render() {
 
 		const options = {
@@ -153,8 +168,11 @@ class Facturaciones extends Component {
 										<BootstrapTable ref="table" version='4'
 											data={this.state.facturaciones}
 											bordered={false}
-											striped hover condensed
+											hover //striped
 											options={options}
+											expandableRow={this.isExpandableRow}
+											expandComponent={ this.expandComponent }
+											expandColumnOptions={ { expandColumnVisible: true } }
 											>
 											<TableHeaderColumn 
 												hidden
@@ -211,6 +229,24 @@ class Facturaciones extends Component {
 		)
 	}
 
+}
+
+const ExpandRowComp = ({rowData}) => {
+
+	let li = prepagas.map(item => {
+		let valor = rowData.prepagas[item.id];
+		let porc = round(valor / rowData.totalPrepaga * 100, 2);
+		return(
+			<li key={item.id}><StatItem title={item.nombre} value={`$ ${valor}`} porc={`${porc}`} color="info" /></li>
+		)
+	});
+	return (
+		<div>
+			<ul className="horizontal-bars type-2">
+			{li}
+			</ul>
+		</div>
+	);
 }
 
 export default Facturaciones;

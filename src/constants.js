@@ -184,7 +184,7 @@ function armarFacturaciones(data) {
             // chequeo si la sesion es del mismo mes y anio
             if ( sesion.mes !== mes || sesion.anio !== anio ) {
                 // agrego facturacion actual
-                fac.total = fac.totalPrepaga + fac.totalPrivado + fac.totalCopago;
+                fac.total = round(fac.totalPrepaga + fac.totalPrivado + fac.totalCopago,2);
                 facturaciones.push(fac);
                 // reinicio facturacion
                 fac = {
@@ -216,10 +216,18 @@ function armarFacturaciones(data) {
                 }
             }
 
+            // redondeo totales
+            fac.totalPrivado = round(fac.totalPrivado,2);
+            fac.totalCopago = round(fac.totalCopago,2);
+            fac.totalPrepaga = round(fac.totalPrepaga,2);
+            for (const key in fac.prepagas) {
+                fac.prepagas[key] = round(fac.prepagas[key],2);
+            }
+
         });
 
         // agrego última facturación
-        fac.total = fac.totalPrepaga + fac.totalPrivado + fac.totalCopago;
+        fac.total = round(fac.totalPrepaga + fac.totalPrivado + fac.totalCopago,2);
         facturaciones.push(fac);
 
     }
@@ -263,4 +271,9 @@ export const enumFormatter = (cell, row, enumObject) =>{
 export const boolFormatter = {
     true: 'Sí',
     false: 'No' 
+}
+
+// utiles
+export const round = (value, decimals) => {
+    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }

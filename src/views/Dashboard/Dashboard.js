@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import db from '../../fire';
-import { pacientePrepaga, pacientePrivado, prepagas } from '../../constants';
+import { pacientePrepaga, pacientePrivado, prepagas, round } from '../../constants';
 import Loader from 'react-loaders';
 
 import {
@@ -15,6 +15,7 @@ import {
 	} from 'reactstrap';
 	
 import Widget02 from '../Widgets/Widget02';
+import {StatItem, Callout} from '../Widgets/WidgetsAuxiliares';
 	
 class Dashboard extends Component {
   
@@ -67,15 +68,15 @@ class Dashboard extends Component {
 				}
 			});
 			// percentages
-			data.porcActivos = data.total > 0 ? (data.activos / data.total * 100) : 0;
-			data.porcInactivos = data.total > 0 ? (data.inactivos / data.total * 100) : 0;
+			data.porcActivos = data.total > 0 ? round(data.activos / data.total * 100,2) : 0;
+			data.porcInactivos = data.total > 0 ? round(data.inactivos / data.total * 100,2) : 0;
 
 			// porcentajes activos
-			data.porcPrivados = data.activos > 0 ? (data.privadosActivos / data.activos * 100) : 0;
-			data.porcObrasocial = data.activos > 0 ? (data.obraSocialActivos / data.activos * 100) : 0;
+			data.porcPrivados = data.activos > 0 ? round(data.privadosActivos / data.activos * 100,2) : 0;
+			data.porcObrasocial = data.activos > 0 ? round(data.obraSocialActivos / data.activos * 100,2) : 0;
 
 			data.prepagas.forEach( i => {
-				i.porc = data.obraSocialActivos > 0 ? (data[i.id] / data.obraSocialActivos * 100) : 0;
+				i.porc = data.obraSocialActivos > 0 ? round(data[i.id] / data.obraSocialActivos * 100,2) : 0;
 			});
 
 			this.setState(data);
@@ -140,31 +141,6 @@ class Dashboard extends Component {
 			</div>
 		);
 	}
-}
-
-// componentes auxiliares
-const Callout = ({title, color, value}) => {
-	return (
-		<div className={`callout callout-${color}`}>
-			<small className="text-muted">{title}</small>
-			<br />
-			<strong className="h4">{value}</strong>
-		</div>
-	);
-}
-
-const StatItem = ({title, porc, value, icon, color}) => {
-	let legend = value !== undefined ? <span className="value">{value} <span className="text-muted small">{`(${porc}%)`}</span></span> : <span className="value">{`${porc}%`}</span>;
-	return(
-		<div>
-			<i className={icon}></i>
-			<span className="title">{title}</span>
-			{legend}
-			<div className="bars">
-				<Progress className="progress-xs" color={color} value={porc} />
-			</div>
-		</div>
-	);
 }
 
 export default Dashboard;
