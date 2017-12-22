@@ -4,7 +4,7 @@ import {
 	Row,
 	Col,
 	Button,
-	Card,
+	Card, CardTitle,
 	CardHeader,
 	CardFooter,
 	CardBody,
@@ -15,9 +15,10 @@ import {
 import {BootstrapTable, TableHeaderColumn, SearchField} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates, getFacturacion, prepagas, getFacturacionesPeriodo, prepagasById, round } from '../../constants';
+import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates, getFacturacion, prepagas, getFacturacionesPeriodo, prepagasById, round, facChartOpts } from '../../constants';
 import { NotificationManager } from 'react-notifications';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
+import {Line} from 'react-chartjs-2';
 
 import moment from 'moment';
 moment.locale("es");
@@ -27,13 +28,12 @@ class Facturaciones extends Component {
 		super(props);
 		this.state = {
 			facturaciones: [],
+			grafica: {},
+			optsGrafica: {},
 			pacientesMap: {},
 			showResultados: false,
 			loading: true,
-			mesIni: '',
-			mesFin: '',
-			anioIni: '',
-			anioFin: ''
+			periodo: ''
 		};
 		this.loading = this.loading.bind(this);
 		this.initFiltros = this.initFiltros.bind(this);
@@ -55,12 +55,6 @@ class Facturaciones extends Component {
 		this.anioIni.value = anio;
 		this.mesFin.value = mes; 
 		this.anioFin.value = anio;
-		this.setState({
-			mesIni: mes,
-			mesFin: mes,
-			anioIni: anio,
-			anioFin: anio
-		});
 	}
 
 	loading(val){
@@ -82,8 +76,9 @@ class Facturaciones extends Component {
 		// valido periodo
 		if (this.validarPeriodo(mesIni, anioIni, mesFin, anioFin)) {
 	
-			getFacturacionesPeriodo(mesIni, anioIni, mesFin, anioFin).then( result => {				
-				this.setState({showResultados: true, facturaciones: result});
+			getFacturacionesPeriodo(mesIni, anioIni, mesFin, anioFin).then( result => {	
+				console.log('Resultado', result);			
+				this.setState({showResultados: true, facturaciones: result.facturaciones, grafica: result.grafica.grafica, optsGrafica: result.grafica.optsGrafica});
 			});
 
 		}
@@ -97,6 +92,9 @@ class Facturaciones extends Component {
 			NotificationManager.error(errores.periodoInvalido, 'Error');
 			return false;
 		}
+		// armo string de período para gráfica
+		let periodo = `${meses[this.mesIni.value-1]} ${this.anioIni.value} - ${meses[this.mesFin.value-1]} ${this.anioFin.value}`;
+		this.setState({periodo});
 		return true;
 	}
 
@@ -223,7 +221,51 @@ class Facturaciones extends Component {
 								</CardBody>
 							</Card>
 						</Col>
-					</Row>				
+					</Row>			
+					{ this.state.showResultados &&			
+					<Row>
+						<Col>
+							<Card>
+								<CardBody>
+									<Row>
+										<Col>
+											<CardTitle className="mb-0">Gráfica</CardTitle>
+											<div className="small text-muted">{this.state.periodo}</div>
+										</Col>
+									</Row>
+									<div className="chart-wrapper">
+										<Line data={this.state.grafica} options={this.state.optsGrafica} height={300} />
+									</div>
+								</CardBody>
+								<CardFooter>
+									<ul>
+										<li>
+											<div className="text-muted">Total</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumTotal}</strong>
+											<Progress className="progress-xs mt-2" color="success" value="100" />
+										</li>
+										<li>
+											<div className="text-muted">Privados</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrivados}</strong>
+											<Progress className="progress-xs mt-2" color="warning" value="100" />
+										</li>
+										<li>
+											<div className="text-muted">Copagos</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumCopagos}</strong>
+											<Progress className="progress-xs mt-2" color="info" value="100" />
+										</li>
+										<li>
+											<div className="text-muted">Prepagas</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrepagas}</strong>
+											<Progress className="progress-xs mt-2" color="primary" value="100" />
+										</li>																				
+									</ul>
+								</CardFooter>
+							</Card>
+						</Col>
+					</Row>
+					}
+
 				</div>
 			</div>
 		)

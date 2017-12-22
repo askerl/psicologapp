@@ -34,6 +34,7 @@
     "history": "4.7.2",
     "jquery": "^1.9.1",
     "loaders.css": "^0.1.2",
+    "lodash": "^4.17.4",
     "moment": "^2.19.3",
     "react": "^16.2.0",
     "react-bootstrap-table": "^4.2.0",
