@@ -262,7 +262,11 @@ function armarGrafica(facturaciones) {
         prepagas:   _.map(facturaciones, 'totalPrepaga'),
         copagos:    _.map(facturaciones, 'totalCopago')
     };
-
+    let minimo = _.min(data.totales);
+    data.minimo = []
+    for (let i = 0; i <= data.totales.length; i++) {
+        data.minimo.push(minimo);
+    }
 
     let grafica = {
         labels: facturaciones.map(item => mesesShort[item.mes-1]),
@@ -272,7 +276,7 @@ function armarGrafica(facturaciones) {
                 backgroundColor: convertHex(brandSuccess, 10),
                 borderColor: brandSuccess,
                 pointHoverBackgroundColor: '#fff',
-                borderWidth: 3,
+                borderWidth: 2,
                 data: data.totales
             },
             {
@@ -298,12 +302,21 @@ function armarGrafica(facturaciones) {
                 pointHoverBackgroundColor: '#fff',
                 borderWidth: 2,
                 data: data.copagos
-            }
+            }//,
+            // {
+            //     label: 'Mínimo facturado',
+            //     backgroundColor: 'transparent',
+            //     borderColor: brandDanger,
+            //     pointHoverBackgroundColor: '#fff',
+            //     borderWidth: 1,
+            //     borderDash: [8, 5],
+            //     data: data.minimo
+            // }
         ],
-        sumTotal: _.sum(data.totales),
-        sumPrivados: _.sum(data.privados),
-        sumPrepagas: _.sum(data.prepagas),
-        sumCopagos: _.sum(data.copagos)
+        sumTotal: round(_.sum(data.totales),2),
+        sumPrivados: round(_.sum(data.privados),2),
+        sumPrepagas: round(_.sum(data.prepagas),2),
+        sumCopagos: round(_.sum(data.copagos),2)
     }
 
     let facChartOpts = {
@@ -320,7 +333,7 @@ function armarGrafica(facturaciones) {
             yAxes: [{
                 ticks: {
                     beginAtZero: true,
-                    maxTicksLimit: 5,
+                    maxTicksLimit: 10,
                     stepSize: 5000,
                     // max: maxGraf
                 }
@@ -381,7 +394,7 @@ export const round = (value, decimals) => {
     return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
 
-// grafica de facturaciones
+// valores para grafica de facturaciones
 
 const brandPrimary = '#20a8d8';
 const brandSuccess = '#4dbd74';
@@ -399,53 +412,3 @@ function convertHex(hex, opacity) {
 	var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity / 100 + ')';
 	return result;
 }
-  
-//Random Numbers
-function random(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-
-for (var i = 0; i <= elements; i++) {
-    data1.push(random(50, 200));
-    data2.push(random(80, 100));
-    data3.push(65);
-}
-  
-const mainChart = {
-    labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S', 'M', 'T', 'W', 'T', 'F', 'S', 'S'],
-    datasets: [
-        {
-            label: 'My First dataset',
-            backgroundColor: convertHex(brandInfo, 10),
-            borderColor: brandInfo,
-            pointHoverBackgroundColor: '#fff',
-            borderWidth: 2,
-            data: data1
-        },
-        {
-            label: 'My Second dataset',
-            backgroundColor: 'transparent',
-            borderColor: brandSuccess,
-            pointHoverBackgroundColor: '#fff',
-            borderWidth: 2,
-            data: data2
-        },
-        {
-            label: 'My Third dataset',
-            backgroundColor: 'transparent',
-            borderColor: brandDanger,
-            pointHoverBackgroundColor: '#fff',
-            borderWidth: 1,
-            borderDash: [8, 5],
-            data: data3
-        }
-    ]
-}
-
-
-
