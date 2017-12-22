@@ -218,7 +218,7 @@ class ListaSesiones extends Component {
 											</div>
 										</Col>
 										<Col xs="12" sm="6">
-											<div className="filtros-sesiones d-flex flex-row mb-2 justify-content-sm-end">
+											<div className="filtros d-flex flex-row mb-2 justify-content-sm-end">
 												<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
 													{ meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>)}						
 												</Input>
@@ -243,6 +243,7 @@ class ListaSesiones extends Component {
 										</TableHeaderColumn>										
 										<TableHeaderColumn
 											dataField='fecha'
+											dataFormat={ dateFormatter }
 											width="90"
 											>
 											<span className="thTitle">Fecha</span>

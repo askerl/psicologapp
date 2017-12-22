@@ -1,5 +1,6 @@
 import db from './fire';
 import moment from 'moment';
+import Facturaciones from './views/Facturaciones/Facturaciones';
 moment.locale("es");
 
 export const tipoPaciente = [
@@ -53,7 +54,8 @@ export const errores = {
     errorBorrar: "Ocurrió un error al borrar los datos",
     fechaVacia: "Ingrese la fecha",
     pacientesVacios: "Seleccione algún paciente",
-    sesionesVacias: "Seleccione alguna sesión"
+    sesionesVacias: "Seleccione alguna sesión",
+    periodoInvalido: "Debe seleccionar un período válido"
 }
 
 export const tipoLoader = "ball-scale-ripple-multiple";
@@ -118,64 +120,119 @@ export const pacientesMap = () => {
 
 export const createFechaSesion = (value) =>{
     let fecha = moment(value);
+    let dia = fecha.date(), mes = fecha.month()+1, anio = fecha.year(); 
     return {
-        fechaString: fecha.format('DD/MM/YYYY'),
-        dia: fecha.date(),
-        mes: fecha.month()+1,
-        anio: fecha.year()
+        fechaTS: new Date(anio, mes-1, dia),
+        dia,
+        mes,
+        anio
     }
 }
 
 // calculo de facturaciones
-export const getFacturacion = (mes, anio) => {
+
+export const getFacturacionesPeriodo = (mesIni, anioIni, mesFin, anioFin) => {
+
+    // armo fechas del período
+    let desde = new Date(anioIni, mesIni-1, 1); // 1/mesIni/anioIni
+	let hasta = new Date(anioFin, mesFin, 1); // 1/mesFin+1/anioFin
+
     let promise = new Promise( (resolve, reject) => {
         // query database
         db.collection("sesiones")
-		.where("mes","==",parseInt(mes))
-		.where("anio","==",parseInt(anio))		
-		.orderBy("dia","desc")
+		.where("fecha",">=",desde).where("fecha","<",hasta)
+		.orderBy("fecha","asc")
 		.get().then( querySnapshot => {
-			resolve(calcularFacturacion(querySnapshot.docs, mes, anio))
+			resolve(armarFacturaciones(querySnapshot.docs))
 		});
     });
     return promise;
 }
 
-function calcularFacturacion(data, mes, anio) {
-    let fac = {
-        anio,
-        mes,
-        total: 0,
-        totalPrepaga: 0,
-        totalPrivado: 0,
-        totalCopago: 0,
-        // por prepaga
-        prepagas: {}
-    };
-    data.forEach( doc => {            
+function armarFacturaciones(data) {
+    let sesiones = [];
+    data.forEach( doc => {
         let sesion = doc.data();
-        let valor = parseFloat(sesion.valor);
-        console.log('sesion', sesion);
-        if (sesion.tipo === pacientePrivado) {
-            fac.totalPrivado += valor;
-        } else {
-            // sesion prepaga
-            fac.totalCopago += parseFloat(sesion.copago);
-            if (sesion.facturaPrepaga === true){
-                fac.totalPrepaga += valor;
-                fac.prepagas[sesion.prepaga] = fac.prepagas[sesion.prepaga] ? fac.prepagas[sesion.prepaga] += valor : valor;
-            }
+        sesion.id = doc.id;
+        sesiones.push(sesion);
+    });
+    // console.log('Sesiones del período', sesiones);
+
+    let facturaciones = [];
+    if (sesiones.length > 0) {
+
+        // inicializo recorrida
+        let mes = sesiones[0].mes, anio = sesiones[0].anio;
+
+        let fac = {
+            id: `${anio}-${mes}`,
+            mes,
+            anio,
+            total: 0,
+            totalPrepaga: 0,
+            totalPrivado: 0,
+            totalCopago: 0,
+            prepagas: {}
+        };
+        // key para prepagas
+        for (const key in prepagasById) {            
+            fac.prepagas[key] = 0;
         }
 
-    });
+        sesiones.forEach( sesion => {
 
-    fac.total = fac.totalPrepaga + fac.totalPrivado + fac.totalCopago;
+            // chequeo si la sesion es del mismo mes y anio
+            if ( sesion.mes !== mes || sesion.anio !== anio ) {
+                // agrego facturacion actual
+                fac.total = fac.totalPrepaga + fac.totalPrivado + fac.totalCopago;
+                facturaciones.push(fac);
+                // reinicio facturacion
+                fac = {
+                    id: `${sesion.anio}-${sesion.mes}`,
+                    mes: sesion.mes,
+                    anio: sesion.anio,
+                    total: 0,
+                    totalPrepaga: 0,
+                    totalPrivado: 0,
+                    totalCopago: 0,
+                    prepagas: {}
+                };
+                for (const key in prepagasById) {            
+                    fac.prepagas[key] = 0;
+                }
+                mes = sesion.mes;
+                anio = sesion.anio;                
+            }
 
-    return fac;
+            let valor = parseFloat(sesion.valor);            
+            if (sesion.tipo === pacientePrivado) {
+                fac.totalPrivado += valor;
+            } else {
+                // sesion prepaga
+                fac.totalCopago += parseFloat(sesion.copago);
+                if (sesion.facturaPrepaga === true){
+                    fac.totalPrepaga += valor;
+                    fac.prepagas[sesion.prepaga] = fac.prepagas[sesion.prepaga] ? fac.prepagas[sesion.prepaga] += valor : valor;
+                }
+            }
+
+        });
+
+        // agrego última facturación
+        fac.total = fac.totalPrepaga + fac.totalPrivado + fac.totalCopago;
+        facturaciones.push(fac);
+
+    }
+    console.log('Facturaciones', facturaciones);
+    return facturaciones;
+
 }
 
-
 // table formatters
+
+export const dateFormatter = (cell, row) => {
+    return moment(cell).format('L');
+}
 
 export const tipoFormatter = (cell, row) => {
     let badge;

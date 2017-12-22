@@ -100,7 +100,7 @@ class Sesion extends Component {
                 let warning = false;
                 let sesionesFecha = {};
 
-                db.collection("sesiones").where("fecha", "==", fecha.fechaString)
+                db.collection("sesiones").where("fecha", "==", fecha.fechaTS)
                 .get()
                 .then((result) => {
                     result.forEach((doc) =>{
@@ -154,10 +154,10 @@ class Sesion extends Component {
     createSesion(p,fecha){
        
         let sesion = {
-            fecha: fecha.fechaString,
             dia: fecha.dia,
             mes: fecha.mes,
             anio: fecha.anio,
+            fecha: fecha.fechaTS,
             paciente: p.value,
             // determinar campos por tipo de paciente (privado/prepaga)
             tipo: p.tipo

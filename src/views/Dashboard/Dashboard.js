@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import db from '../../fire';
-import { pacientePrepaga, pacientePrivado, cargarPrepagas } from '../../constants';
+import { pacientePrepaga, pacientePrivado, prepagas } from '../../constants';
 import Loader from 'react-loaders';
 
 import {
@@ -16,38 +16,12 @@ import {
 	
 import Widget02 from '../Widgets/Widget02';
 	
-const Callout = ({title, color, value}) => {
-	return (
-		<div className={`callout callout-${color}`}>
-			<small className="text-muted">{title}</small>
-			<br />
-			<strong className="h4">{value}</strong>
-		</div>
-	);
-}
-
-const StatItem = ({title, porc, value, icon, color}) => {
-	let legend = value !== undefined ? <span className="value">{value} <span className="text-muted small">{`(${porc}%)`}</span></span> : <span className="value">{`${porc}%`}</span>;
-	return(
-		<div>
-			<i className={icon}></i>
-			<span className="title">{title}</span>
-			{legend}
-			<div className="bars">
-				<Progress className="progress-xs" color={color} value={porc} />
-			</div>
-		</div>
-	);
-}
-
-
 class Dashboard extends Component {
   
 	constructor(props) {
 		super(props);
 		this.state = {
 			loading: false,
-			prepagas: [],
 			total: 0,
 			activos: 0,
 			inactivos: 0,
@@ -63,52 +37,51 @@ class Dashboard extends Component {
 		this.setState({loading: val});
 	}
 
-	componentWillMount(){
+	componentDidMount(){
 		this.loading(true);
-		cargarPrepagas().then( () => {
-			let data = Object.assign({}, this.state);
-			// initialize prepagas counters
-			data.prepagas = window.prepagas;
-			data.prepagas.forEach( i => {
-				data[i.id] = 0;
-			});
-			// query db
-			db.collection("pacientes").get().then((querySnapshot)=> {
-				querySnapshot.docs.forEach( doc => {
-					data.total += 1;
-					let pac = doc.data();
-					pac.activo ? data.activos += 1 : data.inactivos += 1;
-					switch (pac.tipo) {
-						case pacientePrepaga:
-							data.obraSocial += 1;
-							if (pac.activo) {
-								data.obraSocialActivos += 1 ;
-								data[pac.prepaga] += 1;
-							}
-							break;
-						case pacientePrivado:
-							data.privados += 1;
-							if (pac.activo) data.privadosActivos += 1 ;
-							break;
-					}
-				});
-				// percentages
-				data.porcActivos = data.total > 0 ? (data.activos / data.total * 100) : 0;
-				data.porcInactivos = data.total > 0 ? (data.inactivos / data.total * 100) : 0;
-
-				// porcentajes activos
-				data.porcPrivados = data.activos > 0 ? (data.privadosActivos / data.activos * 100) : 0;
-				data.porcObrasocial = data.activos > 0 ? (data.obraSocialActivos / data.activos * 100) : 0;
-
-				data.prepagas.forEach( i => {
-					i.porc = data.obraSocialActivos > 0 ? (data[i.id] / data.obraSocialActivos * 100) : 0;
-				});
-				console.log('data', data);
-
-				this.setState(data);
-				this.loading(false);
-			});
+		
+		let data = Object.assign({}, this.state);
+		// initialize prepagas counters
+		data.prepagas = prepagas;
+		data.prepagas.forEach( i => {
+			data[i.id] = 0;
 		});
+		// query db
+		db.collection("pacientes").get().then((querySnapshot)=> {
+			querySnapshot.docs.forEach( doc => {
+				data.total += 1;
+				let pac = doc.data();
+				pac.activo ? data.activos += 1 : data.inactivos += 1;
+				switch (pac.tipo) {
+					case pacientePrepaga:
+						data.obraSocial += 1;
+						if (pac.activo) {
+							data.obraSocialActivos += 1 ;
+							data[pac.prepaga] += 1;
+						}
+						break;
+					case pacientePrivado:
+						data.privados += 1;
+						if (pac.activo) data.privadosActivos += 1 ;
+						break;
+				}
+			});
+			// percentages
+			data.porcActivos = data.total > 0 ? (data.activos / data.total * 100) : 0;
+			data.porcInactivos = data.total > 0 ? (data.inactivos / data.total * 100) : 0;
+
+			// porcentajes activos
+			data.porcPrivados = data.activos > 0 ? (data.privadosActivos / data.activos * 100) : 0;
+			data.porcObrasocial = data.activos > 0 ? (data.obraSocialActivos / data.activos * 100) : 0;
+
+			data.prepagas.forEach( i => {
+				i.porc = data.obraSocialActivos > 0 ? (data[i.id] / data.obraSocialActivos * 100) : 0;
+			});
+
+			this.setState(data);
+			this.loading(false);
+		});
+
 
 	}
 
@@ -154,7 +127,7 @@ class Dashboard extends Component {
 													<StatItem title="Obra social" icon="icon-user-follow" value={data.obraSocialActivos} porc={data.porcObrasocial} color="primary"/>
 												</li>
 												<li className="divider"></li>
-												{ data.prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon="icon-plus" value={data[item.id]} porc={item.porc} color="info"/></li>)}
+												{ prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon="icon-plus" value={data[item.id]} porc={item.porc} color="info"/></li>)}
 											</ul>
 										</Col>
 									</Row>
@@ -167,6 +140,31 @@ class Dashboard extends Component {
 			</div>
 		);
 	}
+}
+
+// componentes auxiliares
+const Callout = ({title, color, value}) => {
+	return (
+		<div className={`callout callout-${color}`}>
+			<small className="text-muted">{title}</small>
+			<br />
+			<strong className="h4">{value}</strong>
+		</div>
+	);
+}
+
+const StatItem = ({title, porc, value, icon, color}) => {
+	let legend = value !== undefined ? <span className="value">{value} <span className="text-muted small">{`(${porc}%)`}</span></span> : <span className="value">{`${porc}%`}</span>;
+	return(
+		<div>
+			<i className={icon}></i>
+			<span className="title">{title}</span>
+			{legend}
+			<div className="bars">
+				<Progress className="progress-xs" color={color} value={porc} />
+			</div>
+		</div>
+	);
 }
 
 export default Dashboard;

@@ -74,18 +74,18 @@ span.thTitle{
     margin-bottom: 1rem;
 }    
 
-.listaSesiones {
+.listaSesiones, .facturaciones {
     tr{
         cursor: pointer;
     }
     hr{
         margin: 0;
     }
-    .filtros-sesiones{
-        #anio{
+    .filtros{
+        .anio{
             width: 70px;
         }
-        #mes{
+        .mes{
             width: 100px;
         }
     }
