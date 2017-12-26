@@ -32,7 +32,7 @@ class Facturaciones extends Component {
 			optsGrafica: {},
 			pacientesMap: {},
 			showResultados: false,
-			loading: true,
+			loading: false,
 			periodo: ''
 		};
 		this.loading = this.loading.bind(this);
@@ -42,9 +42,7 @@ class Facturaciones extends Component {
 	}
 	
 	componentDidMount(){
-		this.loading(true);
 		this.initFiltros();
-		this.loading(false);
 	}
 
 	initFiltros(){
@@ -63,6 +61,8 @@ class Facturaciones extends Component {
 
 	getFacturacion(){
 
+		this.loading(true);
+
 		// oculto resultados anteriores
 		if (this.state.showResultados){
 			this.setState({showResultados: false});	
@@ -76,9 +76,9 @@ class Facturaciones extends Component {
 		// valido periodo
 		if (this.validarPeriodo(mesIni, anioIni, mesFin, anioFin)) {
 	
-			getFacturacionesPeriodo(mesIni, anioIni, mesFin, anioFin).then( result => {	
-				console.log('Resultado', result);			
+			getFacturacionesPeriodo(mesIni, anioIni, mesFin, anioFin).then( result => {			
 				this.setState({showResultados: true, facturaciones: result.facturaciones, grafica: result.grafica.grafica, optsGrafica: result.grafica.optsGrafica});
+				this.loading(false);
 			});
 
 		}
@@ -86,7 +86,6 @@ class Facturaciones extends Component {
 	}
 
 	validarPeriodo(mesIni, anioIni, mesFin, anioFin) {
-		console.log('Periodo', mesIni, anioIni, mesFin, anioFin);
 		if (!anioIni || !anioFin || (anioIni > anioFin) || (anioIni == anioFin && mesIni > mesFin) ){
 			//periodo invalido
 			NotificationManager.error(errores.periodoInvalido, 'Error');
@@ -121,108 +120,114 @@ class Facturaciones extends Component {
 		const optionsMes = meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>);
 		
 		return (
-			<div className="animated fadeIn">
-				<Loader type={tipoLoader} active={this.state.loading} />
-				<div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn facturaciones"}>                
-					<Row>
-						<Col>
-							<Card>
-								<CardHeader>
-									<i className="fa fa-book fa-lg"></i> Facturaciones
+			<div className="animated fadeIn">				
+				<Row>
+					<Col>
+						<Card>
+							<CardHeader>
+								<i className="fa fa-book fa-lg"></i> Facturaciones
 								</CardHeader>
-								<CardBody>
-									<Form className="filtros">
-										<Row>
-											<Col xs="12" sm="6">
-												<FormGroup>
-                                                    <Label htmlFor="mesIni">Desde</Label>
-                                                    <InputGroup>
-														<Input className="mes" type="select" bsSize="sm" name="mesIni" id="mesIni" innerRef={el => this.mesIni = el}>
-															{optionsMes}
-														</Input>
-														<Input className="anio ml-2" type="number" bsSize="sm" name="anioIni" id="anioIni" innerRef={el => this.anioIni = el} />    
-                                                    </InputGroup>
-                                                </FormGroup>
-											</Col>
-											<Col xs="12" sm="6">	
-												<FormGroup>
-                                                    <Label htmlFor="mesFin">Hasta</Label>
-                                                    <InputGroup>
-														<Input className="mes" type="select" bsSize="sm" name="mesFin" id="mesFin" innerRef={el => this.mesFin = el}>
-															{optionsMes}
-														</Input>
-														<Input className="anio ml-2" type="number" bsSize="sm" name="anioFin" id="anioFin" innerRef={el => this.anioFin = el} />
-													</InputGroup>
-												</FormGroup>													
-											</Col>
-										</Row>
-										<Row>
-											<Col>
-												<Button className="mb-3" color="primary" size="sm" onClick={this.getFacturacion}><i className="fa fa-search"></i> Consultar</Button>
-											</Col>
-										</Row>
-									</Form>
-									{ this.state.showResultados &&
-										<BootstrapTable ref="table" version='4'
-											data={this.state.facturaciones}
-											bordered={false}
-											hover //striped
-											options={options}
-											expandableRow={this.isExpandableRow}
-											expandComponent={ this.expandComponent }
-											expandColumnOptions={ { expandColumnVisible: true } }
-											>
-											<TableHeaderColumn 
-												hidden
-												dataField='id' isKey
-												dataAlign='center'
-												>											
-											</TableHeaderColumn>										
-											<TableHeaderColumn
-												dataField='anio'
-												dataSort>
-												<span className="thTitle">Año</span>
-											</TableHeaderColumn>										
-											<TableHeaderColumn
-												dataField='mes'
-												dataSort>
-												<span className="thTitle">Mes</span>
-											</TableHeaderColumn>										
-											<TableHeaderColumn 
-												dataField='totalPrivado'
-												dataFormat={ priceFormatter }
-												dataSort
-												>
-												<span className="thTitle">Privados</span>
-											</TableHeaderColumn>
-											<TableHeaderColumn 
-												dataField='totalCopago'
-												dataFormat={ priceFormatter }
-												dataSort
-												>
-												<span className="thTitle">Copagos</span>
-											</TableHeaderColumn>
-											<TableHeaderColumn 
-												dataField='totalPrepaga'
-												dataFormat={ priceFormatter }
-												dataSort
-												>
-												<span className="thTitle">Prepagas</span>
-											</TableHeaderColumn>								
-											<TableHeaderColumn 
-												dataField='total'
-												dataFormat={ priceFormatter }
-												dataSort
-												>
-												<span className="thTitle">Total</span>
-											</TableHeaderColumn>
-										</BootstrapTable>
-									}
-								</CardBody>
-							</Card>
-						</Col>
-					</Row>			
-					{ this.state.showResultados &&			
+							<CardBody>
+								<Form className="filtros">
+									<Row>
+										<Col xs="12" sm="6">
+											<FormGroup>
+												<Label htmlFor="mesIni">Desde</Label>
+												<InputGroup>
+													<Input className="mes" type="select" bsSize="sm" name="mesIni" id="mesIni" innerRef={el => this.mesIni = el}>
+														{optionsMes}
+													</Input>
+													<Input className="anio ml-2" type="number" bsSize="sm" name="anioIni" id="anioIni" innerRef={el => this.anioIni = el} />
+												</InputGroup>
+											</FormGroup>
+										</Col>
+										<Col xs="12" sm="6">
+											<FormGroup>
+												<Label htmlFor="mesFin">Hasta</Label>
+												<InputGroup>
+													<Input className="mes" type="select" bsSize="sm" name="mesFin" id="mesFin" innerRef={el => this.mesFin = el}>
+														{optionsMes}
+													</Input>
+													<Input className="anio ml-2" type="number" bsSize="sm" name="anioFin" id="anioFin" innerRef={el => this.anioFin = el} />
+												</InputGroup>
+											</FormGroup>
+										</Col>
+									</Row>
+									<Row>
+										<Col>
+											<FormGroup>
+												<InputGroup>
+													<Button color="primary" size="sm" onClick={this.getFacturacion}><i className="fa fa-search"></i> Consultar</Button>
+													{ this.state.loading &&
+													<div className="spinner-container">
+														<i className={"fa fa-spinner fa-lg " + (this.state.loading ? 'fa-spin' : '')}></i>
+													</div>}								
+												</InputGroup>
+											</FormGroup>
+										</Col>
+									</Row>
+								</Form>
+								{this.state.showResultados &&
+									<BootstrapTable ref="table" version='4'
+										data={this.state.facturaciones}
+										bordered={false}
+										hover //striped
+										options={options}
+										expandableRow={this.isExpandableRow}
+										expandComponent={this.expandComponent}
+										expandColumnOptions={{ expandColumnVisible: true }}
+									>
+										<TableHeaderColumn
+											hidden
+											dataField='id' isKey
+											dataAlign='center'
+										>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='anio'
+											dataSort>
+											<span className="thTitle">Año</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='mes'
+											dataSort>
+											<span className="thTitle">Mes</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='totalPrivado'
+											dataFormat={priceFormatter}
+											dataSort
+										>
+											<span className="thTitle">Privados</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='totalCopago'
+											dataFormat={priceFormatter}
+											dataSort
+										>
+											<span className="thTitle">Copagos</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='totalPrepaga'
+											dataFormat={priceFormatter}
+											dataSort
+										>
+											<span className="thTitle">Prepagas</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='total'
+											dataFormat={priceFormatter}
+											dataSort
+										>
+											<span className="thTitle">Total</span>
+										</TableHeaderColumn>
+									</BootstrapTable>
+								}
+							</CardBody>
+						</Card>
+					</Col>
+				</Row>
+				{this.state.showResultados && this.state.grafica !== null &&
 					<Row>
 						<Col>
 							<Card>
@@ -258,15 +263,13 @@ class Facturaciones extends Component {
 											<div className="text-muted">Prepagas</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrepagas}</strong>
 											<Progress className="progress-xs mt-2" color="primary" value="100" />
-										</li>																				
+										</li>
 									</ul>
 								</CardFooter>
 							</Card>
 						</Col>
 					</Row>
-					}
-
-				</div>
+				}
 			</div>
 		)
 	}

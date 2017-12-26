@@ -114,11 +114,14 @@ export const pacientesMap = () => {
                 paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;          
                 pacientes[paciente.id] = paciente;                
             });
-            window.pacientesMap = pacientes;
-            resolve(console.log('cargo map de pacientes en window', window.pacientesMap));
+            resolve(setPacientesWindow(pacientes));
         });
     });
     return promise;
+}
+
+function setPacientesWindow(pacientes) {
+    window.pacientesMap = pacientes;
 }
 
 export const createFechaSesion = (value) =>{
@@ -147,7 +150,7 @@ export const getFacturacionesPeriodo = (mesIni, anioIni, mesFin, anioFin) => {
 		.orderBy("fecha","asc")
 		.get().then( querySnapshot => {
             let facturaciones = armarFacturaciones(querySnapshot.docs, mesIni, anioIni, mesFin, anioFin);
-            let grafica = armarGrafica(facturaciones);
+            let grafica = facturaciones.length > 1 ? armarGrafica(facturaciones) : {grafica: null};
 			resolve({facturaciones, grafica});
 		});
     });
@@ -179,7 +182,6 @@ function armarFacturaciones(data, mesIni, anioIni, mesFin, anioFin) {
         sesion.id = doc.id;
         sesiones.push(sesion);
     });
-    // console.log('Sesiones del período', sesiones);
 
     let facturaciones = [], mes, anio;
     if (sesiones.length > 0) {
@@ -262,8 +264,8 @@ function armarGrafica(facturaciones) {
         prepagas:   _.map(facturaciones, 'totalPrepaga'),
         copagos:    _.map(facturaciones, 'totalCopago')
     };
-    let minimo = _.min(data.totales);
-    data.minimo = []
+    let minimo = 1000;//_.min(data.totales);
+    data.minimo = [];
     for (let i = 0; i <= data.totales.length; i++) {
         data.minimo.push(minimo);
     }
@@ -302,16 +304,16 @@ function armarGrafica(facturaciones) {
                 pointHoverBackgroundColor: '#fff',
                 borderWidth: 2,
                 data: data.copagos
-            }//,
-            // {
-            //     label: 'Mínimo facturado',
-            //     backgroundColor: 'transparent',
-            //     borderColor: brandDanger,
-            //     pointHoverBackgroundColor: '#fff',
-            //     borderWidth: 1,
-            //     borderDash: [8, 5],
-            //     data: data.minimo
-            // }
+            },
+            {
+                label: 'Facturación baja',
+                backgroundColor: 'transparent',
+                borderColor: brandDanger,
+                pointHoverBackgroundColor: '#fff',
+                borderWidth: 1,
+                borderDash: [8, 5],
+                data: data.minimo
+            }
         ],
         sumTotal: round(_.sum(data.totales),2),
         sumPrivados: round(_.sum(data.privados),2),

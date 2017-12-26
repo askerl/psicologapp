@@ -93,70 +93,70 @@ class ListaPacientes extends Component {
 		}
 
 		return (
-			<div className="animated fadeIn">
-				<Loader type={tipoLoader} active={this.state.loading} />
-				<div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn listaPacientes"}>                
-					<Row>
-						<Col>
-							<Card>
-								<CardHeader>
-									<i className="fa fa-address-book-o fa-lg"></i> Pacientes
+			<div className="animated fadeIn listaPacientes">
+				<Row>
+					<Col>
+						<Card>
+							<CardHeader>
+								<i className="fa fa-address-book-o fa-lg"></i> Pacientes
 								</CardHeader>
-								<CardBody>
-									<div className="d-flex flex-row mb-1">
-										<div className="mr-auto">
-											<Button color="primary" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus"></i> Nuevo paciente</Button>
-										</div>
+							<CardBody>
+								<div className="d-flex flex-row mb-1">
+									<div className="mr-auto">
+										<Button color="primary" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus"></i> Nuevo paciente</Button>
 									</div>
+								</div>
+								<Loader type={tipoLoader} active={this.state.loading} />
+								{!this.state.loading &&
 									<BootstrapTable ref="table" version='4'
 										data={this.state.pacientes}
 										bordered={false}
 										striped hover
 										options={options}
-										>
-										<TableHeaderColumn 
+									>
+										<TableHeaderColumn
 											dataField='id' isKey
-											dataFormat={ this.actionsFormatter}
+											dataFormat={this.actionsFormatter}
 											dataAlign='center'
-											width="43">											
-										</TableHeaderColumn>										
+											width="43">
+										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='nombreCompleto'
-											filter={{ type: 'TextFilter', placeholder:"..."}}
+											filter={{ type: 'TextFilter', placeholder: "..." }}
 											dataSort>
 											<span className="thTitle">Paciente</span>
-										</TableHeaderColumn>										
-										<TableHeaderColumn 
+										</TableHeaderColumn>
+										<TableHeaderColumn
 											dataField='tipo'
 											width="130"
-											dataFormat={ tipoFormatter }
-          									filter={ { type: 'SelectFilter', placeholder:"Todos", options: filtroTipoPaciente } }
+											dataFormat={tipoFormatter}
+											filter={{ type: 'SelectFilter', placeholder: "Todos", options: filtroTipoPaciente }}
 											dataSort>
 											<span className="thTitle">Tipo</span>
 										</TableHeaderColumn>
-										<TableHeaderColumn 
+										<TableHeaderColumn
 											dataField='prepaga'
-											dataFormat={ prepagaFormatter } 											
-											filter={ { type: 'SelectFilter', placeholder:"Todas", options: filtroPrepagas } }
+											dataFormat={prepagaFormatter}
+											filter={{ type: 'SelectFilter', placeholder: "Todas", options: filtroPrepagas }}
 											dataSort
-											>
+										>
 											<span className="thTitle">Prepaga</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='sesionesRestantes'
-											dataFormat= { this.restantesFormatter }											
-											filter={{ type: 'NumberFilter', placeholder:"...", numberComparators: [ '=', '>', '<=' ] }}
+											dataFormat={this.restantesFormatter}
+											filter={{ type: 'NumberFilter', placeholder: "...", numberComparators: ['=', '>', '<='] }}
 											dataSort
 											width="200"
-											>
+										>
 											<span className="thTitle">Sesiones restantes</span>
-										</TableHeaderColumn>										
+										</TableHeaderColumn>
 									</BootstrapTable>
-								</CardBody>
-							</Card>
-						</Col>
-					</Row>
-				</div>
+								}
+							</CardBody>
+						</Card>
+					</Col>
+				</Row>
 			</div>
 		)
 	}

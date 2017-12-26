@@ -30,9 +30,7 @@ class ListaSesiones extends Component {
 			loading: true,
 			showDeleteModal: false,
 			selected: [],
-			selectedPacientes: [],
-			filtroMes: '',
-			filtroAnio: ''
+			selectedPacientes: []
 		};
 		this.nuevaSesion = this.nuevaSesion.bind(this);
 		this.cargarSesiones = this.cargarSesiones.bind(this);
@@ -62,16 +60,12 @@ class ListaSesiones extends Component {
 		let anio = hoy.year();
 		this.inputMes.value = mes;
 		this.inputAnio.value = anio; 
-		this.setState({
-			filtroMes: mes,
-			filtroAnio: anio
-		});
 	}
 
 	cargarSesiones(){
 		db.collection("sesiones")
-		.where("mes","==",parseInt(this.state.filtroMes))
-		.where("anio","==",parseInt(this.state.filtroAnio))		
+		.where("mes","==",parseInt(this.inputMes.value))
+		.where("anio","==",parseInt(this.inputAnio.value))		
 		.orderBy("dia","desc")
 		.get().then( querySnapshot => {			
 			this.loadSesiones(querySnapshot);
@@ -174,8 +168,6 @@ class ListaSesiones extends Component {
 
 	changePeriodo(){
 		this.setState({
-			filtroMes: this.inputMes.value,
-			filtroAnio: this.inputAnio.value,
 			loading: true
 		}, () => {
 			this.cargarSesiones();
@@ -200,33 +192,33 @@ class ListaSesiones extends Component {
 		};
 
 		return (
-			<div className="animated fadeIn">
-				<Loader type={tipoLoader} active={this.state.loading} />
-				<div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn listaSesiones"}>                
-					<Row>
-						<Col>
-							<Card>
-								<CardHeader>
-									<i className="fa fa-comments fa-lg"></i> Sesiones
+			<div className="animated fadeIn listaSesiones">
+				<Row>
+					<Col>
+						<Card>
+							<CardHeader>
+								<i className="fa fa-comments fa-lg"></i> Sesiones
 								</CardHeader>
-								<CardBody>
-									<Row>
-										<Col xs="12" sm="6">
-											<div className="d-flex flex-row mb-2 mr-auto">
-												<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus"></i> Nueva sesión</Button>
-												<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser"></i> Borrar sesiones</Button>												
-											</div>
-										</Col>
-										<Col xs="12" sm="6">
-											<div className="filtros d-flex flex-row mb-2 justify-content-sm-end">
-												<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
-													{ meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>)}						
-												</Input>
-												<Input className="ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
-											</div>										
-										</Col>
-									</Row>
-									<hr/>
+							<CardBody>
+								<Row>
+									<Col xs="12" sm="6">
+										<div className="d-flex flex-row mb-2 mr-auto">
+											<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus"></i> Nueva sesión</Button>
+											<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser"></i> Borrar sesiones</Button>
+										</div>
+									</Col>
+									<Col xs="12" sm="6">
+										<div className="filtros d-flex flex-row mb-2 justify-content-sm-end">
+											<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
+												{meses.map((value, index) => <option key={index} value={index + 1}>{value}</option>)}
+											</Input>
+											<Input className="ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
+										</div>
+									</Col>
+								</Row>
+								<hr />
+								<Loader type={tipoLoader} active={this.state.loading} />
+								{!this.state.loading &&
 									<BootstrapTable ref="table" version='4'
 										data={this.state.sesiones}
 										bordered={false}
@@ -234,66 +226,67 @@ class ListaSesiones extends Component {
 										options={options}
 										selectRow={selectRowProp}
 										search
-										>
-										<TableHeaderColumn 
+									>
+										<TableHeaderColumn
 											hidden
 											dataField='id' isKey
 											dataAlign='center'
-											>											
-										</TableHeaderColumn>										
+										>
+										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='fecha'
-											dataFormat={ dateFormatter }
+											dataFormat={dateFormatter}
 											width="90"
-											>
+										>
 											<span className="thTitle">Fecha</span>
-										</TableHeaderColumn>										
+										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='nombreCompleto'
 											dataSort
 											width="250">
 											<span className="thTitle">Paciente</span>
-										</TableHeaderColumn>										
-										<TableHeaderColumn 
+										</TableHeaderColumn>
+										<TableHeaderColumn
 											dataField='tipo'
-											dataFormat={ tipoFormatter }
-											>
+											dataFormat={tipoFormatter}
+										>
 											<span className="thTitle">Tipo</span>
 										</TableHeaderColumn>
-										<TableHeaderColumn 
+										<TableHeaderColumn
 											dataField='prepaga'
-											dataFormat={ prepagaFormatter } 											
+											dataFormat={prepagaFormatter}
 											dataSort
-											>
+										>
 											<span className="thTitle">Prepaga</span>
 										</TableHeaderColumn>
-										<TableHeaderColumn 
+										<TableHeaderColumn
 											dataField='facturaPrepaga'
 											dataFormat={enumFormatter} formatExtraData={boolFormatter}
 											dataAlign="center"
-											>
+										>
 											<span className="thTitle">Factura</span>
 										</TableHeaderColumn>
-										<TableHeaderColumn 
+										<TableHeaderColumn
 											dataField='valor'
 											dataAlign='right'
-											dataFormat={ priceFormatter }
-											>
+											dataFormat={priceFormatter}
+										>
 											<span className="thTitle">Valor</span>
 										</TableHeaderColumn>
-										<TableHeaderColumn 
+										<TableHeaderColumn
 											dataField='copago'
 											dataAlign='right'
-											dataFormat={ priceFormatter }
-											>
+											dataFormat={priceFormatter}
+										>
 											<span className="thTitle">Copago</span>
-										</TableHeaderColumn>										
+										</TableHeaderColumn>
 									</BootstrapTable>
-								</CardBody>
-							</Card>
-						</Col>
-					</Row>
-					<Modal isOpen={this.state.showDeleteModal} toggle={this.toggleDelete} className={'modal-md modal-danger'}>
+								}
+							</CardBody>
+						</Card>
+					</Col>
+				</Row>
+				<Modal isOpen={this.state.showDeleteModal} toggle={this.toggleDelete} className={'modal-md modal-danger'}>
 					<ModalHeader toggle={this.toggleDelete}>Borrar sesiones</ModalHeader>
 					<ModalBody>
 						Confirme la eliminación de las sesiones seleccionadas ({this.state.selected.length}). Esta acción no podrá deshacerse.
@@ -302,8 +295,7 @@ class ListaSesiones extends Component {
 						<Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>{' '}
 						<Button color="danger" size="sm" onClick={this.deleteSesiones}>Borrar</Button>
 					</ModalFooter>
-					</Modal>
-				</div>
+				</Modal>
 			</div>
 		)
 	}
