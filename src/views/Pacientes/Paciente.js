@@ -26,8 +26,7 @@ import {NotificationManager} from 'react-notifications';
 import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, tipoLoader, prepagasById, prepagas } from '../../constants';
 import Widget01 from '../Widgets/Widget01';
 import Widget02 from '../Widgets/Widget02';
-import WidgetSesionesUsadas from '../Widgets/WidgetsAuxiliares';
-import WidgetSesionesRestantes from '../Widgets/WidgetsAuxiliares';
+import {WidgetSesionesUsadas, WidgetSesionesRestantes} from '../Widgets/WidgetsAuxiliares';
 import Toggle from 'react-toggle';
 import Loader from 'react-loaders';
 

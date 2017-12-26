@@ -12,9 +12,11 @@ export const WidgetSesionesUsadas = ({title, color, value, porc, resetAction}) =
         progressColor = "danger";
     }
 
+    let classColor = color ? `bg-${color}` : '';
+
 	return (
 		
-        <div className={"card " + (color ? `bg-${color}` : '')}>
+        <div className={"card " + classColor}>
             <div className="card-body">
                 <a href="javascript:void(0);" className="reset-sesiones float-right" onClick={() => resetAction()}>
                     <i className="icon-reload"></i>{' '}Reiniciar
@@ -39,8 +41,10 @@ export const WidgetSesionesRestantes = ({title, color, value, porc}) => {
         progressColor = "danger";
     }
 
+    let classColor = color ? `bg-${color}` : '';
+
 	return (
-        <div className={"card " + (color ? `bg-${color}` : '')}>
+        <div className={"card " + classColor}>
             <div className="card-body">
                 <h4 className="mb-0">{value}</h4>
                 <p>{title}</p>
