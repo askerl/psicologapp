@@ -26,7 +26,7 @@
     "webpack-dev-server": "2.9.4"
   },
   "dependencies": {
-    "@coreui/react": "^1.0.4",
+    "@coreui/react": "^1.0.6",
     "bootstrap": "4.0.0-beta.2",
     "chart.js": "2.7.1",
     "firebase": "^4.6.2",
@@ -43,6 +43,7 @@
     "react-dates": "^15.3.0",
     "react-day-picker": "^7.0.5",
     "react-dom": "^16.1.1",
+    "react-firebaseui": "^1.0.10",
     "react-loaders": "^3.0.1",
     "react-notifications": "^1.4.3",
     "react-router-dom": "4.2.2",

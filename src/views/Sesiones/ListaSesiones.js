@@ -209,10 +209,10 @@ class ListaSesiones extends Component {
 									</Col>
 									<Col xs="12" sm="6">
 										<div className="filtros d-flex flex-row mb-2 justify-content-sm-end">
-											<Input type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
+											<Input className="mes" type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
 												{meses.map((value, index) => <option key={index} value={index + 1}>{value}</option>)}
 											</Input>
-											<Input className="ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
+											<Input className="anio ml-2" type="number" bsSize="sm" name="anio" id="anio" innerRef={el => this.inputAnio = el} onChange={this.changePeriodo} />
 										</div>
 									</Col>
 								</Row>

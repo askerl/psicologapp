@@ -21,10 +21,12 @@ import 'react-select/dist/react-select.css';
 
 // Containers
 import Full from './containers/Full';
+import Login from './views/Pages/Login';
 
 ReactDOM.render((
   <HashRouter>
     <Switch>
+      <Route exact path="/login" name="Login" component={Login}/>
       <Route path="/" name="Inicio" component={Full}/>
     </Switch>
   </HashRouter>

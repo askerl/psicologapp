@@ -14,12 +14,29 @@ import ListaSesiones from '../../views/Sesiones/ListaSesiones';
 import Sesion from '../../views/Sesiones/Sesion';
 import Facturaciones from '../../views/Facturaciones/Facturaciones';
 
+
 import {NotificationContainer} from 'react-notifications';
 
-import db from '../../fire';
+import { FirebaseAuth } from 'react-firebaseui';
 
+import {db, auth, uiConfig} from '../../fire';
+import { currentUser } from '../../constants';
 
 class Full extends Component {
+
+  componentDidMount(){
+
+    auth.onAuthStateChanged( (user) => {
+      console.log('USER', user);
+      if (!user) {
+        // User is signed out.
+        // redirect to login
+        this.props.history.push('/login');
+      }
+    }, (error) => {
+      console.log(error);
+    });
+  };
 
   render() {
     return (
@@ -36,7 +53,7 @@ class Full extends Component {
                 <Route path='/pacientes/:id' name="Paciente" component={Paciente}/>
                 <Route exact path="/sesiones" name="Sesiones" component={ListaSesiones}/>
                 <Route path='/sesiones/:id' name="Sesion" component={Sesion}/>
-                <Route exact path="/facturaciones" name="Facturaciones" component={Facturaciones}/>
+                <Route exact path="/facturaciones" name="Facturaciones" component={Facturaciones}/>                
                 <Redirect from="/" to="/dashboard"/>                
               </Switch>
               <NotificationContainer enterTimeout={200}/>

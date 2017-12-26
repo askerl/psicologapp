@@ -120,7 +120,7 @@ class Facturaciones extends Component {
 		const optionsMes = meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>);
 		
 		return (
-			<div className="animated fadeIn">				
+			<div className="animated fadeIn facturaciones">				
 				<Row>
 					<Col>
 						<Card>
