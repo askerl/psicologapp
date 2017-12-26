@@ -118,3 +118,7 @@ span.thTitle{
 .spinner-container{
     padding-top: 2px;
 }
+
+.btn-secondary:not([disabled]):not(.disabled):active, .btn-secondary:not([disabled]):not(.disabled).active, .show > .btn-secondary.dropdown-toggle{
+    box-shadow: none;
+}

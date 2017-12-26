@@ -418,3 +418,13 @@ function convertHex(hex, opacity) {
 	var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity / 100 + ')';
 	return result;
 }
+
+
+const mailHabilitados = [
+    "alfredo.skerl@gmail.com",
+    "estacco@gmail.com"
+]
+
+export const isHabilitado = (email) =>{
+    return _.indexOf(mailHabilitados, email) !== -1;
+}

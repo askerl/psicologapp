@@ -28,8 +28,7 @@ export const uiConfig = {
     // credentialHelper: firebaseui.auth.CredentialHelper.NONE
     callbacks: {
         signInSuccess: (currentUser) => {
-            console.log('Sign in success', currentUser);
-            // aca se puede controlar el usuario y si no está permitido retornar true
+            console.log('Sign in success', currentUser);            
             return true;
         }
     }

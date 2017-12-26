@@ -19,16 +19,21 @@ import {NotificationContainer} from 'react-notifications';
 
 import { FirebaseAuth } from 'react-firebaseui';
 
-import {db, auth, uiConfig} from '../../fire';
-import { currentUser } from '../../constants';
+import {db, auth, uiConfig, logout} from '../../fire';
+import { isHabilitado } from '../../constants';
 
 class Full extends Component {
 
   componentDidMount(){
 
     auth.onAuthStateChanged( (user) => {
-      console.log('USER', user);
-      if (!user) {
+      if (user) {
+        // chequeo si es usuario de mi lista
+        if (!isHabilitado(user.email)){
+          logout();
+          this.props.history.push('/login');  
+        } 
+      } else {
         // User is signed out.
         // redirect to login
         this.props.history.push('/login');
