@@ -361,7 +361,7 @@ function armarGrafica(facturaciones) {
 // table formatters
 
 export const dateFormatter = (cell, row) => {
-    return moment(cell).format('L');
+    return moment(cell).format('DD/MM/YYYY');
 }
 
 export const tipoFormatter = (cell, row) => {
