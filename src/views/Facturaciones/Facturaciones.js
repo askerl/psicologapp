@@ -18,7 +18,7 @@ import db from '../../fire';
 import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates, getFacturacion, prepagas, getFacturacionesPeriodo, prepagasById, round, facChartOpts } from '../../constants';
 import { NotificationManager } from 'react-notifications';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
-import {Line} from 'react-chartjs-2';
+import {Line, Bar} from 'react-chartjs-2';
 
 import moment from 'moment';
 moment.locale("es");
@@ -201,18 +201,18 @@ class Facturaciones extends Component {
 											<span className="thTitle">Privados</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn
-											dataField='totalCopago'
-											dataFormat={priceFormatter}
-											dataSort
-										>
-											<span className="thTitle">Copagos</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
 											dataField='totalPrepaga'
 											dataFormat={priceFormatter}
 											dataSort
 										>
 											<span className="thTitle">Prepagas</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='totalCopago'
+											dataFormat={priceFormatter}
+											dataSort
+										>
+											<span className="thTitle">Copagos</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='total'
@@ -239,7 +239,8 @@ class Facturaciones extends Component {
 										</Col>
 									</Row>
 									<div className="chart-wrapper">
-										<Line data={this.state.grafica} options={this.state.optsGrafica} height={300} />
+										{/* <Line data={this.state.grafica} options={this.state.optsGrafica} height={300} /> */}
+										<Bar data={this.state.grafica} options={this.state.optsGrafica} height={300} />
 									</div>
 								</CardBody>
 								<CardFooter>
@@ -255,15 +256,15 @@ class Facturaciones extends Component {
 											<Progress className="progress-xs mt-2" color="warning" value="100" />
 										</li>
 										<li>
-											<div className="text-muted">Copagos</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumCopagos}</strong>
+											<div className="text-muted">Prepagas</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrepagas}</strong>
 											<Progress className="progress-xs mt-2" color="info" value="100" />
 										</li>
 										<li>
-											<div className="text-muted">Prepagas</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrepagas}</strong>
-											<Progress className="progress-xs mt-2" color="primary" value="100" />
-										</li>
+											<div className="text-muted">Copagos</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumCopagos}</strong>
+											<Progress className="progress-xs mt-2" color="teal" value="100" />
+										</li>										
 									</ul>
 								</CardFooter>
 							</Card>

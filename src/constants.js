@@ -277,47 +277,48 @@ function armarGrafica(facturaciones) {
     let grafica = {
         labels: facturaciones.map(item => mesesShort[item.mes-1]),
         datasets: [
-            {
-                label: 'Total',
-                backgroundColor: convertHex(brandSuccess, 10),
-                borderColor: brandSuccess,
-                pointHoverBackgroundColor: '#fff',
-                borderWidth: 2,
-                data: data.totales
-            },
+            // {
+            //     label: 'Total',
+            //     backgroundColor: brandSuccess, // convertHex(brandSuccess, 10),
+            //     borderColor: brandSuccess,
+            //     pointHoverBackgroundColor: '#fff',
+            //     borderWidth: 2,
+            //     data: data.totales
+            // },
             {
                 label: 'Privados',
-                backgroundColor: 'transparent',//convertHex(brandWarning, 10),
+                backgroundColor: convertHex(brandWarning, 90),
                 borderColor: brandWarning,
                 pointHoverBackgroundColor: '#fff',
-                borderWidth: 2,
+                borderWidth: 0,
                 data: data.privados
             },
             {
                 label: 'Prepagas',
-                backgroundColor: 'transparent',//convertHex(brandPrimary, 10),
-                borderColor: brandPrimary,
+                backgroundColor: convertHex(brandInfo, 90),
+                borderColor: brandInfo,
                 pointHoverBackgroundColor: '#fff',
-                borderWidth: 2,
+                borderWidth: 0,
                 data: data.prepagas
             },
             {
                 label: 'Copagos',
-                backgroundColor: 'transparent',//convertHex(brandInfo, 10),
-                borderColor: brandInfo,
+                backgroundColor: convertHex(brandTeal, 90),
+                borderColor: brandTeal,
                 pointHoverBackgroundColor: '#fff',
-                borderWidth: 2,
+                borderWidth: 0,
                 data: data.copagos
-            },
-            {
-                label: 'Facturación baja',
-                backgroundColor: 'transparent',
-                borderColor: brandDanger,
-                pointHoverBackgroundColor: '#fff',
-                borderWidth: 1,
-                borderDash: [8, 5],
-                data: data.minimo
-            }
+            }//,
+            // {
+            //     label: 'Facturación baja',
+            //     backgroundColor: 'transparent',
+            //     borderColor: brandDanger,
+            //     pointHoverBackgroundColor: '#fff',
+            //     borderWidth: 1,
+            //     borderDash: [8, 5],
+            //     data: data.minimo,
+            //     type: 'line'
+            // }
         ],
         sumTotal: round(_.sum(data.totales),2),
         sumPrivados: round(_.sum(data.privados),2),
@@ -328,21 +329,23 @@ function armarGrafica(facturaciones) {
     let facChartOpts = {
         maintainAspectRatio: false,
         legend: {
-            display: false
+            display: true
         },
         scales: {
             xAxes: [{
                 gridLines: {
                     drawOnChartArea: false,
-                }
+                },
+                stacked: true
             }],
             yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                    maxTicksLimit: 10,
-                    stepSize: 5000,
-                    // max: maxGraf
-                }
+                // ticks: {
+                //     beginAtZero: true,
+                //     maxTicksLimit: 10,
+                //     stepSize: 5000,
+                //     // max: maxGraf
+                // },
+                stacked: true
             }]
         },
         elements: {
@@ -407,6 +410,8 @@ const brandSuccess = '#4dbd74';
 const brandInfo = '#63c2de';
 const brandWarning = '#f8cb00';
 const brandDanger = '#f86c6b';
+const brandPurple = '#6f42c1';
+const brandTeal = '#20c997';
 
 // convert Hex to RGBA
 function convertHex(hex, opacity) {
