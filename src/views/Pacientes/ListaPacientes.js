@@ -112,8 +112,7 @@ class ListaPacientes extends Component {
 										data={this.state.pacientes}
 										bordered={false}
 										striped hover
-										options={options}
-									>
+										options={options}>
 										<TableHeaderColumn
 											dataField='id' isKey
 											dataFormat={this.actionsFormatter}
@@ -128,7 +127,7 @@ class ListaPacientes extends Component {
 										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='tipo'
-											width="130"
+											// width="130"
 											dataFormat={tipoFormatter}
 											filter={{ type: 'SelectFilter', placeholder: "Todos", options: filtroTipoPaciente }}
 											dataSort>
@@ -138,17 +137,22 @@ class ListaPacientes extends Component {
 											dataField='prepaga'
 											dataFormat={prepagaFormatter}
 											filter={{ type: 'SelectFilter', placeholder: "Todas", options: filtroPrepagas }}
-											dataSort
-										>
+											dataSort>
 											<span className="thTitle">Prepaga</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='credencial'
+											filter={{ type: 'TextFilter', placeholder: "..." }}
+											dataSort
+											>
+											<span className="thTitle">Credencial</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='sesionesRestantes'
 											dataFormat={this.restantesFormatter}
 											filter={{ type: 'NumberFilter', placeholder: "...", numberComparators: ['=', '>', '<='] }}
-											dataSort
-											width="200"
-										>
+											dataSort>
+											{/* width="200"> */}
 											<span className="thTitle">Sesiones restantes</span>
 										</TableHeaderColumn>
 									</BootstrapTable>
