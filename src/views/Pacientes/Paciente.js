@@ -23,13 +23,13 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, tipoLoader, prepagasById, prepagas } from '../../constants';
+import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, tipoLoader, prepagasById, prepagas, pacientesMap } from '../../constants';
 import Widget01 from '../Widgets/Widget01';
 import Widget02 from '../Widgets/Widget02';
 import {WidgetSesionesUsadas, WidgetSesionesRestantes} from '../Widgets/WidgetsAuxiliares';
 import Toggle from 'react-toggle';
 import Loader from 'react-loaders';
-
+import _ from 'lodash';
 import moment from 'moment';
 moment.locale("es");
 
@@ -54,7 +54,8 @@ class Paciente extends Component {
             errorTipo: false,
             errorValorConsulta: false,
             errorPrepaga: false,            
-            errorPago: false
+            errorPago: false,
+            pacientesMap: {}
         }; // <- set up react state
         this.loadPaciente = this.loadPaciente.bind(this);
         this.savePacient = this.savePacient.bind(this);
@@ -71,6 +72,7 @@ class Paciente extends Component {
         this.loading = this.loading.bind(this);
         this.porcentajesSesiones = this.porcentajesSesiones.bind(this);
         this.resetSesiones = this.resetSesiones.bind(this);
+        this.checkExistePaciente = this.checkExistePaciente.bind(this);
     }
 
     componentDidMount(){
@@ -81,15 +83,17 @@ class Paciente extends Component {
 
         this.loading(true);
 
-        if (!nuevo){                
-            db.collection("pacientes").doc(id).get().then( pac => {
-                console.log(pac.id, pac.data());
-                this.loadPaciente(pac.data());
-                this.loading(false);
-            });
-        } else {
-            this.loading(false);
-        }
+        pacientesMap().then( () => {
+            this.setState({pacientesMap: window.pacientesMap});
+        }).then( () => {
+            if (!nuevo){
+                db.collection("pacientes").doc(id).get().then( pac => {
+                    console.log(pac.id, pac.data());
+                    this.loadPaciente(pac.data());
+                    this.loading(false);
+                });
+            }
+        });
         
     }
 
@@ -286,6 +290,24 @@ class Paciente extends Component {
 
     }
 
+    checkExistePaciente() {
+        if (this.inputNombre.value && this.inputApellido.value) {
+            console.log('chequeando si existe paciente', this.inputNombre.value, this.inputApellido.value);
+            console.log('pacientes map', this.state.pacientesMap);
+
+            for (const id in this.state.pacientesMap) {
+                let obj = this.state.pacientesMap[id];
+                if (_.lowerCase(obj.nombre) == _.lowerCase(this.inputNombre.value) && _.lowerCase(obj.apellido) == _.lowerCase(this.inputApellido.value)
+                    && id !== this.state.id
+                ){
+                    NotificationManager.warning(errores.existePacienteNombre);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     render() {
         return (
             <div className="animated fadeIn">
@@ -318,7 +340,7 @@ class Paciente extends Component {
                                                 <FormGroup>
                                                     <Label for="nombre">Nombre(s)</Label>
                                                     <Input type="text" name="nombre" id="nombre" innerRef={ el => this.inputNombre = el } required
-                                                        className={this.state.errorNombre ? 'is-invalid' : ''} onChange={this.changeNombre}/>
+                                                        className={this.state.errorNombre ? 'is-invalid' : ''} onChange={this.changeNombre} onBlur={this.checkExistePaciente}/>
                                                     <FormFeedback>{errores.nombreVacio}</FormFeedback>
                                                 </FormGroup>    
                                             </Col>
@@ -326,7 +348,7 @@ class Paciente extends Component {
                                                 <FormGroup>    
                                                     <Label htmlFor="apellido">Apellido(s)</Label>
                                                     <Input type="text" id="apellido" innerRef={ el => this.inputApellido = el } required 
-                                                        className={this.state.errorApellido ? 'is-invalid' : ''} onChange={this.changeApellido}/>
+                                                        className={this.state.errorApellido ? 'is-invalid' : ''} onChange={this.changeApellido} onBlur={this.checkExistePaciente}/>
                                                     <FormFeedback>{errores.apellidoVacio}</FormFeedback>
                                                 </FormGroup>
                                             </Col> 

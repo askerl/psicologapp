@@ -59,7 +59,8 @@ export const errores = {
     fechaVacia: "Ingrese la fecha",
     pacientesVacios: "Seleccione algún paciente",
     sesionesVacias: "Seleccione alguna sesión",
-    periodoInvalido: "Debe seleccionar un período válido"
+    periodoInvalido: "Debe seleccionar un período válido",
+    existePacienteNombre: "Ya ingresó un Paciente con ese nombre y apellido"
 }
 
 export const tipoLoader = "ball-scale-ripple-multiple";

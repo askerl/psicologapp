@@ -46,7 +46,6 @@ class HeaderDropdown extends Component {
   }
 
   dropAccnt() {
-    console.log('current user', this.state.user);
     let user = this.state.user;
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
