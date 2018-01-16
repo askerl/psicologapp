@@ -13,6 +13,7 @@ import {
     FormFeedback,
     FormText,
     Label,
+    Modal, ModalHeader, ModalBody, ModalFooter,
     Input,
     InputGroup,
     InputGroupAddon,
@@ -55,10 +56,13 @@ class Paciente extends Component {
             errorValorConsulta: false,
             errorPrepaga: false,            
             errorPago: false,
-            pacientesMap: {}
+            pacientesMap: {},
+            sesionesPaciente: [],
+            showDeleteModal: false
         }; // <- set up react state
         this.loadPaciente = this.loadPaciente.bind(this);
         this.savePacient = this.savePacient.bind(this);
+        this.deletePacient = this.deletePacient.bind(this);
         this.getPagosPrepaga = this.getPagosPrepaga.bind(this);
         this.goBack = this.goBack.bind(this);
         this.changeNombre = this.changeNombre.bind(this);
@@ -73,6 +77,7 @@ class Paciente extends Component {
         this.porcentajesSesiones = this.porcentajesSesiones.bind(this);
         this.resetSesiones = this.resetSesiones.bind(this);
         this.checkExistePaciente = this.checkExistePaciente.bind(this);
+        this.toggleDelete = this.toggleDelete.bind(this);
     }
 
     componentDidMount(){
@@ -87,11 +92,25 @@ class Paciente extends Component {
             this.setState({pacientesMap: window.pacientesMap});
         }).then( () => {
             if (!nuevo){
+                // cargo paciente y sus sesiones
                 db.collection("pacientes").doc(id).get().then( pac => {
                     console.log(pac.id, pac.data());
                     this.loadPaciente(pac.data());
-                    this.loading(false);
+                }).then( () => {
+                    db.collection("sesiones")
+		            .where("paciente","==",id)
+		            .orderBy("fecha","desc")
+		            .get().then( querySnapshot => {
+                        let sesionesPaciente = [];
+                        querySnapshot.docs.forEach( doc => {
+                            sesionesPaciente.push(doc.id);
+                        });
+                        this.setState({sesionesPaciente});
+                        this.loading(false);
+                    });
                 });
+            } else {
+                this.loading(false);
             }
         });
         
@@ -306,6 +325,37 @@ class Paciente extends Component {
             }
         }
         return false;
+    }
+
+    toggleDelete(){
+		this.setState({showDeleteModal: !this.state.showDeleteModal});
+    }
+    
+    deletePacient(){
+        // Get a new write batch
+		let batch = db.batch();                
+        
+        let refPaciente = db.collection("pacientes").doc(this.state.id);
+        batch.delete(refPaciente);
+
+		this.state.sesionesPaciente.forEach( sesion => {			
+			let refSession = db.collection("sesiones").doc(sesion);
+			// elimino sesiones del paciente
+			batch.delete(refSession);
+		});
+
+		//Commit the batch
+		batch.commit().then(() => {			
+			console.log("Paciente eliminado correctamente");
+            NotificationManager.success('El Paciente ha sido eliminado');
+            this.goBack();
+		})
+		.catch((error) => {
+			console.error("Error eliminando paciente: ", error);
+			NotificationManager.error(errores.errorBorrar, 'Error');
+			this.loading(false);
+		});
+
     }
 
     render() {
@@ -542,11 +592,24 @@ class Paciente extends Component {
                                 </CardBody>
                                 <CardFooter>
                                     <Button type="submit" color="primary" onClick={ e => this.savePacient(e)}>Guardar</Button>
+                                    { !this.state.nuevo &&
+                                    <Button color="danger" onClick={this.toggleDelete}>Eliminar</Button>
+                                    }
                                     <Button type="reset" color="secondary" onClick={this.goBack}>Cancelar</Button>
                                 </CardFooter>
                             </Card>
                         </Col>
                     </Row>
+                    <Modal isOpen={this.state.showDeleteModal} toggle={this.toggleDelete} className={'modal-md modal-danger'}>
+                        <ModalHeader toggle={this.toggleDelete}>Eliminar Paciente</ModalHeader>
+                        <ModalBody>
+                            Confirme la eliminación del Paciente. Se eliminarán todas sus sesiones ({this.state.sesionesPaciente.length}) e impactará en las facturaciones . Esta acción no podrá deshacerse.
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="danger" size="sm" onClick={e => this.deletePacient(e)}>Eliminar</Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>{' '}
+                        </ModalFooter>
+                    </Modal>
                 </div>
             </div>
         );

@@ -292,8 +292,8 @@ class ListaSesiones extends Component {
 						Confirme la eliminación de las sesiones seleccionadas ({this.state.selected.length}). Esta acción no podrá deshacerse.
 					</ModalBody>
 					<ModalFooter>
-						<Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>{' '}
 						<Button color="danger" size="sm" onClick={this.deleteSesiones}>Borrar</Button>
+						<Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>{' '}
 					</ModalFooter>
 				</Modal>
 			</div>
