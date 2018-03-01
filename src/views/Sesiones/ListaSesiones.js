@@ -79,6 +79,7 @@ class ListaSesiones extends Component {
 			let sesion = doc.data();
 			sesion.id = doc.id;
 			sesion.nombreCompleto = this.state.pacientesMap[sesion.paciente].nombreCompleto;
+			sesion.credencial = this.state.pacientesMap[sesion.paciente].credencial;
 			sesiones.push(sesion);
 		});
 		this.setState({sesiones});
@@ -258,6 +259,11 @@ class ListaSesiones extends Component {
 											dataSort
 										>
 											<span className="thTitle">Prepaga</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='credencial'
+											dataSort>
+											<span className="thTitle">Credencial</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='facturaPrepaga'
