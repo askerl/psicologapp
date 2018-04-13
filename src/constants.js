@@ -24,7 +24,7 @@ export const filtroTipoPaciente = auxfiltroTipoPaciente;
 export const prepagasById = {
     "galeno": {
         nombre: "Galeno",
-        pagos: [15, 175, 452.36]
+        pagos: [15, 200, 475]
     },
     "ososs": {
         nombre: "OSOSS",
