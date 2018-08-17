@@ -1,11 +1,7 @@
 import db from './fire';
 import moment from 'moment';
 import _ from 'lodash';
-import { auth } from 'firebase/app';
-import FirebaseAuth from 'react-firebaseui/FirebaseAuth';
 moment.locale("es");
-
-var currentUser = null;
 
 export const tipoPaciente = [
     { key: "O", name: "Obra social"},
