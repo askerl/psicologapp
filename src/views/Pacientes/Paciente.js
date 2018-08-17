@@ -127,6 +127,7 @@ class Paciente extends Component {
         this.inputTel.value         = p.tel;
         this.inputTelFlia.value     = p.telFlia;
         this.inputDir.value         = p.dir;
+        this.inputEmail.value       = p.email || '';
         this.inputFchNac.value      = moment(p.fchNac, "DD/MM/YYYY").format("YYYY-MM-DD");
         this.inputNotas.value       = p.notas;
         this.inputTipo.value        = p.tipo;
@@ -210,7 +211,8 @@ class Paciente extends Component {
                 "telFlia": this.inputTelFlia.value || null,
                 "dir": this.inputDir.value || null,
                 "notas": this.inputNotas.value || null,
-                "tipo": this.inputTipo.value || null
+                "tipo": this.inputTipo.value || null,
+                "email": this.inputEmail.value || null
             };
 
             if (this.state.tipo === pacientePrivado){
@@ -447,7 +449,7 @@ class Paciente extends Component {
                                             </Col>
                                         </Row>
                                         <Row>
-                                            <Col xs="12">
+                                            <Col xs="12" sm="6">
                                                 <FormGroup>
                                                     <Label htmlFor="dir">Dirección</Label>
                                                     <InputGroup>
@@ -455,6 +457,16 @@ class Paciente extends Component {
                                                         <Input type="text" id="dir" innerRef={el => this.inputDir = el} />
                                                     </InputGroup>
                                                     <FormText>ej: Rivadavia 3456</FormText>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col xs="12" sm="6">
+                                                <FormGroup>
+                                                    <Label htmlFor="email">Email</Label>
+                                                    <InputGroup>
+                                                        <InputGroupAddon><i className="fa fa-envelope-o"></i></InputGroupAddon>
+                                                        <Input type="email" id="email" innerRef={el => this.inputEmail = el} />
+                                                    </InputGroup>
+                                                    <FormText>ej: alguien@example.com</FormText>
                                                 </FormGroup>
                                             </Col>
                                         </Row>
