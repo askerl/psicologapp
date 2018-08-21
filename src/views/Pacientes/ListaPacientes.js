@@ -13,7 +13,9 @@ import {
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, tipoFormatter, prepagaFormatter, tipoLoader, filtroPrepagas } from '../../constants';
+import moment from 'moment';
+moment.locale("es");
+import { filtroTipoPaciente, calcPorcentajesSesiones, tipoFormatter, prepagaFormatter, tipoLoader, filtroPrepagas } from '../../constants';
 
 class ListaPacientes extends Component {
 	constructor(props) {
@@ -45,6 +47,8 @@ class ListaPacientes extends Component {
 			let porcs = calcPorcentajesSesiones(paciente.sesionesAut, paciente.sesiones);
 			paciente.porcRestantes = porcs.porcRestantes;
 			paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;
+			let fchNacMoment = moment(paciente.fchNac, 'DD/MM/YYYY');
+    		paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : 0;
 			pacientes.push(paciente);
 		});
 		this.setState({pacientes: [...pacientes].concat([])});
@@ -63,6 +67,10 @@ class ListaPacientes extends Component {
 		return (
 			<Link to={`/pacientes/${cell}`} title="Editar paciente"><i className="fa fa-edit fa-lg"></i></Link>
 		);
+	}
+
+	edadFormatter(cell,row) {
+		return cell > 0 ? cell : '';
 	}
 	
 	restantesFormatter(cell, row) {
@@ -124,6 +132,14 @@ class ListaPacientes extends Component {
 											filter={{ type: 'TextFilter', placeholder: "..." }}
 											dataSort>
 											<span className="thTitle">Paciente</span>
+										</TableHeaderColumn>
+										<TableHeaderColumn
+											dataField='edad'
+											dataAlign='center'
+											dataFormat={this.edadFormatter}
+											filter={{ type: 'NumberFilter', placeholder: "...", numberComparators: ['=', '>', '<='] }}
+											dataSort>
+											<span className="thTitle">Edad</span>
 										</TableHeaderColumn>
 										<TableHeaderColumn
 											dataField='tipo'
