@@ -2,5 +2,5 @@
   "name": "ListaPacientes",
   "version": "0.0.0",
   "private": true,
-  "main": "./ListaPacientes.js"
+  "main": "./listaPacientes.js"
 }

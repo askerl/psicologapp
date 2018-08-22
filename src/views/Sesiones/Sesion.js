@@ -1,4 +1,4 @@
-import React, { Component, cloneElement } from 'react';
+import React, { Component } from 'react';
 import {
     Row,
     Col,
@@ -10,18 +10,19 @@ import {
     CardBody,
     Form,
     FormGroup,
-    FormFeedback,
     FormText,
     Label,
     Input,
     InputGroup,
-    InputGroupAddon
+    InputGroupAddon,
+    InputGroupText
 } from 'reactstrap';
 
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { errores, pacientePrepaga, pacientePrivado, tipoLoader, createFechaSesion, prepagasById } from '../../constants';
+import {pacientePrivado, tipoLoader, createFechaSesion, prepagasById} from '../../config/constants';
+import {errores} from '../../config/mensajes';
 import Select from 'react-select';
 import Loader from 'react-loaders';
 
@@ -230,7 +231,7 @@ class Sesion extends Component {
                                                 <FormGroup className="errorAddon">
                                                     <Label htmlFor="fchNac">Fecha</Label>
                                                     <InputGroup className="input-group-fecha">
-                                                        <InputGroupAddon><i className="fa fa-calendar"></i></InputGroupAddon>
+                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-calendar"></i></InputGroupText></InputGroupAddon>
                                                         <Input type="date" id="fecha" name="Fecha" innerRef={el => this.inputFecha = el} onChange={this.changeFecha} />                                                        
                                                     </InputGroup>                                                    
                                                     {this.state.errorFecha &&

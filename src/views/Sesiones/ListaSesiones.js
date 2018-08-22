@@ -1,21 +1,18 @@
-import React, {Component, cloneElement} from 'react';
-import {Link} from 'react-router-dom';
+import React, {Component} from 'react';
 import {
 	Row,
 	Col,
 	Button,
 	Card,
 	CardHeader,
-	CardFooter,
 	CardBody,
-	Form, FormGroup, Label, Input,
-	Modal, ModalHeader, ModalBody, ModalFooter,
-	Progress
-} from 'reactstrap';
+	Input,
+	Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn, SearchField} from 'react-bootstrap-table';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates } from '../../constants';
+import { tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates } from '../../config/constants';
+import {errores} from '../../config/mensajes';
 import { NotificationManager } from 'react-notifications';
 
 import moment from 'moment';
@@ -310,12 +307,8 @@ class ListaSesiones extends Component {
 
 // componente auxiliar
 
-const createCustomSearchField = (props) => {
-	return (
-		<SearchField
-			className='form-control form-control-sm mt-2'			
-			placeholder='Buscar...'/>
-	);
+const createCustomSearchField = () => {
+	return (<SearchField className='form-control form-control-sm mt-2' placeholder='Buscar...' />);
 }
 
 export default ListaSesiones;

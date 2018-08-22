@@ -4,7 +4,7 @@ import firebaseui from 'firebaseui';
 // Required for side-effects
 require("firebase/firestore");
 
-var config = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
+var configPROD = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
     apiKey: "AIzaSyBP2hcETIRSFvvFhgMabmDZ-RjShqDlX70",
     authDomain: "psicologapp-84.firebaseapp.com",
     databaseURL: "https://psicologapp-84.firebaseio.com",
@@ -12,7 +12,17 @@ var config = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
     storageBucket: "psicologapp-84.appspot.com",
     messagingSenderId: "721791562259"
 };
-firebase.initializeApp(config);
+
+var configTESTING = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
+    apiKey: 'AIzaSyDVbWeM5isevTOPK5TEyGjCZlZqulVUjJQ',
+    authDomain: 'psicologapp-testing.firebaseapp.com',
+    databaseURL: 'https://psicologapp-testing.firebaseio.com',
+    projectId: 'psicologapp-testing',
+    storageBucket: 'psicologapp-testing.appspot.com',
+    messagingSenderId: '236252094290',
+};
+
+firebase.initializeApp(configTESTING);
 
 // Configure FirebaseUI.
 export const uiConfig = {
@@ -33,8 +43,8 @@ export const uiConfig = {
         }
     }
 };
-
-let db = firebase.firestore();
+const settings = {timestampsInSnapshots: true};
+const db = firebase.firestore();
 let auxAuth = firebase.auth();
 auxAuth.languageCode = 'es';
 export const auth = auxAuth;
@@ -52,5 +62,6 @@ export const logout = () => {
 
 }
 
+db.settings(settings);
 
 export default db;

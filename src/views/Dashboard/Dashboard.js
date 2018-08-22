@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import db from '../../fire';
-import { pacientePrepaga, pacientePrivado, prepagas, round } from '../../constants';
+import { pacientePrepaga, pacientePrivado, prepagas, round } from '../../config/constants';
 import Loader from 'react-loaders';
 
 import {

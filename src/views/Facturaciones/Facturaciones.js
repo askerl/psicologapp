@@ -1,5 +1,4 @@
-import React, {Component, cloneElement} from 'react';
-import {Link} from 'react-router-dom';
+import React, {Component} from 'react';
 import {
 	Row,
 	Col,
@@ -9,16 +8,14 @@ import {
 	CardFooter,
 	CardBody,
 	Form, FormGroup, Label, Input, InputGroup,
-	Modal, ModalHeader, ModalBody, ModalFooter,
 	Progress
 } from 'reactstrap';
-import {BootstrapTable, TableHeaderColumn, SearchField} from 'react-bootstrap-table';
-import Loader from 'react-loaders';
-import db from '../../fire';
-import { filtroTipoPaciente, pacientePrivado, pacientePrepaga, calcPorcentajesSesiones, cargarPrepagas, tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, errores, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates, getFacturacion, prepagas, getFacturacionesPeriodo, prepagasById, round, facChartOpts } from '../../constants';
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import { priceFormatter, meses, prepagas, getFacturacionesPeriodo, round } from '../../config/constants';
+import {errores} from '../../config/mensajes';
 import { NotificationManager } from 'react-notifications';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
-import {Line, Bar} from 'react-chartjs-2';
+import {Bar} from 'react-chartjs-2';
 
 import moment from 'moment';
 moment.locale("es");

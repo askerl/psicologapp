@@ -1,26 +1,23 @@
-import React, {Component, cloneElement} from 'react';
-import {Link, Switch, Route, Redirect} from 'react-router-dom';
+import React, {Component} from 'react';
+import {Switch, Route, Redirect} from 'react-router-dom';
 import {Container} from 'reactstrap';
 import Header from '../../components/Header/';
 import Sidebar from '../../components/Sidebar/';
 import Breadcrumb from '../../components/Breadcrumb/';
-import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
 import Dashboard from '../../views/Dashboard/';
-import ListaPacientes from '../../views/Pacientes/ListaPacientes';
-import Paciente from '../../views/Pacientes/Paciente';
-import ListaSesiones from '../../views/Sesiones/ListaSesiones';
-import Sesion from '../../views/Sesiones/Sesion';
-import Facturaciones from '../../views/Facturaciones/Facturaciones';
+import ListaPacientes from '../../views/Pacientes/listaPacientes';
+import Paciente from '../../views/Pacientes/paciente';
+import ListaSesiones from '../../views/Sesiones/listaSesiones';
+import Sesion from '../../views/Sesiones/sesion';
+import Facturaciones from '../../views/Facturaciones/facturaciones';
 
 
 import {NotificationContainer} from 'react-notifications';
 
-import { FirebaseAuth } from 'react-firebaseui';
-
-import {db, auth, uiConfig, logout} from '../../fire';
-import { isHabilitado } from '../../constants';
+import {auth, logout} from '../../fire';
+import { isHabilitado } from '../../config/constants';
 
 class Full extends Component {
 

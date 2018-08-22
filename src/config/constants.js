@@ -1,4 +1,4 @@
-import db from './fire';
+import db from '../fire';
 import moment from 'moment';
 import _ from 'lodash';
 moment.locale("es");
@@ -15,7 +15,6 @@ let auxfiltroTipoPaciente = {};
 auxfiltroTipoPaciente[pacientePrepaga] = tipoPaciente[0].name;
 auxfiltroTipoPaciente[pacientePrivado] = tipoPaciente[1].name;
 export const filtroTipoPaciente = auxfiltroTipoPaciente;
-
 
 export const prepagasById = {
     "galeno": {
@@ -39,25 +38,15 @@ for (const prop in prepagasById) {
     auxfiltroPrepagas[prop] = prepaga.nombre;
     auxprepagas.push(prepaga);
 }
+
 export const filtroPrepagas = auxfiltroPrepagas;
 export const prepagas = auxprepagas;
 
-
-export const errores = {
-    nombreVacio: "Ingrese el nombre",
-    apellidoVacio: "Ingrese el apellido",
-    tipoPacienteVacio: "Seleccione el tipo",
-    valorConsultaVacio: "Ingrese el valor de la consulta",
-    prepagaVacia: "Seleccione la prepaga",
-    pagoPrepagaVacio: "Seleccione el pago",
-    errorGuardar: "Ocurrió un error al guardar los datos",
-    errorBorrar: "Ocurrió un error al borrar los datos",
-    fechaVacia: "Ingrese la fecha",
-    pacientesVacios: "Seleccione algún paciente",
-    sesionesVacias: "Seleccione alguna sesión",
-    periodoInvalido: "Debe seleccionar un período válido",
-    existePacienteNombre: "Ya ingresó un Paciente con ese nombre y apellido"
-}
+export const estadosPaciente = [
+    { value: '', title: 'Todos' },
+    { value: true, title: 'Activos' },
+    { value: false, title: 'Inactivos'}
+];
 
 export const tipoLoader = "ball-scale-ripple-multiple";
 
@@ -67,6 +56,13 @@ export const meses = [
 export const mesesShort = [
     "ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"
 ];
+
+export const tableColumnClasses = {
+    showLarge: 'd-none d-lg-table-cell',
+    showMedium: 'd-none d-md-table-cell',
+    showSmall: 'd-none d-sm-table-cell',
+    hide: 'd-none'
+}
 
 export const arrayRemoveDuplicates = (arr) => {
     let unique_array = Array.from(new Set(arr))

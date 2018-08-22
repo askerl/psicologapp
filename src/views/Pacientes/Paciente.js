@@ -1,4 +1,4 @@
-import React, { Component, cloneElement } from 'react';
+import React, { Component } from 'react';
 import {
     Row,
     Col,
@@ -17,15 +17,14 @@ import {
     Input,
     InputGroup,
     InputGroupAddon,
-    InputGroupButton,
-    Progress
+    InputGroupText
 } from 'reactstrap';
 
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, errores, calcPorcentajesSesiones, tipoLoader, prepagasById, prepagas, pacientesMap } from '../../constants';
-import Widget01 from '../Widgets/Widget01';
+import { tipoPaciente, pacientePrepaga, pacientePrivado, calcPorcentajesSesiones, tipoLoader, prepagasById, prepagas, pacientesMap } from '../../config/constants';
+import {errores} from '../../config/mensajes';
 import Widget02 from '../Widgets/Widget02';
 import {WidgetSesionesUsadas, WidgetSesionesRestantes} from '../Widgets/WidgetsAuxiliares';
 import Toggle from 'react-toggle';
@@ -410,7 +409,9 @@ class Paciente extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="dni">DNI</Label>
                                                     <InputGroup>
-                                                        <InputGroupAddon><i className="fa fa-id-card-o"></i></InputGroupAddon>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-id-card-o"></i></InputGroupText>
+                                                        </InputGroupAddon>
                                                         <Input type="text" id="dni" innerRef={el => this.inputDNI = el} />
                                                     </InputGroup>
                                                     <FormText>ej: 95001002</FormText>
@@ -420,7 +421,7 @@ class Paciente extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="fchNac">Fecha de nacimiento</Label>
                                                     <InputGroup>
-                                                        <InputGroupAddon><i className="fa fa-calendar"></i></InputGroupAddon>
+                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-calendar"></i></InputGroupText></InputGroupAddon>
                                                         <Input type="date" id="fchNac" name="Fecha nacimiento" innerRef={el => this.inputFchNac = el} />
                                                     </InputGroup>
                                                 </FormGroup>
@@ -431,7 +432,7 @@ class Paciente extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="tel">Teléfono</Label>
                                                     <InputGroup>
-                                                        <InputGroupAddon><i className="fa fa-phone"></i></InputGroupAddon>
+                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-phone"></i></InputGroupText></InputGroupAddon>
                                                         <Input type="text" id="tel" innerRef={el => this.inputTel = el} />
                                                     </InputGroup>
                                                     <FormText>ej: 1134567890</FormText>
@@ -441,7 +442,7 @@ class Paciente extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="telFlia">Contacto familiar</Label>
                                                     <InputGroup>
-                                                        <InputGroupAddon><i className="fa fa-phone-square"></i></InputGroupAddon>
+                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-phone-square"></i></InputGroupText></InputGroupAddon>
                                                         <Input type="text" id="telFlia" innerRef={el => this.inputTelFlia = el} />
                                                     </InputGroup>
                                                     <FormText>ej: 11123456780 - padre/madre</FormText>
@@ -453,7 +454,7 @@ class Paciente extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="dir">Dirección</Label>
                                                     <InputGroup>
-                                                        <InputGroupAddon><i className="fa fa-address-book-o"></i></InputGroupAddon>
+                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-address-book-o"></i></InputGroupText></InputGroupAddon>
                                                         <Input type="text" id="dir" innerRef={el => this.inputDir = el} />
                                                     </InputGroup>
                                                     <FormText>ej: Rivadavia 3456</FormText>
@@ -463,7 +464,7 @@ class Paciente extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="email">Email</Label>
                                                     <InputGroup>
-                                                        <InputGroupAddon><i className="fa fa-envelope-o"></i></InputGroupAddon>
+                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-envelope-o"></i></InputGroupText></InputGroupAddon>
                                                         <Input type="email" id="email" innerRef={el => this.inputEmail = el} />
                                                     </InputGroup>
                                                     <FormText>ej: alguien@example.com</FormText>
@@ -489,7 +490,7 @@ class Paciente extends Component {
                                                     <FormGroup className="errorAddon">
                                                         <Label htmlFor="valorConsulta">Valor de consulta</Label>
                                                         <InputGroup>
-                                                            <InputGroupAddon><i className="fa fa-usd"></i></InputGroupAddon>
+                                                            <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
                                                             <Input type="number" id="valorConsulta" name="valorConsulta" innerRef={el => this.inputValorConsulta = el} required
                                                                 className={this.state.errorValorConsulta ? 'is-invalid' : ''} onChange={this.changeValorConsulta} />
                                                         </InputGroup>
@@ -550,7 +551,7 @@ class Paciente extends Component {
                                                     <FormGroup className="errorAddon">
                                                         <Label htmlFor="copago">Copago</Label>
                                                         <InputGroup>
-                                                            <InputGroupAddon><i className="fa fa-usd"></i></InputGroupAddon>
+                                                            <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
                                                             <Input type="number" id="copago" name="copago" innerRef={el => this.inputCopago = el} onChange={this.changeCopago} />
                                                         </InputGroup>                                                        
                                                     </FormGroup>
@@ -563,7 +564,7 @@ class Paciente extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="tipo">Sesiones autorizadas</Label>
                                                         <InputGroup>
-                                                            <InputGroupAddon><i className="fa fa-comments-o"></i></InputGroupAddon>
+                                                            <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-comments-o"></i></InputGroupText></InputGroupAddon>
                                                             <Input type="number" id="sesionesAutorizadas" name="sesionesAutorizadas" innerRef={ el => this.inputSesiones = el } onChange={this.changeSesionesAut}/>
                                                         </InputGroup>
                                                     </FormGroup>    
@@ -572,7 +573,7 @@ class Paciente extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="credencial">Credencial</Label>
                                                         <InputGroup>
-                                                            <InputGroupAddon><i className="fa fa-vcard"></i></InputGroupAddon>
+                                                            <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-vcard"></i></InputGroupText></InputGroupAddon>
                                                             <Input type="text" id="credencial" innerRef={el => this.inputCredencial = el} />
                                                         </InputGroup>
                                                     </FormGroup>
@@ -594,7 +595,7 @@ class Paciente extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="notas">Notas</Label>
                                                     <InputGroup>
-                                                        <InputGroupAddon><i className="fa fa-book"></i></InputGroupAddon>
+                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-book"></i></InputGroupText></InputGroupAddon>
                                                         <Input type="textarea" id="notas" innerRef={el => this.inputNotas = el} rows="2" />
                                                     </InputGroup>
                                                 </FormGroup>

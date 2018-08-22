@@ -1,37 +1,38 @@
-import React, {Component, cloneElement} from 'react';
-import {Link} from 'react-router-dom';
+import React, {Component} from 'react';
 import {
 	Row,
 	Col,
 	Button,
 	Card,
 	CardHeader,
-	CardFooter,
 	CardBody,
-	Progress
+	Input
 } from 'reactstrap';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import BootstrapTable from 'react-bootstrap-table-next';
 import Loader from 'react-loaders';
 import db from '../../fire';
 import moment from 'moment';
 moment.locale("es");
-import { filtroTipoPaciente, calcPorcentajesSesiones, tipoFormatter, prepagaFormatter, tipoLoader, filtroPrepagas } from '../../constants';
+import {calcPorcentajesSesiones, tipoLoader, filtroPrepagas, filtroTipoPaciente, tableColumnClasses, estadosPaciente} from '../../config/constants';
+import {tablasFormatter} from '../../config/formatters';
+import filterFactory, { textFilter, numberFilter, selectFilter } from 'react-bootstrap-table2-filter';
 
 class ListaPacientes extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			pacientes: [],
+			filtroEstado: estadosPaciente[1].value, //activos por defecto
 			loading: true
 		};
-		this.actionsFormatter = this.actionsFormatter.bind(this);
-		this.restantesFormatter = this.restantesFormatter.bind(this);
 		this.nuevoPaciente = this.nuevoPaciente.bind(this);
+		this.changeEstado = this.changeEstado.bind(this);
 		this.loading = this.loading.bind(this);
 	}
 
 	componentDidMount(){
 		this.loading(true);
+		this.filtroEstado.value = this.state.filtroEstado;
 		db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
 			this.loadPacientes(querySnapshot);
 			this.loading(false);
@@ -63,42 +64,95 @@ class ListaPacientes extends Component {
 		this.props.history.push('/pacientes/new');
 	}
 
-	actionsFormatter(cell, row) {
-		return (
-			<Link to={`/pacientes/${cell}`} title="Editar paciente"><i className="fa fa-edit fa-lg"></i></Link>
-		);
+	changeEstado(){
+		this.estadoFilter(this.filtroEstado.value);
+		this.setState({filtroEstado: this.filtroEstado.value});
 	}
-
-	edadFormatter(cell,row) {
-		return cell > 0 ? cell : '';
-	}
-	
-	restantesFormatter(cell, row) {
-		let color;
-		if (row.porcRestantes > 80) {
-			color = "success";
-		} else if (row.porcRestantes > 10) {
-			color = "warning";
-		} else {
-			color = "danger";
-		}
-		let prog = cell == '' ? '': 
-			<div className="d-flex flex-column">
-				<div className="d-flex">
-					<strong>{cell}</strong>
-				</div>				
-				<Progress className="progress-xs" color={color} value={row.porcRestantes}/>
-			</div>;
-		return prog;
-	}
-	
 	
 	render() {
 
-		const options = {
-			noDataText: 'No hay pacientes registrados',
-			onFilterChange: this.onFilterChange
-		}
+		const columns = [{
+			dataField: 'id',
+			text: '',
+			headerAttrs: { width: '36px' },
+			formatter: tablasFormatter.actionsPaciente
+		}, {
+			dataField: 'nombreCompleto',
+			text: 'Paciente',
+			formatter: tablasFormatter.nombrePaciente,
+			sort: true,
+			filter: textFilter({placeholder:' ', className:tablasFormatter.filterClass})
+		},{
+			dataField: 'edad',
+			text: 'Edad',
+			align: 'center', headerAlign: 'center',
+			headerAttrs: { width: '130px' },
+			formatter: tablasFormatter.edad,
+			sort: true,
+			filter: numberFilter({
+				placeholder:' ', 
+				comparatorClassName: tablasFormatter.filterClass,
+				numberClassName: tablasFormatter.filterClass
+			}),
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
+		},{
+			dataField: 'tipo',
+			text: 'Tipo',
+			headerAttrs: { width: '130px' },
+			formatter: tablasFormatter.tipoPaciente,
+			sort: true,
+			filter: selectFilter({
+				options: filtroTipoPaciente,
+				placeholder: 'Todos',
+				className:tablasFormatter.filterClass
+			}),
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
+		},{
+			dataField: 'prepaga',
+			text: 'Prepaga',
+			headerAttrs: { width: '130px' },
+			formatter: tablasFormatter.prepaga,
+			sort: true,
+			filter: selectFilter({
+				options: filtroPrepagas,
+				placeholder: 'Todas',
+				className:tablasFormatter.filterClass
+			}),
+			headerClasses: tableColumnClasses.showMedium,
+			classes: tableColumnClasses.showMedium
+		},{
+			dataField: 'credencial',
+			text: 'Credencial',
+			sort: true,
+			filter: textFilter({placeholder:' ', className:tablasFormatter.filterClass}),
+			headerClasses: tableColumnClasses.showMedium,
+			classes: tableColumnClasses.showMedium
+		},{
+			dataField: 'sesionesRestantes',
+			text: 'Sesiones restantes',
+			formatter: tablasFormatter.sesionesRestantes,
+			sort: true,
+			filter: numberFilter({
+				placeholder:' ', 
+				comparatorClassName: tablasFormatter.filterClass,
+				numberClassName: tablasFormatter.filterClass
+			}),
+			headerClasses: tableColumnClasses.showLarge,
+			classes: tableColumnClasses.showLarge
+		},{
+			dataField: 'activo',
+			text: 'Activo',
+			filter: textFilter({
+				getFilter: (filter) => {
+				  this.estadoFilter = filter;
+				},
+				defaultValue: estadosPaciente[1].value
+			}),
+			headerClasses: tableColumnClasses.hide,
+			classes: tableColumnClasses.hide
+		}];
 
 		return (
 			<div className="animated fadeIn listaPacientes">
@@ -109,69 +163,33 @@ class ListaPacientes extends Component {
 								<i className="fa fa-address-book-o fa-lg"></i> Pacientes
 								</CardHeader>
 							<CardBody>
-								<div className="d-flex flex-row mb-1">
-									<div className="mr-auto">
+								<Row>
+								<Col xs="12" sm="6">
+									<div className="d-flex flex-row mb-2 mr-auto">
 										<Button color="primary" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus"></i> Nuevo paciente</Button>
 									</div>
-								</div>
+								</Col>
+								<Col xs="12" sm="6">
+									<div className="filtros d-flex flex-row mb-2 justify-content-sm-end">
+										<Input id="filtroEstado" className="filtroEstado" type="select" title="Filtrar por estado"
+											bsSize="sm" name="filtroEstado"  innerRef={el => this.filtroEstado = el} onChange={this.changeEstado}>
+											{estadosPaciente.map((item, index) => <option key={index} value={item.value}>{item.title}</option>)}
+										</Input>
+									</div>
+								</Col>
+								</Row>
 								<Loader type={tipoLoader} active={this.state.loading} />
 								{!this.state.loading &&
-									<BootstrapTable ref="table" version='4'
-										data={this.state.pacientes}
-										bordered={false}
-										striped hover
-										options={options}>
-										<TableHeaderColumn
-											dataField='id' isKey
-											dataFormat={this.actionsFormatter}
-											dataAlign='center'
-											width="43">
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='nombreCompleto'
-											filter={{ type: 'TextFilter', placeholder: "..." }}
-											dataSort>
-											<span className="thTitle">Paciente</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='edad'
-											dataAlign='center'
-											dataFormat={this.edadFormatter}
-											filter={{ type: 'NumberFilter', placeholder: "...", numberComparators: ['=', '>', '<='] }}
-											dataSort>
-											<span className="thTitle">Edad</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='tipo'
-											// width="130"
-											dataFormat={tipoFormatter}
-											filter={{ type: 'SelectFilter', placeholder: "Todos", options: filtroTipoPaciente }}
-											dataSort>
-											<span className="thTitle">Tipo</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='prepaga'
-											dataFormat={prepagaFormatter}
-											filter={{ type: 'SelectFilter', placeholder: "Todas", options: filtroPrepagas }}
-											dataSort>
-											<span className="thTitle">Prepaga</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='credencial'
-											filter={{ type: 'TextFilter', placeholder: "..." }}
-											dataSort
-											>
-											<span className="thTitle">Credencial</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='sesionesRestantes'
-											dataFormat={this.restantesFormatter}
-											filter={{ type: 'NumberFilter', placeholder: "...", numberComparators: ['=', '>', '<='] }}
-											dataSort>
-											{/* width="200"> */}
-											<span className="thTitle">Sesiones restantes</span>
-										</TableHeaderColumn>
-									</BootstrapTable>
+									<BootstrapTable keyField='id' classes="tablaPacientes"
+										data={this.state.pacientes} 
+										columns={columns} 
+										filter={filterFactory()}
+										defaultSortDirection="asc"
+										noDataIndication='No hay pacientes registrados'
+										bordered={ false }
+										bootstrap4
+										striped
+										hover/>
 								}
 							</CardBody>
 						</Card>
