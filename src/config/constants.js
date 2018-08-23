@@ -75,31 +75,6 @@ export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
     return {porcUsadas, porcRestantes};
 }
 
-// export const cargarPrepagas = () => {
-//     let promise = new Promise( (resolve, reject) => {
-//         let prepagas = [], filtroPrepagas = {}, prepagasById = {};
-//         if (window.prepagas && window.filtroPrepagas){
-//             resolve(console.log('variables from cache', window.prepagas, window.filtroPrepagas));
-//         } else {
-//             // query database
-//             db.collection("prepagas").get().then( querySnapshot => {
-//                 querySnapshot.docs.forEach( doc => {            
-//                     let prepaga = doc.data();
-//                     prepaga.id = doc.id;          
-//                     prepagas.push(prepaga);
-//                     filtroPrepagas[prepaga.id] = prepaga.nombre;
-//                     prepagasById[prepaga.id] = prepaga;
-//                 });
-//                 window.prepagas = prepagas;
-//                 window.filtroPrepagas = filtroPrepagas;
-//                 window.prepagasById = prepagasById;
-//                 resolve(console.log('cargo variables en window', window.prepagas, window.filtroPrepagas, window.prepagasById));
-//             });
-//         }
-//     });
-//     return promise;
-// }    
-
 export const pacientesMap = () => {
     let promise = new Promise( (resolve, reject) => {
         let pacientes = [];
@@ -357,7 +332,7 @@ function armarGrafica(facturaciones) {
 // table formatters
 
 export const dateFormatter = (cell, row) => {
-    return moment(cell).format('DD/MM/YYYY');
+    return moment.unix(cell.seconds).format('DD/MM/YYYY');
 }
 
 export const tipoFormatter = (cell, row) => {
@@ -416,7 +391,6 @@ function convertHex(hex, opacity) {
 	var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity / 100 + ')';
 	return result;
 }
-
 
 const mailHabilitados = [
     "alfredo.skerl@gmail.com",

@@ -148,7 +148,7 @@ class ListaPacientes extends Component {
 				getFilter: (filter) => {
 				  this.estadoFilter = filter;
 				},
-				defaultValue: estadosPaciente[1].value
+				defaultValue: estadosPaciente[1].value.toString()
 			}),
 			headerClasses: tableColumnClasses.hide,
 			classes: tableColumnClasses.hide
