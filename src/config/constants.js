@@ -329,43 +329,6 @@ function armarGrafica(facturaciones) {
     return {grafica, optsGrafica: facChartOpts};
 }
 
-// table formatters
-
-export const dateFormatter = (cell, row) => {
-    return moment.unix(cell.seconds).format('DD/MM/YYYY');
-}
-
-export const tipoFormatter = (cell, row) => {
-    let badge;
-    switch (cell) {
-        case pacientePrivado:
-            badge = `<span class="badge badge-warning">${filtroTipoPaciente[pacientePrivado]}</span>`;
-            break;
-        case pacientePrepaga:
-            badge = `<span class="badge badge-primary">${filtroTipoPaciente[pacientePrepaga]}</span>`;
-            break;
-    }
-    return badge;
-}
-
-export const priceFormatter = (cell, row) => {
-    let val = cell > 0 ? `<i class="fa fa-usd"></i> ${cell}` : '';
-    return val;
-}
-
-export const prepagaFormatter = (cell, row) => {
-    return cell ? prepagasById[cell].nombre : '';
-}
-
-export const enumFormatter = (cell, row, enumObject) =>{
-    return enumObject[cell];
-}
-
-export const boolFormatter = {
-    true: 'Sí',
-    false: 'No' 
-}
-
 // utiles
 export const round = (value, decimals) => {
     return Number(Math.round(value+'e'+decimals)+'e-'+decimals);

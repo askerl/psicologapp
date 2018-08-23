@@ -8,12 +8,14 @@ import {
 	CardBody,
 	Input,
 	Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
-import {BootstrapTable, TableHeaderColumn, SearchField} from 'react-bootstrap-table';
+import BootstrapTable from 'react-bootstrap-table-next';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { tipoFormatter, priceFormatter, prepagaFormatter, pacientesMap, dateFormatter, tipoLoader, meses, enumFormatter, boolFormatter, arrayRemoveDuplicates } from '../../config/constants';
+import { pacientesMap, tipoLoader, meses, arrayRemoveDuplicates } from '../../config/constants';
 import {errores} from '../../config/mensajes';
 import { NotificationManager } from 'react-notifications';
+import {tablasFormatter} from '../../config/formatters';
 
 import moment from 'moment';
 moment.locale("es");
@@ -75,6 +77,7 @@ class ListaSesiones extends Component {
 		querySnapshot.docs.forEach( doc => {            
 			let sesion = doc.data();
 			sesion.id = doc.id;
+			sesion.fecha = sesion.fecha.seconds;
 			sesion.nombreCompleto = this.state.pacientesMap[sesion.paciente].nombreCompleto;
 			sesion.credencial = this.state.pacientesMap[sesion.paciente].credencial;
 			sesiones.push(sesion);
@@ -189,6 +192,47 @@ class ListaSesiones extends Component {
 			selected: this.state.selected
 		};
 
+		const { SearchBar } = Search;
+		const columns = [{
+			dataField: 'id',
+			text: 'Session ID',
+			hidden: true
+		}, {
+			dataField: 'fecha',
+			text: 'Fecha',
+			formatter: tablasFormatter.fecha
+		}, {
+			dataField: 'nombreCompleto',
+			text: 'Paciente'
+		}, {
+			dataField: 'tipo',
+			text: 'Tipo',
+			formatter: tablasFormatter.tipoPaciente
+		}, {
+			dataField: 'prepaga',
+			text: 'Prepaga',
+			formatter: tablasFormatter.prepaga
+		}, {
+			dataField: 'credencial',
+			text: 'Credencial',
+		}, {
+			dataField: 'facturaPrepaga',
+			text: 'Factura',
+			align: 'center', headerAlign: 'center',
+			formatter: tablasFormatter.factura,
+			formatExtraData: tablasFormatter.boolFormatter
+		}, {
+			dataField: 'valor',
+			text: 'Valor',
+			align: 'right', headerAlign: 'right',
+			formatter: tablasFormatter.precio
+		}, {
+			dataField: 'copago',
+			text: 'Copago',
+			align: 'right', headerAlign: 'right',
+			formatter: tablasFormatter.precio
+		}];
+
 		return (
 			<div className="animated fadeIn listaSesiones">
 				<Row>
@@ -214,9 +258,37 @@ class ListaSesiones extends Component {
 										</div>
 									</Col>
 								</Row>
-								<hr />
+								<hr className="mb-2"/>
 								<Loader type={tipoLoader} active={this.state.loading} />
 								{!this.state.loading &&
+									<ToolkitProvider
+										keyField='id'
+										data={this.state.sesiones} 
+										columns={columns}
+										search={ {searchFormatted: true} }
+									>
+									{
+										props => (
+											<div>
+												<SearchBar { ...props.searchProps } 
+													placeholder="Buscar..."
+													className={`${tablasFormatter.filterClass} mb-2`}
+												/>
+												<BootstrapTable	{ ...props.baseProps }
+													classes="tablaSesiones table-sm"
+													defaultSortDirection="asc"
+													noDataIndication='No hay sesiones registradas'
+													bootstrap4
+													bordered={ false }
+													striped
+													hover
+												/>
+											</div>
+										)
+									}
+									</ToolkitProvider>
+								}
+								{/* {!this.state.loading &&
 									<BootstrapTable ref="table" version='4'
 										data={this.state.sesiones}
 										bordered={false}
@@ -225,66 +297,8 @@ class ListaSesiones extends Component {
 										selectRow={selectRowProp}
 										search
 									>
-										<TableHeaderColumn
-											hidden
-											dataField='id' isKey
-											dataAlign='center'
-										>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='fecha'
-											dataFormat={dateFormatter}
-											width="90"
-										>
-											<span className="thTitle">Fecha</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='nombreCompleto'
-											dataSort
-											width="250">
-											<span className="thTitle">Paciente</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='tipo'
-											dataFormat={tipoFormatter}
-										>
-											<span className="thTitle">Tipo</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='prepaga'
-											dataFormat={prepagaFormatter}
-											dataSort
-										>
-											<span className="thTitle">Prepaga</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='credencial'
-											dataSort>
-											<span className="thTitle">Credencial</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='facturaPrepaga'
-											dataFormat={enumFormatter} formatExtraData={boolFormatter}
-											dataAlign="center"
-										>
-											<span className="thTitle">Factura</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='valor'
-											dataAlign='right'
-											dataFormat={priceFormatter}
-										>
-											<span className="thTitle">Valor</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='copago'
-											dataAlign='right'
-											dataFormat={priceFormatter}
-										>
-											<span className="thTitle">Copago</span>
-										</TableHeaderColumn>
 									</BootstrapTable>
-								}
+								} */}
 							</CardBody>
 						</Card>
 					</Col>
@@ -303,12 +317,6 @@ class ListaSesiones extends Component {
 		)
 	}
 
-}
-
-// componente auxiliar
-
-const createCustomSearchField = () => {
-	return (<SearchField className='form-control form-control-sm mt-2' placeholder='Buscar...' />);
 }
 
 export default ListaSesiones;

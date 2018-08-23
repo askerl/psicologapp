@@ -2,7 +2,8 @@ import React from 'react';
 import {Progress} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {filtroTipoPaciente, pacientePrivado, pacientePrepaga, prepagasById} from '../config/constants';
-// PACIENTES
+import moment from 'moment';
+moment.locale("es");
 
 export const tablasFormatter = {
     filterClass: 'form-control-sm',
@@ -57,5 +58,25 @@ export const tablasFormatter = {
     },
     prepaga(cell, row) {
         return cell ? prepagasById[cell].nombre : '';
+    },
+    fecha(cell, row) {
+        return moment.unix(cell).format('DD/MM/YYYY');
+    },
+    precio(cell, row) {
+        if (cell > 0) {
+            return (
+                <span><i className="fa fa-usd"></i> {cell}</span>
+            );
+        } else {
+            return '';
+        }
+    },
+    factura(cell, row, rowIndex, formatExtraData) {
+        return formatExtraData[cell];
+    },
+    boolFormatter: {
+        true: 'Sí',
+        false: 'No' 
     }
+
 }
