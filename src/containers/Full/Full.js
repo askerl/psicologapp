@@ -17,7 +17,7 @@ import Facturaciones from '../../views/Facturaciones/facturaciones';
 import {NotificationContainer} from 'react-notifications';
 
 import {auth, logout} from '../../fire';
-import { isHabilitado } from '../../config/constants';
+import { isHabilitado } from '../../utils/utils';
 
 class Full extends Component {
 

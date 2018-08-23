@@ -10,12 +10,15 @@ import {
 	Form, FormGroup, Label, Input, InputGroup,
 	Progress
 } from 'reactstrap';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import { priceFormatter, meses, prepagas, getFacturacionesPeriodo, round } from '../../config/constants';
-import {errores} from '../../config/mensajes';
+import BootstrapTable from 'react-bootstrap-table-next';
+import { priceFormatter, meses, prepagas, tableColumnClasses, mesesFormat } from '../../config/constants';
+import { round } from '../../utils/utils';
+import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
+import { errores } from '../../config/mensajes';
+import { tablasFormatter } from '../../utils/formatters'
 import { NotificationManager } from 'react-notifications';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
-import {Bar} from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 
 import moment from 'moment';
 moment.locale("es");
@@ -116,11 +119,65 @@ class Facturaciones extends Component {
 
 		const optionsMes = meses.map( (value, index) => <option key={index} value={index+1}>{value}</option>);
 		
+		const columns = [{
+			dataField: 'id',
+			text: 'ID',
+			hidden: true
+		},{
+			dataField: 'anio',
+			text: 'Año',
+			align: 'center', headerAlign: 'center',
+			//headerAttrs: { width: '130px' },
+			sort: true,
+		},{
+			dataField: 'mes',
+			text: 'Mes',
+			align: 'center', headerAlign: 'center',
+			//headerAttrs: { width: '130px' },
+			formatter: tablasFormatter.mes,
+			formatExtraData: mesesFormat.long,
+			sort: true,
+		},{
+			dataField: 'totalPrivado',
+			text: 'Privados',
+			align: 'right', headerAlign: 'right',
+			//headerAttrs: { width: '130px' },
+			formatter: tablasFormatter.precio,
+			sort: true,
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
+		},{
+			dataField: 'totalPrepaga',
+			text: 'Prepagas',
+			align: 'right', headerAlign: 'right',
+			//headerAttrs: { width: '130px' },
+			formatter: tablasFormatter.precio,
+			sort: true,
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
+		},{
+			dataField: 'totalCopago',
+			text: 'Copagos',
+			align: 'right', headerAlign: 'right',
+			//headerAttrs: { width: '130px' },
+			formatter: tablasFormatter.precio,
+			sort: true,
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
+		},{
+			dataField: 'total',
+			text: 'Total',
+			align: 'right', headerAlign: 'right',
+			//headerAttrs: { width: '130px' },
+			formatter: tablasFormatter.precio,
+			sort: true
+		}];
+
 		return (
 			<div className="animated fadeIn facturaciones">				
 				<Row>
 					<Col>
-						<Card>
+						<Card className="mainCard">
 							<CardHeader>
 								<i className="fa fa-book fa-lg"></i> Facturaciones
 								</CardHeader>
@@ -165,60 +222,69 @@ class Facturaciones extends Component {
 									</Row>
 								</Form>
 								{this.state.showResultados &&
-									<BootstrapTable ref="table" version='4'
-										data={this.state.facturaciones}
-										bordered={false}
-										hover //striped
-										options={options}
-										expandableRow={this.isExpandableRow}
-										expandComponent={this.expandComponent}
-										expandColumnOptions={{ expandColumnVisible: true }}
-									>
-										<TableHeaderColumn
-											hidden
-											dataField='id' isKey
-											dataAlign='center'
-										>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='anio'
-											dataSort>
-											<span className="thTitle">Año</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='mes'
-											dataSort>
-											<span className="thTitle">Mes</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='totalPrivado'
-											dataFormat={priceFormatter}
-											dataSort
-										>
-											<span className="thTitle">Privados</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='totalPrepaga'
-											dataFormat={priceFormatter}
-											dataSort
-										>
-											<span className="thTitle">Prepagas</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='totalCopago'
-											dataFormat={priceFormatter}
-											dataSort
-										>
-											<span className="thTitle">Copagos</span>
-										</TableHeaderColumn>
-										<TableHeaderColumn
-											dataField='total'
-											dataFormat={priceFormatter}
-											dataSort
-										>
-											<span className="thTitle">Total</span>
-										</TableHeaderColumn>
-									</BootstrapTable>
+									<BootstrapTable keyField='id' classes="tablaFacturaciones"
+										data={this.state.facturaciones} 
+										columns={columns} 
+										defaultSortDirection="asc"
+										noDataIndication={options.noDataText}
+										bordered={ false }
+										bootstrap4
+										hover
+									/>
+									// <BootstrapTable ref="table" version='4'
+									// 	data={this.state.facturaciones}
+									// 	bordered={false}
+									// 	hover //striped
+									// 	options={options}
+									// 	expandableRow={this.isExpandableRow}
+									// 	expandComponent={this.expandComponent}
+									// 	expandColumnOptions={{ expandColumnVisible: true }}
+									// >
+									// 	<TableHeaderColumn
+									// 		hidden
+									// 		dataField='id' isKey
+									// 		dataAlign='center'
+									// 	>
+									// 	</TableHeaderColumn>
+									// 	<TableHeaderColumn
+									// 		dataField='anio'
+									// 		dataSort>
+									// 		<span className="thTitle">Año</span>
+									// 	</TableHeaderColumn>
+									// 	<TableHeaderColumn
+									// 		dataField='mes'
+									// 		dataSort>
+									// 		<span className="thTitle">Mes</span>
+									// 	</TableHeaderColumn>
+									// 	<TableHeaderColumn
+									// 		dataField='totalPrivado'
+									// 		dataFormat={priceFormatter}
+									// 		dataSort
+									// 	>
+									// 		<span className="thTitle">Privados</span>
+									// 	</TableHeaderColumn>
+									// 	<TableHeaderColumn
+									// 		dataField='totalPrepaga'
+									// 		dataFormat={priceFormatter}
+									// 		dataSort
+									// 	>
+									// 		<span className="thTitle">Prepagas</span>
+									// 	</TableHeaderColumn>
+									// 	<TableHeaderColumn
+									// 		dataField='totalCopago'
+									// 		dataFormat={priceFormatter}
+									// 		dataSort
+									// 	>
+									// 		<span className="thTitle">Copagos</span>
+									// 	</TableHeaderColumn>
+									// 	<TableHeaderColumn
+									// 		dataField='total'
+									// 		dataFormat={priceFormatter}
+									// 		dataSort
+									// 	>
+									// 		<span className="thTitle">Total</span>
+									// 	</TableHeaderColumn>
+									// </BootstrapTable>
 								}
 							</CardBody>
 						</Card>
@@ -236,7 +302,6 @@ class Facturaciones extends Component {
 										</Col>
 									</Row>
 									<div className="chart-wrapper">
-										{/* <Line data={this.state.grafica} options={this.state.optsGrafica} height={300} /> */}
 										<Bar data={this.state.grafica} options={this.state.optsGrafica} height={300} />
 									</div>
 								</CardBody>

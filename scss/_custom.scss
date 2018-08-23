@@ -1,4 +1,15 @@
 // Here you can add other styles
+
+.mainCard {
+    @include media-breakpoint-down(xs) {
+        border-left: none;
+        border-right: none;
+        .card-body {
+            padding: 1rem;
+        }
+    }
+}
+
 button{
     margin-right: 5px;
 }
@@ -104,6 +115,11 @@ span.thTitle{
         .react-bs-table-no-data {
             display: none;
         }
+        @include media-breakpoint-down(xs) {
+            td, th {
+                padding: 0.3rem;
+            }
+        }
     }
 }
 
@@ -143,6 +159,12 @@ span.thTitle{
     min-width: 60px;
 }
 
+// React Bootstrap Table customizations
+
 .react-bootstrap-table>table>thead>tr>th .date-filter-comparator, .react-bootstrap-table>table>thead>tr>th .number-filter-comparator{
     max-width: 45px;
+}
+
+.react-bootstrap-table td>.selection-input-4, .react-bootstrap-table th>.selection-input-4 {
+    margin: 0;
 }

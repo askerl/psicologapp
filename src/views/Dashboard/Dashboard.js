@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import db from '../../fire';
-import { pacientePrepaga, pacientePrivado, prepagas, round } from '../../config/constants';
+import { pacientePrepaga, pacientePrivado, prepagas} from '../../config/constants';
+import { round } from '../../utils/utils';
 import Loader from 'react-loaders';
 
 import {
@@ -95,7 +96,7 @@ class Dashboard extends Component {
 					
 					<Row>
 						<Col>
-							<Card>
+							<Card className="mainCard">
 								<CardBody>
 									<Row>
 										<Col xs="12" sm="6">

@@ -77,6 +77,9 @@ export const tablasFormatter = {
     boolFormatter: {
         true: 'Sí',
         false: 'No' 
+    },
+    mes(cell, row, rowIndex, formatExtraData) {
+        return _.capitalize(moment(`${cell}`, 'M').format(formatExtraData));
     }
 
 }

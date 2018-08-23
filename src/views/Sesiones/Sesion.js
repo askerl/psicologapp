@@ -21,7 +21,8 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import {pacientePrivado, tipoLoader, createFechaSesion, prepagasById} from '../../config/constants';
+import { pacientePrivado, tipoLoader, prepagasById} from '../../config/constants';
+import { createFechaSesion } from '../../utils/utils';
 import {errores} from '../../config/mensajes';
 import Select from 'react-select';
 import Loader from 'react-loaders';
@@ -77,7 +78,7 @@ class Sesion extends Component {
 			pacientes.push(paciente);
 		});
 		this.setState({pacientes});
-		console.log('pacientes', this.state.pacientes);		
+		//console.log('pacientes', this.state.pacientes);		
     }
     
     loading(val){
@@ -216,7 +217,7 @@ class Sesion extends Component {
                 <div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn sesion"}>                
                     <Row>
                         <Col>
-                            <Card>
+                            <Card className="mainCard">
                                 <CardHeader>
                                     <i className="fa fa-comments-o fa-lg"></i>
                                     <strong>Sesión</strong>                                

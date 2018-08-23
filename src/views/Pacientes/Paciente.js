@@ -23,7 +23,8 @@ import {
 import db from '../../fire';
 
 import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, calcPorcentajesSesiones, tipoLoader, prepagasById, prepagas, pacientesMap } from '../../config/constants';
+import { tipoPaciente, pacientePrepaga, pacientePrivado, tipoLoader, prepagasById, prepagas} from '../../config/constants';
+import { calcPorcentajesSesiones, pacientesMap } from '../../utils/utils';
 import {errores} from '../../config/mensajes';
 import Widget02 from '../Widgets/Widget02';
 import {WidgetSesionesUsadas, WidgetSesionesRestantes} from '../Widgets/WidgetsAuxiliares';
@@ -93,7 +94,7 @@ class Paciente extends Component {
             if (!nuevo){
                 // cargo paciente y sus sesiones
                 db.collection("pacientes").doc(id).get().then( pac => {
-                    console.log(pac.id, pac.data());
+                    // console.log(pac.id, pac.data());
                     this.loadPaciente(pac.data());
                 }).then( () => {
                     db.collection("sesiones")
@@ -233,7 +234,7 @@ class Paciente extends Component {
                 db.collection("pacientes").add(paciente)
                 .then(docRef => {
                     this.loading(false);
-                    console.log("Paciente generado con ID: ", docRef.id);
+                    //console.log("Paciente generado con ID: ", docRef.id);
                     NotificationManager.success('Los datos han sido guardados');
                     this.goBack();
                 })
@@ -249,7 +250,7 @@ class Paciente extends Component {
                 db.collection("pacientes").doc(this.state.id).update(paciente)
                 .then(() => {
                     this.loading(false);
-                    console.log("Paciente actualizado con ID:", this.state.id);
+                    //console.log("Paciente actualizado con ID:", this.state.id);
                     NotificationManager.success('Los datos han sido actualizados');
                     this.goBack();
                 })
@@ -312,8 +313,8 @@ class Paciente extends Component {
 
     checkExistePaciente() {
         if (this.inputNombre.value && this.inputApellido.value) {
-            console.log('chequeando si existe paciente', this.inputNombre.value, this.inputApellido.value);
-            console.log('pacientes map', this.state.pacientesMap);
+            //console.log('chequeando si existe paciente', this.inputNombre.value, this.inputApellido.value);
+            //console.log('pacientes map', this.state.pacientesMap);
 
             for (const id in this.state.pacientesMap) {
                 let obj = this.state.pacientesMap[id];
@@ -366,7 +367,7 @@ class Paciente extends Component {
                 <div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn paciente"}>                
                     <Row>
                         <Col>
-                            <Card>
+                            <Card className="mainCard">
                                 <CardHeader>
                                     <i className="fa fa-user-circle fa-lg"></i>
                                     <strong>Paciente</strong>                                

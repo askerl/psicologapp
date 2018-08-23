@@ -13,8 +13,9 @@ import Loader from 'react-loaders';
 import db from '../../fire';
 import moment from 'moment';
 moment.locale("es");
-import {calcPorcentajesSesiones, tipoLoader, filtroPrepagas, filtroTipoPaciente, tableColumnClasses, estadosPaciente} from '../../config/constants';
-import {tablasFormatter} from '../../config/formatters';
+import { tipoLoader, filtroPrepagas, filtroTipoPaciente, tableColumnClasses, estadosPaciente} from '../../config/constants';
+import { calcPorcentajesSesiones } from '../../utils/utils';
+import { tablasFormatter } from '../../utils/formatters';
 import filterFactory, { textFilter, numberFilter, selectFilter } from 'react-bootstrap-table2-filter';
 
 class ListaPacientes extends Component {
@@ -53,7 +54,7 @@ class ListaPacientes extends Component {
 			pacientes.push(paciente);
 		});
 		this.setState({pacientes: [...pacientes].concat([])});
-		console.log('pacientes', this.state.pacientes);		
+		//console.log('pacientes', this.state.pacientes);		
 	}
 
 	loading(val){
@@ -158,7 +159,7 @@ class ListaPacientes extends Component {
 			<div className="animated fadeIn listaPacientes">
 				<Row>
 					<Col>
-						<Card>
+						<Card className="mainCard">
 							<CardHeader>
 								<i className="fa fa-address-book-o fa-lg"></i> Pacientes
 								</CardHeader>

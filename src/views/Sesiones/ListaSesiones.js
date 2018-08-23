@@ -12,10 +12,11 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import Loader from 'react-loaders';
 import db from '../../fire';
-import { pacientesMap, tipoLoader, meses, arrayRemoveDuplicates } from '../../config/constants';
-import {errores} from '../../config/mensajes';
+import { tableColumnClasses, tipoLoader, meses } from '../../config/constants';
+import { arrayRemoveDuplicates, pacientesMap } from '../../utils/utils';
+import { errores } from '../../config/mensajes';
 import { NotificationManager } from 'react-notifications';
-import {tablasFormatter} from '../../config/formatters';
+import { tablasFormatter } from '../../utils/formatters';
 
 import moment from 'moment';
 moment.locale("es");
@@ -83,7 +84,7 @@ class ListaSesiones extends Component {
 			sesiones.push(sesion);
 		});
 		this.setState({sesiones});
-		console.log('sesiones', this.state.sesiones);
+		//console.log('sesiones', this.state.sesiones);
 	}
 
 	loading(val){
@@ -130,7 +131,7 @@ class ListaSesiones extends Component {
 
 		//Commit the batch
 		batch.commit().then(() => {			
-			console.log("Sesiones borradas correctamente");
+			//console.log("Sesiones borradas correctamente");
 			NotificationManager.success('Las sesiones han sido borradas');
 			// recargo datos y limpio selección
 			this.setState({selected: []});
@@ -177,13 +178,7 @@ class ListaSesiones extends Component {
 
 	render() {
 
-		const options = {
-			noDataText: 'No hay sesiones registradas',
-			searchField: createCustomSearchField,
-			searchPosition: 'left'
-		}
-
-		const selectRowProp = {
+		const selectRow = {
 			mode: 'checkbox',
 			clickToSelect: true,
 			bgColor: '#ddf7ff',
@@ -200,6 +195,7 @@ class ListaSesiones extends Component {
 		}, {
 			dataField: 'fecha',
 			text: 'Fecha',
+			headerAttrs: { width: '100px' },
 			formatter: tablasFormatter.fecha
 		}, {
 			dataField: 'nombreCompleto',
@@ -207,37 +203,51 @@ class ListaSesiones extends Component {
 		}, {
 			dataField: 'tipo',
 			text: 'Tipo',
-			formatter: tablasFormatter.tipoPaciente
+			headerAttrs: { width: '90px' },
+			formatter: tablasFormatter.tipoPaciente,
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
 		}, {
 			dataField: 'prepaga',
 			text: 'Prepaga',
-			formatter: tablasFormatter.prepaga
+			formatter: tablasFormatter.prepaga,
+			headerClasses: tableColumnClasses.showLarge,
+			classes: tableColumnClasses.showLarge
 		}, {
 			dataField: 'credencial',
 			text: 'Credencial',
+			headerClasses: tableColumnClasses.showLarge,
+			classes: tableColumnClasses.showLarge
 		}, {
 			dataField: 'facturaPrepaga',
 			text: 'Factura',
+			headerAttrs: { width: '80px' },
 			align: 'center', headerAlign: 'center',
 			formatter: tablasFormatter.factura,
-			formatExtraData: tablasFormatter.boolFormatter
+			formatExtraData: tablasFormatter.boolFormatter,
+			headerClasses: tableColumnClasses.showLarge,
+			classes: tableColumnClasses.showLarge
 		}, {
 			dataField: 'valor',
 			text: 'Valor',
 			align: 'right', headerAlign: 'right',
-			formatter: tablasFormatter.precio
+			formatter: tablasFormatter.precio,
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
 		}, {
 			dataField: 'copago',
 			text: 'Copago',
 			align: 'right', headerAlign: 'right',
-			formatter: tablasFormatter.precio
+			formatter: tablasFormatter.precio,
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
 		}];
 
 		return (
 			<div className="animated fadeIn listaSesiones">
 				<Row>
 					<Col>
-						<Card>
+						<Card className="mainCard">
 							<CardHeader>
 								<i className="fa fa-comments fa-lg"></i> Sesiones
 								</CardHeader>
@@ -282,6 +292,7 @@ class ListaSesiones extends Component {
 													bordered={ false }
 													striped
 													hover
+													selectRow={selectRow}
 												/>
 											</div>
 										)
