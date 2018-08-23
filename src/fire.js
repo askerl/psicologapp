@@ -1,28 +1,10 @@
 import firebase from 'firebase';
-import firebaseui from 'firebaseui';
+import { firebaseConfig as config } from './config/firebaseConfig';
 
 // Required for side-effects
 require("firebase/firestore");
 
-var configPROD = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
-    apiKey: "AIzaSyBP2hcETIRSFvvFhgMabmDZ-RjShqDlX70",
-    authDomain: "psicologapp-84.firebaseapp.com",
-    databaseURL: "https://psicologapp-84.firebaseio.com",
-    projectId: "psicologapp-84",
-    storageBucket: "psicologapp-84.appspot.com",
-    messagingSenderId: "721791562259"
-};
-
-var configTESTING = { /* COPY THE ACTUAL CONFIG FROM FIREBASE CONSOLE */
-    apiKey: 'AIzaSyDVbWeM5isevTOPK5TEyGjCZlZqulVUjJQ',
-    authDomain: 'psicologapp-testing.firebaseapp.com',
-    databaseURL: 'https://psicologapp-testing.firebaseio.com',
-    projectId: 'psicologapp-testing',
-    storageBucket: 'psicologapp-testing.appspot.com',
-    messagingSenderId: '236252094290',
-};
-
-firebase.initializeApp(configTESTING);
+firebase.initializeApp(config.PROD);
 
 // Configure FirebaseUI.
 export const uiConfig = {

@@ -6,7 +6,7 @@ import Sidebar from '../../components/Sidebar/';
 import Breadcrumb from '../../components/Breadcrumb/';
 import Footer from '../../components/Footer/';
 
-import Dashboard from '../../views/Dashboard/';
+import Dashboard from '../../views/Dashboard/dashboard';
 import ListaPacientes from '../../views/Pacientes/listaPacientes';
 import Paciente from '../../views/Pacientes/paciente';
 import ListaSesiones from '../../views/Sesiones/listaSesiones';
