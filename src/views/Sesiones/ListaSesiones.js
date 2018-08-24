@@ -1,24 +1,16 @@
-import React, {Component} from 'react';
-import {
-	Row,
-	Col,
-	Button,
-	Card,
-	CardHeader,
-	CardBody,
-	Input,
-	Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
+import moment from 'moment';
+import React, { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import Loader from 'react-loaders';
-import db from '../../fire';
-import { tableColumnClasses, tipoLoader, meses } from '../../config/constants';
-import { arrayRemoveDuplicates, pacientesMap } from '../../utils/utils';
-import { errores } from '../../config/mensajes';
+import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
+import { Button, Card, CardBody, CardHeader, Col, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import { meses, tableColumnClasses, overlay } from '../../config/constants';
+import { errores } from '../../config/mensajes';
+import db from '../../fire';
 import { tablasFormatter } from '../../utils/formatters';
+import { arrayRemoveDuplicates, pacientesMap } from '../../utils/utils';
 
-import moment from 'moment';
 moment.locale("es");
 
 class ListaSesiones extends Component {
@@ -269,21 +261,23 @@ class ListaSesiones extends Component {
 									</Col>
 								</Row>
 								<hr className="mb-2"/>
-								<Loader type={tipoLoader} active={this.state.loading} />
-								{!this.state.loading &&
+								<LoadingOverlay
+									active={this.state.loading}
+									animate
+									spinner
+									color={overlay.color}
+									background={overlay.background}>
 									<ToolkitProvider
 										keyField='id'
 										data={this.state.sesiones} 
 										columns={columns}
-										search={ {searchFormatted: true} }
-									>
+										search={ {searchFormatted: true} }>
 									{
 										props => (
 											<div>
 												<SearchBar { ...props.searchProps } 
 													placeholder="Buscar..."
-													className={`${tablasFormatter.filterClass} mb-2`}
-												/>
+													className={`${tablasFormatter.filterClass} mb-2`}/>
 												<BootstrapTable	{ ...props.baseProps }
 													classes="tablaSesiones table-sm"
 													defaultSortDirection="asc"
@@ -292,24 +286,12 @@ class ListaSesiones extends Component {
 													bordered={ false }
 													striped
 													hover
-													selectRow={selectRow}
-												/>
+													selectRow={selectRow}/>
 											</div>
 										)
 									}
 									</ToolkitProvider>
-								}
-								{/* {!this.state.loading &&
-									<BootstrapTable ref="table" version='4'
-										data={this.state.sesiones}
-										bordered={false}
-										striped hover condensed
-										options={options}
-										selectRow={selectRowProp}
-										search
-									>
-									</BootstrapTable>
-								} */}
+								</LoadingOverlay>
 							</CardBody>
 						</Card>
 					</Col>

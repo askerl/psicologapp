@@ -10,6 +10,13 @@
     }
 }
 
+.dashboard {
+    .linkPacientes {
+        text-decoration: none;
+        color: initial;
+    }
+}
+
 button{
     margin-right: 5px;
 }
@@ -112,9 +119,9 @@ span.thTitle{
         }
     }
     .tablaPacientes {
-        .react-bs-table-no-data {
-            display: none;
-        }
+        // .react-bs-table-no-data {
+        //     display: none;
+        // }
         @include media-breakpoint-down(xs) {
             td, th {
                 padding: 0.3rem;

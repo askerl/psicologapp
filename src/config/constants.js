@@ -40,9 +40,9 @@ export const filtroPrepagas = auxfiltroPrepagas;
 export const prepagas = auxprepagas;
 
 export const estadosPaciente = [
-    { value: '', title: 'Todos' },
-    { value: true, title: 'Activos' },
-    { value: false, title: 'Inactivos'}
+    { value: 'T', title: 'Todos' },
+    { value: 'A', title: 'Activos' },
+    { value: 'I', title: 'Inactivos' }
 ];
 
 export const tipoLoader = "ball-scale-ripple-multiple";
@@ -78,10 +78,24 @@ export const brandColors = {
     brandTeal:      '#20c997'
 }
 
+export const overlay = {
+    color: brandColors.brandInfo,
+    background: 'rgba(192,192,192,0.3)',
+    backgroundDashboard: 'white'
+}
+
 // breakpoints Bootstrap 4
 export const breakpoints = {
     sm: 576,
     md: 768,
     lg: 992,
     xl: 1200
+}
+
+export const initialSizes = {
+    xs: false,
+    sm: false,
+    md: false,
+    lg: false,
+    xl: false
 }

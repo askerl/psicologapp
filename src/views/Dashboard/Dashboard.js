@@ -1,22 +1,13 @@
 import React, { Component } from 'react';
+import LoadingOverlay from 'react-loading-overlay';
+import { Link } from 'react-router-dom';
+import { Card, CardBody, Col, Row } from 'reactstrap';
+import { pacientePrepaga, pacientePrivado, prepagas, overlay } from '../../config/constants';
 import db from '../../fire';
-import { pacientePrepaga, pacientePrivado, prepagas} from '../../config/constants';
-import { round } from '../../utils/utils';
-import Loader from 'react-loaders';
-
-import {
-	Row,
-	Col,
-	Progress,
-	Card,
-	CardHeader,
-	CardBody,
-	CardFooter,
-	CardTitle
-	} from 'reactstrap';
-	
+import { round, convertHex } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
-import {StatItem, Callout} from '../Widgets/WidgetsAuxiliares';
+import { Callout, StatItem } from '../Widgets/WidgetsAuxiliares';
+
 	
 class Dashboard extends Component {
   
@@ -84,37 +75,41 @@ class Dashboard extends Component {
 			this.loading(false);
 		});
 
-
 	}
 
 	render() {
 		let data = this.state;
 		return (
-			<div className="animated fadeIn">
-				<Loader type="ball-scale-ripple-multiple" active={this.state.loading} />
-				<div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn dashboard"}>           
-					
+			<div className="animated fadeIn dashboard">
+				<LoadingOverlay
+					active={this.state.loading}
+					animate
+					spinner
+					color={overlay.color}
+					background={convertHex('#e4e5e6',30)}>
 					<Row>
 						<Col>
 							<Card className="mainCard">
 								<CardBody>
+									<div className="mb-3"><span className="h6">Pacientes</span></div>
 									<Row>
 										<Col xs="12" sm="6">
-											<Widget02 header={`${data.activos}`} mainText="Pacientes" icon="icon-people icons" color="success" variant="1"/>
+											<Link to={'/pacientes'} title="Ver pacientes activos" className="linkPacientes" onClick={() => localStorage.setItem('filtroEstado', 'A')}>
+												<Widget02 header={`${data.activos}`} mainText="Activos" icon="icon-people icons" color="success" variant="1"/>
+											</Link>
 										</Col>
 										<Col xs="12" sm="6">
-											<Widget02 header={`${data.inactivos}`} mainText="Inactivos" icon="icon-user-unfollow icons" color="danger" variant="1"/>
+											<Link to={'/pacientes'} title="Ver pacientes inactivos" className="linkPacientes" onClick={() => localStorage.setItem('filtroEstado', 'I')}>
+												<Widget02 header={`${data.inactivos}`} mainText="Inactivos" icon="icon-user-unfollow icons" color="danger" variant="1"/>
+											</Link>
 										</Col>
 									</Row>
-									<span className="h6">Estadísticas</span>
+									<div><span className="h6">Estadísticas de activos</span></div>
 									<Row className="d-none d-sm-flex">
-										<Col xs="4" sm="4">
-											<Callout title="Activos" color="success" value={data.activos}/>											
-										</Col>
-										<Col xs="4" sm="4">
+										<Col xs="6" sm="6">
 											<Callout title="Privados" color="warning" value={data.privadosActivos}/>
 										</Col>
-										<Col xs="4" sm="4">
+										<Col xs="6" sm="6">
 											<Callout title="Obra social" color="primary" value={data.obraSocialActivos}/>											
 										</Col>										
 									</Row>
@@ -137,8 +132,7 @@ class Dashboard extends Component {
 							</Card>
 						</Col>
 					</Row>
-
-				</div>
+				</LoadingOverlay>
 			</div>
 		);
 	}

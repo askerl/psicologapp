@@ -1,29 +1,18 @@
-import React, {Component} from 'react';
-import {
-	Row,
-	Col,
-	Button,
-	Card, CardTitle,
-	CardHeader,
-	CardFooter,
-	CardBody,
-	Form, FormGroup, Label, Input, InputGroup,
-	Progress
-} from 'reactstrap';
-import BootstrapTable from 'react-bootstrap-table-next';
-import { meses, prepagas, tableColumnClasses, mesesFormat, breakpoints } from '../../config/constants';
-import { round } from '../../utils/utils';
-import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
-import { errores } from '../../config/mensajes';
-import { tablasFormatter } from '../../utils/formatters'
-import { NotificationManager } from 'react-notifications';
-import { StatItem } from '../Widgets/WidgetsAuxiliares';
-import { Bar } from 'react-chartjs-2';
-
 import moment from 'moment';
-moment.locale("es");
+import React, { Component } from 'react';
+import BootstrapTable from 'react-bootstrap-table-next';
+import { Bar } from 'react-chartjs-2';
+import { NotificationManager } from 'react-notifications';
+import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Form, FormGroup, Input, InputGroup, Label, Progress, Row } from 'reactstrap';
+import { breakpoints, meses, mesesFormat, prepagas, overlay } from '../../config/constants';
+import { errores } from '../../config/mensajes';
+import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
+import { tablasFormatter } from '../../utils/formatters';
+import { round } from '../../utils/utils';
+import { StatItem } from '../Widgets/WidgetsAuxiliares';
+import LoadingOverlay from 'react-loading-overlay';
 
-import $ from 'jquery'; 
+moment.locale("es");
 
 class Facturaciones extends Component {
 	constructor(props) {
@@ -36,7 +25,7 @@ class Facturaciones extends Component {
 			showResultados: false,
 			loading: false,
 			periodo: '',
-			hideColumns: false
+			size: ''
 		};
 		this.loading = this.loading.bind(this);
 		this.initFiltros = this.initFiltros.bind(this);
@@ -74,9 +63,9 @@ class Facturaciones extends Component {
 		this.loading(true);
 
 		// oculto resultados anteriores
-		if (this.state.showResultados){
-			this.setState({showResultados: false});	
-		}
+		// if (this.state.showResultados){
+		// 	this.setState({showResultados: false});	
+		// }
 
 		let mesIni = parseInt(this.mesIni.value),
 		anioIni = parseInt(this.anioIni.value),
@@ -91,6 +80,8 @@ class Facturaciones extends Component {
 				this.loading(false);
 			});
 
+		} else {
+			this.loading(false);
 		}
 		
 	}
@@ -116,7 +107,7 @@ class Facturaciones extends Component {
 	}
 
 	resize(){
-		this.setState({hideColumns: window.innerWidth < breakpoints.sm});
+		this.setState({size: window.innerWidth});
 	}
 
 	render() {
@@ -149,21 +140,21 @@ class Facturaciones extends Component {
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			hidden: this.state.hideColumns
+			hidden: this.state.size < breakpoints.sm
 		},{
 			dataField: 'totalPrepaga',
 			text: 'Prepagas',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			hidden: this.state.hideColumns
+			hidden: this.state.size < breakpoints.sm
 		},{
 			dataField: 'totalCopago',
 			text: 'Copagos',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			hidden: this.state.hideColumns
+			hidden: this.state.size < breakpoints.sm
 		},{
 			dataField: 'total',
 			text: 'Total',
@@ -199,7 +190,13 @@ class Facturaciones extends Component {
 		}
 
 		return (
-			<div className="animated fadeIn facturaciones">				
+			<div className="animated fadeIn facturaciones">
+				<LoadingOverlay
+					active={this.state.loading}
+					animate
+					spinner
+					color={overlay.color}
+					background={overlay.background}>
 				<Row>
 					<Col>
 						<Card className="mainCard">
@@ -307,10 +304,10 @@ class Facturaciones extends Component {
 						</Col>
 					</Row>
 				}
+				</LoadingOverlay>
 			</div>
 		)
 	}
-
 }
 
 export default Facturaciones;

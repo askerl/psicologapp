@@ -3,19 +3,37 @@ import {mailHabilitados} from '../config/firebaseConfig';
 import moment from 'moment';
 moment.locale("es");
 import _ from 'lodash';
+import { breakpoints } from '../config/constants';
 
-// --------------------------------
+// ---------------------- COMMON FUNCTIONS --------------------------------
 
 export const arrayRemoveDuplicates = (arr) => {
     let unique_array = Array.from(new Set(arr))
     return unique_array
 }
 
-export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
-    let porcUsadas = sesionesAut > 0 ? sesiones / sesionesAut * 100 : 0;
-    let porcRestantes = sesionesAut > 0 ? (sesionesAut - sesiones)/ sesionesAut * 100 : 0 ;
-    return {porcUsadas, porcRestantes};
+export const round = (value, decimals) => {
+    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
+
+// convert Hex to RGBA
+export const convertHex = (hex, opacity) => {
+	hex = hex.replace('#', '');
+	var r = parseInt(hex.substring(0, 2), 16);
+	var g = parseInt(hex.substring(2, 4), 16);
+	var b = parseInt(hex.substring(4, 6), 16);
+  
+	var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity / 100 + ')';
+	return result;
+}
+
+// ---------------------- LOGIN --------------------------------
+
+export const isHabilitado = (email) =>{
+    return _.indexOf(mailHabilitados, email) !== -1;
+}
+
+// ---------------------- PACIENTES --------------------------------
 
 export const pacientesMap = () => {
     let promise = new Promise( (resolve, reject) => {
@@ -34,9 +52,52 @@ export const pacientesMap = () => {
     return promise;
 }
 
+export const getPacientes = (estado) => {
+    let promise = new Promise( (resolve, reject) => {
+        
+        if (estado === 'T') { // filtro por TODOS
+            db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
+                resolve(loadPacientes(querySnapshot));
+            });	
+        } else { // filtro por algún estado ACTIVO/INACTIVO
+            let activo = estado === 'A';
+            db.collection("pacientes").where('activo','==',activo).orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
+                resolve(loadPacientes(querySnapshot));
+            });	
+        }
+
+    });
+    return promise;
+}
+
+function loadPacientes(querySnapshot) {
+    let pacientes = [];
+    querySnapshot.docs.forEach( doc => {            
+        let paciente = doc.data();
+        paciente.id = doc.id;
+        paciente.sesionesRestantes = paciente.sesionesAut ? (paciente.sesionesAut - paciente.sesiones) : '';
+        let porcs = calcPorcentajesSesiones(paciente.sesionesAut, paciente.sesiones);
+        paciente.porcRestantes = porcs.porcRestantes;
+        paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;
+        let fchNacMoment = moment(paciente.fchNac, 'DD/MM/YYYY');
+        paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : 0;
+        pacientes.push(paciente);
+    });
+    //console.log('pacientes', pacientes);	
+    return pacientes;	
+}
+
 function setPacientesWindow(pacientes) {
     window.pacientesMap = pacientes;
 }
+
+export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
+    let porcUsadas = sesionesAut > 0 ? sesiones / sesionesAut * 100 : 0;
+    let porcRestantes = sesionesAut > 0 ? (sesionesAut - sesiones)/ sesionesAut * 100 : 0 ;
+    return {porcUsadas, porcRestantes};
+}
+
+// ---------------------- SESIONES --------------------------------
 
 export const createFechaSesion = (value) =>{
     let fecha = moment(value);
@@ -47,24 +108,4 @@ export const createFechaSesion = (value) =>{
         mes,
         anio
     }
-}
-
-// utiles
-export const round = (value, decimals) => {
-    return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
-}
-
-// convert Hex to RGBA
-export const convertHex = (hex, opacity) => {
-	hex = hex.replace('#', '');
-	var r = parseInt(hex.substring(0, 2), 16);
-	var g = parseInt(hex.substring(2, 4), 16);
-	var b = parseInt(hex.substring(4, 6), 16);
-  
-	var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity / 100 + ')';
-	return result;
-}
-
-export const isHabilitado = (email) =>{
-    return _.indexOf(mailHabilitados, email) !== -1;
 }
