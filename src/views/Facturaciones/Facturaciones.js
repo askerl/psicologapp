@@ -137,24 +137,24 @@ class Facturaciones extends Component {
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			// headerClasses: tableColumnClasses.showSmall,
-			// classes: tableColumnClasses.showSmall
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
 		},{
 			dataField: 'totalPrepaga',
 			text: 'Prepagas',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			// headerClasses: tableColumnClasses.showSmall,
-			// classes: tableColumnClasses.showSmall
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
 		},{
 			dataField: 'totalCopago',
 			text: 'Copagos',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			// headerClasses: tableColumnClasses.showSmall,
-			// classes: tableColumnClasses.showSmall
+			headerClasses: tableColumnClasses.showSmall,
+			classes: tableColumnClasses.showSmall
 		},{
 			dataField: 'total',
 			text: 'Total',
