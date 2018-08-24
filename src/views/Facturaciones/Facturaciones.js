@@ -11,7 +11,7 @@ import {
 	Progress
 } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
-import { priceFormatter, meses, prepagas, tableColumnClasses, mesesFormat } from '../../config/constants';
+import { meses, prepagas, tableColumnClasses, mesesFormat, breakpoints } from '../../config/constants';
 import { round } from '../../utils/utils';
 import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
 import { errores } from '../../config/mensajes';
@@ -35,16 +35,24 @@ class Facturaciones extends Component {
 			pacientesMap: {},
 			showResultados: false,
 			loading: false,
-			periodo: ''
+			periodo: '',
+			hideColumns: false
 		};
 		this.loading = this.loading.bind(this);
 		this.initFiltros = this.initFiltros.bind(this);
 		this.getFacturacion = this.getFacturacion.bind(this);
 		this.validarPeriodo = this.validarPeriodo.bind(this);
+		this.resize = this.resize.bind(this);
 	}
 	
 	componentDidMount(){
 		this.initFiltros();
+		window.addEventListener("resize", this.resize);
+		this.resize();
+	}
+	
+	componentWillUnmount() {
+		window.removeEventListener("resize", this.resize);
 	}
 
 	initFiltros(){
@@ -107,6 +115,10 @@ class Facturaciones extends Component {
 		}
 	}
 
+	resize(){
+		this.setState({hideColumns: window.innerWidth < breakpoints.sm});
+	}
+
 	render() {
 
 		const options = {
@@ -137,30 +149,27 @@ class Facturaciones extends Component {
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			hidden: this.state.hideColumns
 		},{
 			dataField: 'totalPrepaga',
 			text: 'Prepagas',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			hidden: this.state.hideColumns
 		},{
 			dataField: 'totalCopago',
 			text: 'Copagos',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
 			sort: true,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			hidden: this.state.hideColumns
 		},{
 			dataField: 'total',
 			text: 'Total',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
-			sort: true
+			sort: true,
 		}];
 
 		const expandRow = {
@@ -256,7 +265,7 @@ class Facturaciones extends Component {
 				{this.state.showResultados && this.state.grafica !== null &&
 					<Row>
 						<Col>
-							<Card>
+							<Card className="mainCard">
 								<CardBody>
 									<Row>
 										<Col>
@@ -269,28 +278,30 @@ class Facturaciones extends Component {
 									</div>
 								</CardBody>
 								<CardFooter>
-									<ul>
-										<li>
-											<div className="text-muted">Total</div>
+									<div className="small text-muted text-center">Totales del período</div>
+									<hr className="mt-1 mb-3"/>
+									<Row>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Global</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumTotal}</strong>
 											<Progress className="progress-xs mt-2" color="success" value="100" />
-										</li>
-										<li>
+										</Col>
+										<Col xs="6" sm="3">
 											<div className="text-muted">Privados</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrivados}</strong>
 											<Progress className="progress-xs mt-2" color="warning" value="100" />
-										</li>
-										<li>
+										</Col>
+										<Col xs="6" sm="3">
 											<div className="text-muted">Prepagas</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrepagas}</strong>
 											<Progress className="progress-xs mt-2" color="info" value="100" />
-										</li>
-										<li>
+										</Col>
+										<Col xs="6" sm="3">
 											<div className="text-muted">Copagos</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumCopagos}</strong>
 											<Progress className="progress-xs mt-2" color="teal" value="100" />
-										</li>										
-									</ul>
+										</Col>
+									</Row>
 								</CardFooter>
 							</Card>
 						</Col>

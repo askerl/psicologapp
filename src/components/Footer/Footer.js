@@ -5,7 +5,8 @@ class Footer extends Component {
   render() {
     return (
       <footer className="app-footer">
-        <span><a href="#">Alfredo Skerl</a> &copy; 2017. v<strong>{version}</strong></span>
+        <div className="mr-auto"><small><a href="#">Alfredo Skerl</a> &copy; 2017.</small></div>
+        <div><small>v<strong>{version}</strong></small></div>
       </footer>
     )
   }
