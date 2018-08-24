@@ -23,6 +23,8 @@ import { Bar } from 'react-chartjs-2';
 import moment from 'moment';
 moment.locale("es");
 
+import $ from 'jquery'; 
+
 class Facturaciones extends Component {
 	constructor(props) {
 		super(props);
@@ -104,12 +106,6 @@ class Facturaciones extends Component {
 			return false;
 		}
 	}
-	
-	expandComponent(row) {
-		return (
-			<ExpandRowComp rowData={row}/>
-		);
-	}
 
 	render() {
 
@@ -127,13 +123,11 @@ class Facturaciones extends Component {
 			dataField: 'anio',
 			text: 'Año',
 			align: 'center', headerAlign: 'center',
-			//headerAttrs: { width: '130px' },
 			sort: true,
 		},{
 			dataField: 'mes',
 			text: 'Mes',
 			align: 'center', headerAlign: 'center',
-			//headerAttrs: { width: '130px' },
 			formatter: tablasFormatter.mes,
 			formatExtraData: mesesFormat.long,
 			sort: true,
@@ -141,37 +135,59 @@ class Facturaciones extends Component {
 			dataField: 'totalPrivado',
 			text: 'Privados',
 			align: 'right', headerAlign: 'right',
-			//headerAttrs: { width: '130px' },
 			formatter: tablasFormatter.precio,
 			sort: true,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			// headerClasses: tableColumnClasses.showSmall,
+			// classes: tableColumnClasses.showSmall
 		},{
 			dataField: 'totalPrepaga',
 			text: 'Prepagas',
 			align: 'right', headerAlign: 'right',
-			//headerAttrs: { width: '130px' },
 			formatter: tablasFormatter.precio,
 			sort: true,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			// headerClasses: tableColumnClasses.showSmall,
+			// classes: tableColumnClasses.showSmall
 		},{
 			dataField: 'totalCopago',
 			text: 'Copagos',
 			align: 'right', headerAlign: 'right',
-			//headerAttrs: { width: '130px' },
 			formatter: tablasFormatter.precio,
 			sort: true,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			// headerClasses: tableColumnClasses.showSmall,
+			// classes: tableColumnClasses.showSmall
 		},{
 			dataField: 'total',
 			text: 'Total',
 			align: 'right', headerAlign: 'right',
-			//headerAttrs: { width: '130px' },
 			formatter: tablasFormatter.precio,
 			sort: true
 		}];
+
+		const expandRow = {
+			renderer: rowData => {
+				let li = prepagas.map(item => {
+					let valor = rowData.prepagas[item.id];
+					let porc = round(valor / rowData.totalPrepaga * 100, 2);
+					return(
+						<li key={item.id}><StatItem title={item.nombre} value={`$ ${valor}`} porc={`${porc}`} color="info" /></li>
+					)
+				});
+				return (
+					<div>
+						<ul className="horizontal-bars type-2">
+						{li}
+						</ul>
+					</div>
+				);
+			},
+			showExpandColumn: true,
+			expandHeaderColumnRenderer: ({ isAnyExpands }) => {
+				return <span title={isAnyExpands ? 'Contraer todo' : 'Expandir todo'}><i className={"fa " + (isAnyExpands ? 'fa-minus' : 'fa-plus')}/></span>;
+			},
+			expandColumnRenderer: ({ expanded }) => {
+				return <span title={expanded ? 'Contraer fila' : 'Expandir fila'}><i className={"fa " + (expanded ? 'fa-minus' : 'fa-plus')}/></span>;
+			}
+		}
 
 		return (
 			<div className="animated fadeIn facturaciones">				
@@ -227,64 +243,11 @@ class Facturaciones extends Component {
 										columns={columns} 
 										defaultSortDirection="asc"
 										noDataIndication={options.noDataText}
+										expandRow={expandRow}
 										bordered={ false }
 										bootstrap4
 										hover
 									/>
-									// <BootstrapTable ref="table" version='4'
-									// 	data={this.state.facturaciones}
-									// 	bordered={false}
-									// 	hover //striped
-									// 	options={options}
-									// 	expandableRow={this.isExpandableRow}
-									// 	expandComponent={this.expandComponent}
-									// 	expandColumnOptions={{ expandColumnVisible: true }}
-									// >
-									// 	<TableHeaderColumn
-									// 		hidden
-									// 		dataField='id' isKey
-									// 		dataAlign='center'
-									// 	>
-									// 	</TableHeaderColumn>
-									// 	<TableHeaderColumn
-									// 		dataField='anio'
-									// 		dataSort>
-									// 		<span className="thTitle">Año</span>
-									// 	</TableHeaderColumn>
-									// 	<TableHeaderColumn
-									// 		dataField='mes'
-									// 		dataSort>
-									// 		<span className="thTitle">Mes</span>
-									// 	</TableHeaderColumn>
-									// 	<TableHeaderColumn
-									// 		dataField='totalPrivado'
-									// 		dataFormat={priceFormatter}
-									// 		dataSort
-									// 	>
-									// 		<span className="thTitle">Privados</span>
-									// 	</TableHeaderColumn>
-									// 	<TableHeaderColumn
-									// 		dataField='totalPrepaga'
-									// 		dataFormat={priceFormatter}
-									// 		dataSort
-									// 	>
-									// 		<span className="thTitle">Prepagas</span>
-									// 	</TableHeaderColumn>
-									// 	<TableHeaderColumn
-									// 		dataField='totalCopago'
-									// 		dataFormat={priceFormatter}
-									// 		dataSort
-									// 	>
-									// 		<span className="thTitle">Copagos</span>
-									// 	</TableHeaderColumn>
-									// 	<TableHeaderColumn
-									// 		dataField='total'
-									// 		dataFormat={priceFormatter}
-									// 		dataSort
-									// 	>
-									// 		<span className="thTitle">Total</span>
-									// 	</TableHeaderColumn>
-									// </BootstrapTable>
 								}
 							</CardBody>
 						</Card>
@@ -337,24 +300,6 @@ class Facturaciones extends Component {
 		)
 	}
 
-}
-
-const ExpandRowComp = ({rowData}) => {
-
-	let li = prepagas.map(item => {
-		let valor = rowData.prepagas[item.id];
-		let porc = round(valor / rowData.totalPrepaga * 100, 2);
-		return(
-			<li key={item.id}><StatItem title={item.nombre} value={`$ ${valor}`} porc={`${porc}`} color="info" /></li>
-		)
-	});
-	return (
-		<div>
-			<ul className="horizontal-bars type-2">
-			{li}
-			</ul>
-		</div>
-	);
 }
 
 export default Facturaciones;
