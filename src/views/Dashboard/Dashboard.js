@@ -86,7 +86,7 @@ class Dashboard extends Component {
 					animate
 					spinner
 					color={overlay.color}
-					background={convertHex('#e4e5e6',30)}>
+					background={overlay.backgroundDashboard}>
 					<Row>
 						<Col>
 							<Card className="mainCard">

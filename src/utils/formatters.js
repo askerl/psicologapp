@@ -3,6 +3,7 @@ import {Progress} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import {filtroTipoPaciente, pacientePrivado, pacientePrepaga, prepagasById} from '../config/constants';
 import moment from 'moment';
+import { getColorPorcentaje } from './utils';
 moment.locale("es");
 
 export const tablasFormatter = {
@@ -27,22 +28,23 @@ export const tablasFormatter = {
         return cell > 0 ? cell : '';
     },
     sesionesRestantes(cell, row) {
-        let color;
-        if (row.porcRestantes > 80) {
-            color = "success";
-        } else if (row.porcRestantes > 10) {
-            color = "warning";
-        } else {
-            color = "danger";
+        if (!cell) {
+            return '';
         }
-        let prog = cell == '' ? '': 
-            <div className="d-flex flex-column">
-                <div className="d-flex">
-                    <strong>{cell}</strong>
-                </div>				
-                <Progress className="progress-xs" color={color} value={row.porcRestantes}/>
-            </div>;
-        return prog;
+        let color = getColorPorcentaje(row.porcRestantes);
+        if (cell <= 0) {
+            return (
+                <div className="d-flex flex-column">
+                    <Progress color={color} value={100}><strong>{cell}</strong></Progress>
+                </div>
+            )
+        } else {
+            return (
+                <div className="d-flex flex-column">
+                    <Progress color={color} value={row.porcRestantes}><strong>{cell}</strong></Progress>
+                </div>
+            )
+        }
     },
     tipoPaciente(cell, row) {
         if (cell === pacientePrivado) {

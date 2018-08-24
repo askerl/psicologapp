@@ -3,7 +3,7 @@ import {mailHabilitados} from '../config/firebaseConfig';
 import moment from 'moment';
 moment.locale("es");
 import _ from 'lodash';
-import { breakpoints } from '../config/constants';
+import { breakpoints, pacientePrepaga } from '../config/constants';
 
 // ---------------------- COMMON FUNCTIONS --------------------------------
 
@@ -75,9 +75,11 @@ function loadPacientes(querySnapshot) {
     querySnapshot.docs.forEach( doc => {            
         let paciente = doc.data();
         paciente.id = doc.id;
-        paciente.sesionesRestantes = paciente.sesionesAut ? (paciente.sesionesAut - paciente.sesiones) : '';
-        let porcs = calcPorcentajesSesiones(paciente.sesionesAut, paciente.sesiones);
-        paciente.porcRestantes = porcs.porcRestantes;
+        if (paciente.tipo === pacientePrepaga) {
+            paciente.sesionesRestantes = paciente.sesionesAut ? (paciente.sesionesAut - paciente.sesiones) : '';
+            let porcs = calcPorcentajesSesiones(paciente.sesionesAut, paciente.sesiones);
+            paciente.porcRestantes = porcs.porcRestantes;
+        }
         paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;
         let fchNacMoment = moment(paciente.fchNac, 'DD/MM/YYYY');
         paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : 0;
@@ -108,4 +110,16 @@ export const createFechaSesion = (value) =>{
         mes,
         anio
     }
+}
+
+export const getColorPorcentaje = (p) => {
+    let color;
+    if (p > 50) {
+        color = "success";
+    } else if (p > 10) {
+        color = "warning";
+    } else {
+        color = "danger";
+    }
+    return color;
 }
