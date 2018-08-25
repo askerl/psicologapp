@@ -22,3 +22,5 @@ yarn-error.log*
 
 # firebase config
 src/config/firebaseConfig.js
+/.firebase
+hosting.*.cache
