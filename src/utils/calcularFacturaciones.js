@@ -1,6 +1,6 @@
 // calculo de facturaciones
 import db from '../fire';
-import { prepagasById, pacientePrivado, mesesShort, brandColors, mesesFormat } from '../config/constants';
+import { prepagasById, pacientePrivado, brandColors, mesesFormat } from '../config/constants';
 import { round, convertHex, formatMonth } from '../utils/utils';
 import _ from 'lodash';
 

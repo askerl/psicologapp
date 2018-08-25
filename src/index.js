@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {HashRouter, Route, Switch, BrowserRouter} from 'react-router-dom';
 
+// localization
+import 'moment/locale/es/';
+
 // Styles
 
 // CSS for datepickers

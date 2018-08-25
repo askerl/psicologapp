@@ -1,5 +1,8 @@
 // CONSTANTES
 
+import moment from 'moment';
+import _ from 'lodash';
+
 export const tipoPaciente = [
     { key: "O", name: "Obra social"},
     { key: "P", name: "Privado"}
@@ -47,12 +50,7 @@ export const estadosPaciente = [
 
 export const tipoLoader = "ball-scale-ripple-multiple";
 
-export const meses = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-];
-export const mesesShort = [
-    "ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"
-];
+export const meses = moment.months().map(_.capitalize);
 
 export const mesesFormat = {
     number: 'M', //1 2 ... 11 12
