@@ -1,9 +1,9 @@
-import db from '../fire';
-import {mailHabilitados} from '../config/firebaseConfig';
-import moment from 'moment';
-moment.locale("es");
 import _ from 'lodash';
-import { breakpoints, pacientePrepaga } from '../config/constants';
+import moment from 'moment';
+import { pacientePrepaga } from '../config/constants';
+import { mailHabilitados } from '../config/firebaseConfig';
+import { lang } from '../config/lang';
+import db from '../fire';
 
 // ---------------------- COMMON FUNCTIONS --------------------------------
 
@@ -25,6 +25,10 @@ export const convertHex = (hex, opacity) => {
   
 	var result = 'rgba(' + r + ',' + g + ',' + b + ',' + opacity / 100 + ')';
 	return result;
+}
+
+export const formatMonth = (month, format) => {
+    return moment(`${month}`, 'M').locale(lang).format(format);
 }
 
 // ---------------------- LOGIN --------------------------------

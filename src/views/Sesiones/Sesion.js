@@ -1,34 +1,13 @@
-import React, { Component } from 'react';
-import {
-    Row,
-    Col,
-    Badge,
-    Button,
-    Card,
-    CardHeader,
-    CardFooter,
-    CardBody,
-    Form,
-    FormGroup,
-    FormText,
-    Label,
-    Input,
-    InputGroup,
-    InputGroupAddon,
-    InputGroupText
-} from 'reactstrap';
-
-import db from '../../fire';
-
-import {NotificationManager} from 'react-notifications';
-import { pacientePrivado, tipoLoader, prepagasById} from '../../config/constants';
-import { createFechaSesion } from '../../utils/utils';
-import {errores} from '../../config/mensajes';
-import Select from 'react-select';
-import Loader from 'react-loaders';
-
 import moment from 'moment';
-moment.locale("es");
+import React, { Component } from 'react';
+import Loader from 'react-loaders';
+import { NotificationManager } from 'react-notifications';
+import Select from 'react-select';
+import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
+import { pacientePrivado, prepagasById, tipoLoader } from '../../config/constants';
+import { errores } from '../../config/mensajes';
+import db from '../../fire';
+import { createFechaSesion } from '../../utils/utils';
 
 class Sesion extends Component {
 

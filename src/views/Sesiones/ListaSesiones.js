@@ -5,13 +5,11 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import { Button, Card, CardBody, CardHeader, Col, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { meses, tableColumnClasses, overlay } from '../../config/constants';
+import { meses, overlay, tableColumnClasses } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { tablasFormatter } from '../../utils/formatters';
 import { arrayRemoveDuplicates, pacientesMap } from '../../utils/utils';
-
-moment.locale("es");
 
 class ListaSesiones extends Component {
 	constructor(props) {

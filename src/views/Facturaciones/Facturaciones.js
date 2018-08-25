@@ -12,8 +12,6 @@ import { round } from '../../utils/utils';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
 import LoadingOverlay from 'react-loading-overlay';
 
-moment.locale("es");
-
 class Facturaciones extends Component {
 	constructor(props) {
 		super(props);

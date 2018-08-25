@@ -1,10 +1,9 @@
-import React from 'react';
-import {Progress} from 'reactstrap';
-import {Link} from 'react-router-dom';
-import {filtroTipoPaciente, pacientePrivado, pacientePrepaga, prepagasById} from '../config/constants';
 import moment from 'moment';
-import { getColorPorcentaje } from './utils';
-moment.locale("es");
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Progress } from 'reactstrap';
+import { filtroTipoPaciente, pacientePrepaga, pacientePrivado, prepagasById } from '../config/constants';
+import { formatMonth, getColorPorcentaje } from './utils';
 
 export const tablasFormatter = {
     filterClass: 'form-control-sm',
@@ -81,7 +80,7 @@ export const tablasFormatter = {
         false: 'No' 
     },
     mes(cell, row, rowIndex, formatExtraData) {
-        return _.capitalize(moment(`${cell}`, 'M').format(formatExtraData));
+        return _.capitalize(formatMonth(cell, formatExtraData));
     }
 
 }

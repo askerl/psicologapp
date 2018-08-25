@@ -1,7 +1,7 @@
 // calculo de facturaciones
 import db from '../fire';
-import { prepagasById, pacientePrivado, mesesShort, brandColors } from '../config/constants';
-import { round, convertHex } from '../utils/utils';
+import { prepagasById, pacientePrivado, mesesShort, brandColors, mesesFormat } from '../config/constants';
+import { round, convertHex, formatMonth } from '../utils/utils';
 import _ from 'lodash';
 
 export const getFacturacionesPeriodo = (mesIni, anioIni, mesFin, anioFin) => {
@@ -137,7 +137,7 @@ function armarGrafica(facturaciones) {
     }
 
     let grafica = {
-        labels: facturaciones.map(item => mesesShort[item.mes-1]),
+        labels: facturaciones.map(item => formatMonth(item.mes,mesesFormat.short)),
         datasets: [
             {
                 label: 'Privados',

@@ -1,38 +1,16 @@
-import React, { Component } from 'react';
-import {
-    Row,
-    Col,
-    Badge,
-    Button,
-    Card,
-    CardHeader,
-    CardFooter,
-    CardBody,
-    Form,
-    FormGroup,
-    FormFeedback,
-    FormText,
-    Label,
-    Modal, ModalHeader, ModalBody, ModalFooter,
-    Input,
-    InputGroup,
-    InputGroupAddon,
-    InputGroupText
-} from 'reactstrap';
-
-import db from '../../fire';
-
-import {NotificationManager} from 'react-notifications';
-import { tipoPaciente, pacientePrepaga, pacientePrivado, tipoLoader, prepagasById, prepagas} from '../../config/constants';
-import { calcPorcentajesSesiones, pacientesMap } from '../../utils/utils';
-import {errores} from '../../config/mensajes';
-import Widget02 from '../Widgets/Widget02';
-import {WidgetSesionesUsadas, WidgetSesionesRestantes} from '../Widgets/WidgetsAuxiliares';
-import Toggle from 'react-toggle';
-import Loader from 'react-loaders';
 import _ from 'lodash';
 import moment from 'moment';
-moment.locale("es");
+import React, { Component } from 'react';
+import Loader from 'react-loaders';
+import { NotificationManager } from 'react-notifications';
+import Toggle from 'react-toggle';
+import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import { pacientePrepaga, pacientePrivado, prepagas, prepagasById, tipoLoader, tipoPaciente } from '../../config/constants';
+import { errores } from '../../config/mensajes';
+import db from '../../fire';
+import { calcPorcentajesSesiones, pacientesMap } from '../../utils/utils';
+import Widget02 from '../Widgets/Widget02';
+import { WidgetSesionesRestantes, WidgetSesionesUsadas } from '../Widgets/WidgetsAuxiliares';
 
 class Paciente extends Component {
 

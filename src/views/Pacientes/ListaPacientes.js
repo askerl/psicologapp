@@ -1,21 +1,11 @@
-import React, {Component} from 'react';
-import {
-	Row,
-	Col,
-	Button,
-	Card,
-	CardHeader,
-	CardBody,
-	Input
-} from 'reactstrap';
+import React, { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
-import moment from 'moment';
-moment.locale("es");
-import { filtroPrepagas, filtroTipoPaciente, estadosPaciente, overlay, breakpoints} from '../../config/constants';
-import { getPacientes } from '../../utils/utils';
-import { tablasFormatter } from '../../utils/formatters';
-import filterFactory, { textFilter, numberFilter, selectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory, { numberFilter, selectFilter, textFilter } from 'react-bootstrap-table2-filter';
 import LoadingOverlay from 'react-loading-overlay';
+import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import { breakpoints, estadosPaciente, filtroPrepagas, filtroTipoPaciente, overlay } from '../../config/constants';
+import { tablasFormatter } from '../../utils/formatters';
+import { getPacientes } from '../../utils/utils';
 
 class ListaPacientes extends Component {
 	constructor(props) {
