@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { pacientePrepaga } from '../config/constants';
+import { pacientePrivado, pacientePrepaga, prepagas } from '../config/constants';
 import { mailHabilitados } from '../config/firebaseConfig';
 import db from '../fire';
 
@@ -13,6 +13,10 @@ export const arrayRemoveDuplicates = (arr) => {
 
 export const round = (value, decimals) => {
     return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+
+export const percentage = (value, total) => {
+    return total > 0 ? round(value / total * 100, 2) : 0;
 }
 
 // convert Hex to RGBA
@@ -34,6 +38,65 @@ export const formatMonth = (month, format) => {
 
 export const isHabilitado = (email) =>{
     return _.indexOf(mailHabilitados, email) !== -1;
+}
+
+// ---------------------- DASHBOARD --------------------------------
+
+export const getEstadisticas = () => {
+    
+    let promise = new Promise( (resolve, reject) => {
+        
+        let data = {
+            total: 0,
+            activos: 0,
+            inactivos: 0,
+            privados: 0,
+            obraSocial: 0,
+            privadosActivos: 0,
+            obraSocialActivos: 0
+        }
+        // initialize prepagas counters
+        data.prepagas = prepagas;
+        data.prepagas.forEach( i => {
+            data[i.id] = 0;
+        });
+        // query db
+        db.collection("pacientes").get().then((querySnapshot)=> {
+            querySnapshot.docs.forEach( doc => {
+                data.total += 1;
+                let pac = doc.data();
+                pac.activo ? data.activos += 1 : data.inactivos += 1;
+                switch (pac.tipo) {
+                    case pacientePrepaga:
+                        data.obraSocial += 1;
+                        if (pac.activo) {
+                            data.obraSocialActivos += 1 ;
+                            data[pac.prepaga] += 1;
+                        }
+                        break;
+                    case pacientePrivado:
+                        data.privados += 1;
+                        if (pac.activo) data.privadosActivos += 1 ;
+                        break;
+                }
+            });
+            // percentages
+            data.porcActivos = percentage(data.activos, data.total);
+            data.porcInactivos = percentage(data.inactivos, data.total);
+    
+            // porcentajes activos
+            data.porcPrivados = percentage(data.privadosActivos, data.activos);
+            data.porcObrasocial = percentage(data.obraSocialActivos, data.activos);
+    
+            data.prepagas.forEach( i => {
+                i.porc = percentage(data[i.id], data.obraSocialActivos);
+            });
+    
+            resolve(data);
+        });
+    });
+    return promise;
+
 }
 
 // ---------------------- PACIENTES --------------------------------

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody, Col, Row } from 'reactstrap';
 import { pacientePrepaga, pacientePrivado, prepagas, overlay } from '../../config/constants';
 import db from '../../fire';
-import { round, convertHex } from '../../utils/utils';
+import { round, convertHex, getEstadisticas } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
 import { Callout, StatItem } from '../Widgets/WidgetsAuxiliares';
 
@@ -15,13 +15,7 @@ class Dashboard extends Component {
 		super(props);
 		this.state = {
 			loading: false,
-			total: 0,
-			activos: 0,
-			inactivos: 0,
-			privados: 0,
-			obraSocial: 0,
-			privadosActivos: 0,
-			obraSocialActivos: 0
+			data: {}
 		};
 
 	}
@@ -32,53 +26,14 @@ class Dashboard extends Component {
 
 	componentDidMount(){
 		this.loading(true);
-		
-		let data = Object.assign({}, this.state);
-		// initialize prepagas counters
-		data.prepagas = prepagas;
-		data.prepagas.forEach( i => {
-			data[i.id] = 0;
-		});
-		// query db
-		db.collection("pacientes").get().then((querySnapshot)=> {
-			querySnapshot.docs.forEach( doc => {
-				data.total += 1;
-				let pac = doc.data();
-				pac.activo ? data.activos += 1 : data.inactivos += 1;
-				switch (pac.tipo) {
-					case pacientePrepaga:
-						data.obraSocial += 1;
-						if (pac.activo) {
-							data.obraSocialActivos += 1 ;
-							data[pac.prepaga] += 1;
-						}
-						break;
-					case pacientePrivado:
-						data.privados += 1;
-						if (pac.activo) data.privadosActivos += 1 ;
-						break;
-				}
-			});
-			// percentages
-			data.porcActivos = data.total > 0 ? round(data.activos / data.total * 100,2) : 0;
-			data.porcInactivos = data.total > 0 ? round(data.inactivos / data.total * 100,2) : 0;
-
-			// porcentajes activos
-			data.porcPrivados = data.activos > 0 ? round(data.privadosActivos / data.activos * 100,2) : 0;
-			data.porcObrasocial = data.activos > 0 ? round(data.obraSocialActivos / data.activos * 100,2) : 0;
-
-			data.prepagas.forEach( i => {
-				i.porc = data.obraSocialActivos > 0 ? round(data[i.id] / data.obraSocialActivos * 100,2) : 0;
-			});
-
-			this.setState(data);
+		getEstadisticas().then( data => {
+			this.setState({data});
 			this.loading(false);
 		});
-
 	}
 
 	render() {
-		let data = this.state;
+		let data = this.state.data;
 		return (
 			<div className="animated fadeIn dashboard">
 				<LoadingOverlay
