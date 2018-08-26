@@ -350,7 +350,7 @@ class Paciente extends Component {
                                     <i className="fa fa-user-circle fa-lg"></i>
                                     <strong>Paciente</strong>                                
                                     { this.state.nuevo &&
-                                        <a><Badge color="primary" className="float-right mt-1">Nuevo</Badge></a>
+                                        <a><Badge color="success" className="badge-pill ml-2">Nuevo</Badge></a>
                                     }
                                     { !this.state.nuevo && !this.state.loading &&
                                         <div className="card-actions">

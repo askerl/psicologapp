@@ -201,7 +201,7 @@ class Sesion extends Component {
                                     <i className="fa fa-comments-o fa-lg"></i>
                                     <strong>Sesión</strong>                                
                                     { this.state.nuevo &&
-                                        <a><Badge color="warning" className="float-right mt-1">Nueva</Badge></a>
+                                        <a><Badge color="success" className="badge-pill ml-2">Nueva</Badge></a>
                                     }                                    
                                 </CardHeader>
                                 <CardBody>

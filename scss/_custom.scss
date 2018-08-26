@@ -1,5 +1,9 @@
 // Here you can add other styles
 
+.progress {
+    border-radius: 10rem;
+}
+
 .mainCard {
     @include media-breakpoint-down(xs) {
         border-left: none;

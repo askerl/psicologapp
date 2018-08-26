@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Progress } from 'reactstrap';
+import { Progress, Badge } from 'reactstrap';
 import { filtroTipoPaciente, pacientePrepaga, pacientePrivado, prepagasById } from '../config/constants';
 import { formatMonth, getColorPorcentaje } from './utils';
 
@@ -48,12 +48,12 @@ export const tablasFormatter = {
     tipoPaciente(cell, row) {
         if (cell === pacientePrivado) {
             return (
-                <span className="badge badge-warning">{filtroTipoPaciente[pacientePrivado]}</span>
+                <Badge color="warning" className="badge-pill">{filtroTipoPaciente[pacientePrivado]}</Badge>
             );
         }
         if (cell === pacientePrepaga) {
             return (
-                <span className="badge badge-primary">{filtroTipoPaciente[pacientePrepaga]}</span>
+                <Badge color="primary" className="badge-pill">{filtroTipoPaciente[pacientePrepaga]}</Badge>
             );
         }
     },

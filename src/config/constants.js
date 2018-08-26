@@ -82,7 +82,7 @@ export const brandColors = {
 export const overlay = {
     color: brandColors.brandInfo,
     background: 'rgba(192,192,192,0.3)',
-    backgroundDashboard: 'white'
+    backgroundWhite: 'white'
 }
 
 // breakpoints Bootstrap 4

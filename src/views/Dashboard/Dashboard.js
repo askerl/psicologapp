@@ -86,7 +86,7 @@ class Dashboard extends Component {
 					animate
 					spinner
 					color={overlay.color}
-					background={overlay.backgroundDashboard}>
+					background={overlay.backgroundWhite}>
 					<Row>
 						<Col>
 							<Card className="mainCard">

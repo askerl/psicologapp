@@ -20,7 +20,6 @@ class Facturaciones extends Component {
 			facturaciones: [],
 			grafica: {},
 			optsGrafica: {},
-			pacientesMap: {},
 			showResultados: false,
 			loading: false,
 			periodo: '',
