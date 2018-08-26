@@ -19,15 +19,18 @@ export const filtroTipoPaciente = auxfiltroTipoPaciente;
 export const prepagasById = {
     "galeno": {
         nombre: "Galeno",
-        pagos: [15, 200, 475]
+        pagos: [15, 200, 475],
+        icono: "fa fa-hospital-o"
     },
     "ososs": {
         nombre: "OSOSS",
-        pagos: [230]
+        pagos: [230],
+        icono: "fa fa-hospital-o"
     },
     "ospacp": {
         nombre: "O.S.P.A.C.P",
-        pagos: [230]
+        pagos: [230],
+        icono: "fa fa-hospital-o"
     }
 }
 // armo arrays auxiliares para filtrar y cargar combos

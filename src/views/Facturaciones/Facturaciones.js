@@ -2,15 +2,16 @@ import moment from 'moment';
 import React, { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import { Bar } from 'react-chartjs-2';
+import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Form, FormGroup, Input, InputGroup, Label, Progress, Row } from 'reactstrap';
-import { breakpoints, meses, mesesFormat, prepagas, overlay } from '../../config/constants';
-import { errores } from '../../config/mensajes';
+import { breakpoints, meses, mesesFormat, overlay, prepagas } from '../../config/constants';
+import { errores, mensajes } from '../../config/mensajes';
 import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
 import { tablasFormatter } from '../../utils/formatters';
 import { round } from '../../utils/utils';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
-import LoadingOverlay from 'react-loading-overlay';
+import _ from 'lodash';
 
 class Facturaciones extends Component {
 	constructor(props) {
@@ -59,11 +60,6 @@ class Facturaciones extends Component {
 	getFacturacion(){
 
 		this.loading(true);
-
-		// oculto resultados anteriores
-		// if (this.state.showResultados){
-		// 	this.setState({showResultados: false});	
-		// }
 
 		let mesIni = parseInt(this.mesIni.value),
 		anioIni = parseInt(this.anioIni.value),
@@ -163,20 +159,29 @@ class Facturaciones extends Component {
 
 		const expandRow = {
 			renderer: rowData => {
-				let li = prepagas.map(item => {
-					let valor = rowData.prepagas[item.id];
-					let porc = round(valor / rowData.totalPrepaga * 100, 2);
+				if (rowData.totalPrepaga > 0) {
+					let auxPrepagas = Object.assign({}, prepagas);
+					_.forEach(auxPrepagas, item => {
+						item.valor 	= rowData.prepagas[item.id];
+						item.porc	= round(item.valor / rowData.totalPrepaga * 100, 2);
+					});
+					let li = _.chain(auxPrepagas).sortBy('valor').reverse().map(item => {
+						return(
+							<li key={item.id}><StatItem title={item.nombre} value={`$ ${item.valor}`} porc={`${item.porc}`} color="info" icon={item.icono} /></li>
+						)
+					}).value();
+					return (
+						<div>
+							<ul className="horizontal-bars type-2">
+							{li}
+							</ul>
+						</div>
+					);
+				} else {
 					return(
-						<li key={item.id}><StatItem title={item.nombre} value={`$ ${valor}`} porc={`${porc}`} color="info" /></li>
-					)
-				});
-				return (
-					<div>
-						<ul className="horizontal-bars type-2">
-						{li}
-						</ul>
-					</div>
-				);
+						<div className="small">{mensajes.noFacturacionPrepaga}</div>
+					);
+				}
 			},
 			showExpandColumn: true,
 			expandHeaderColumnRenderer: ({ isAnyExpands }) => {
@@ -231,11 +236,7 @@ class Facturaciones extends Component {
 										<Col>
 											<FormGroup>
 												<InputGroup>
-													<Button color="primary" size="sm" onClick={this.getFacturacion}><i className="fa fa-search"></i> Consultar</Button>
-													{ this.state.loading &&
-													<div className="spinner-container">
-														<i className={"fa fa-spinner fa-lg " + (this.state.loading ? 'fa-spin' : '')}></i>
-													</div>}								
+													<Button color="primary" size="sm" onClick={this.getFacturacion}><i className="fa fa-search"></i> Consultar</Button>							
 												</InputGroup>
 											</FormGroup>
 										</Col>
@@ -265,7 +266,7 @@ class Facturaciones extends Component {
 									<Row>
 										<Col>
 											<CardTitle className="mb-0">Gráfica</CardTitle>
-											<div className="small text-muted">{this.state.periodo}</div>
+											<div className="text-muted">{this.state.periodo}</div>
 										</Col>
 									</Row>
 									<div className="chart-wrapper">

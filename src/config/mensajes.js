@@ -15,5 +15,5 @@ export const errores = {
 }
 
 export const mensajes = {
-    noDataPacientes: 'No hay pacientes registrados'
+    noFacturacionPrepaga: 'No hubo facturación de prepagas en el mes.'
 }

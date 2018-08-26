@@ -124,7 +124,7 @@ class Dashboard extends Component {
 													<StatItem title="Obra social" icon="icon-user-follow" value={data.obraSocialActivos} porc={data.porcObrasocial} color="primary"/>
 												</li>
 												<li className="divider"></li>
-												{ prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon="icon-plus" value={data[item.id]} porc={item.porc} color="info"/></li>)}
+												{ prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon={item.icono} value={data[item.id]} porc={item.porc} color="info"/></li>)}
 											</ul>
 										</Col>
 									</Row>
