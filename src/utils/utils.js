@@ -189,3 +189,19 @@ export const getColorPorcentaje = (p) => {
     }
     return color;
 }
+
+export const getSelectPacientes = () => {
+    let promise = new Promise( (resolve, reject) => {
+        db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
+            let pacientes = [];
+		    querySnapshot.docs.forEach( doc => {            
+                let paciente = doc.data();
+                paciente.value = doc.id;
+                paciente.label = `${doc.data().apellido}, ${doc.data().nombre}`;			
+                pacientes.push(paciente);
+            });
+            resolve(pacientes);
+        });
+    });
+    return promise;
+}

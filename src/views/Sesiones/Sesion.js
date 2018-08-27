@@ -1,13 +1,13 @@
 import moment from 'moment';
 import React, { Component } from 'react';
-import Loader from 'react-loaders';
+import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import Select from 'react-select';
 import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
-import { pacientePrivado, prepagasById, tipoLoader } from '../../config/constants';
+import { overlay, pacientePrivado, prepagasById } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
-import { createFechaSesion } from '../../utils/utils';
+import { createFechaSesion, getSelectPacientes } from '../../utils/utils';
 
 class Sesion extends Component {
 
@@ -23,7 +23,6 @@ class Sesion extends Component {
             errorPacientes: false
         }; // <- set up react state
         this.handleChange = this.handleChange.bind(this);
-        this.loadPacientes = this.loadPacientes.bind(this);
         this.goBack = this.goBack.bind(this);
         this.validate = this.validate.bind(this);
         this.saveSesion = this.saveSesion.bind(this);
@@ -36,30 +35,16 @@ class Sesion extends Component {
         let id = this.props.match.params.id;
         let nuevo = id === 'new';
         this.setState({id, nuevo});
-
-        this.loading(true);
-
         this.inputFecha.value = moment().format('YYYY-MM-DD');
 
-        db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
-            this.loadPacientes(querySnapshot);
+        this.loading(true);
+        getSelectPacientes().then( pacientes => {
+            this.setState({pacientes});
             this.loading(false);
         });
 
     }
 
-    loadPacientes(querySnapshot){
-		let pacientes = [];
-		querySnapshot.docs.forEach( doc => {            
-			let paciente = doc.data();
-            paciente.value = doc.id;
-            paciente.label = `${doc.data().apellido}, ${doc.data().nombre}`;			
-			pacientes.push(paciente);
-		});
-		this.setState({pacientes});
-		//console.log('pacientes', this.state.pacientes);		
-    }
-    
     loading(val){
         this.setState({loading: val});
     }
@@ -167,7 +152,7 @@ class Sesion extends Component {
     }
 
     handleChange(selectedOption) {
-        console.log('Pacientes seleccionados:', selectedOption);
+        //console.log('Pacientes seleccionados:', selectedOption);
         this.setState({ selectedOption, errorPacientes: false } );
     }
 
@@ -191,9 +176,13 @@ class Sesion extends Component {
 
     render() {
         return (
-            <div className="animated fadeIn">
-                <Loader type={tipoLoader} active={this.state.loading} />
-                <div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn sesion"}>                
+            <div className="animated fadeIn sesion"> 
+                <LoadingOverlay
+                    active={this.state.loading}
+                    animate
+                    spinner
+                    color={overlay.color}
+                    background={overlay.background}>      
                     <Row>
                         <Col>
                             <Card className="mainCard">
@@ -249,7 +238,7 @@ class Sesion extends Component {
                             </Card>
                         </Col>
                     </Row>
-                </div>
+                </LoadingOverlay>
             </div>
         );
     }
