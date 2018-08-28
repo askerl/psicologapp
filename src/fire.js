@@ -4,7 +4,7 @@ import { firebaseConfig as config } from './config/firebaseConfig';
 // Required for side-effects
 require("firebase/firestore");
 
-firebase.initializeApp(config.PROD);
+firebase.initializeApp(config.TEST);
 
 // Configure FirebaseUI.
 export const uiConfig = {

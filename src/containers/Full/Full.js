@@ -14,6 +14,7 @@ import ListaPacientes from '../../views/Pacientes/listaPacientes';
 import Paciente from '../../views/Pacientes/paciente';
 import ListaSesiones from '../../views/Sesiones/listaSesiones';
 import Sesion from '../../views/Sesiones/sesion';
+import PacienteTabs from '../../views/Pacientes/pacienteTabs';
 
 class Full extends Component {
 
@@ -55,7 +56,7 @@ class Full extends Component {
 							<Switch>
 								<Route path="/dashboard" name="Dashboard" component={Dashboard} />
 								<Route exact path="/pacientes" name="Pacientes" component={ListaPacientes} />
-								<Route path='/pacientes/:id' name="Paciente" component={Paciente} />
+								<Route path='/pacientes/:id' name="Paciente" component={PacienteTabs} />
 								<Route exact path="/sesiones" name="Sesiones" component={ListaSesiones} />
 								<Route path='/sesiones/:id' name="Sesion" component={Sesion} />
 								<Route exact path="/facturaciones" name="Facturaciones" component={Facturaciones} />

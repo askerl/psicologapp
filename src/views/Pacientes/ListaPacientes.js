@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { numberFilter, selectFilter, textFilter } from 'react-bootstrap-table2-filter';
 import LoadingOverlay from 'react-loading-overlay';
+import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
 import { breakpoints, estadosPaciente, filtroPrepagas, filtroTipoPaciente, overlay } from '../../config/constants';
-import db from '../../fire';
 import { tablasFormatter } from '../../utils/formatters';
-import { filterPacientesEstado, getPacientes, getSession, setSession, removeSession } from '../../utils/utils';
+import { filterPacientesEstado, getPacientes, getSession, setSession } from '../../utils/utils';
 
 class ListaPacientes extends Component {
 	constructor(props) {
@@ -147,7 +147,9 @@ class ListaPacientes extends Component {
 								<Col>
 									<div className="d-flex flex-row mb-2">
 										<div className="mr-auto">
-											<Button color="primary" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus"></i> Nuevo paciente</Button>
+											<Link to={'/pacientes/new'} title="Nuevo Paciente" className="linkButton">
+												<Button color="primary" size="sm"><i className="fa fa-plus"></i> Nuevo paciente</Button>
+											</Link>
 										</div>
 										<div className="filtros">
 											<Input id="filtroEstado" className="filtroEstado" type="select" title="Filtrar por estado"

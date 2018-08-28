@@ -14,11 +14,17 @@
     }
 }
 
-.dashboard {
-    .linkPacientes {
-        text-decoration: none;
-        color: initial;
+.nav-tabs {  
+    .nav-link {
+        &:hover {
+            cursor: pointer;
+        }
     }
+}
+
+.linkButton {
+    text-decoration: none;
+    color: initial;
 }
 
 button{

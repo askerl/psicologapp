@@ -137,8 +137,9 @@ export const getEstadisticas = () => {
 
 export const getPaciente = (id) => {
     let promise = new Promise( (resolve, reject) => {
-        db.collection("pacientes").doc(id).get().then( doc => {
-            resolve(doc.data());
+        getPacientes().then( pacientes => {
+            let paciente = _.find(pacientes, {'id': id});           
+            resolve(paciente);
         });
     });
     return promise;
