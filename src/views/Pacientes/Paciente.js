@@ -8,7 +8,7 @@ import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormF
 import { pacientePrepaga, pacientePrivado, prepagas, prepagasById, tipoLoader, tipoPaciente } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
-import { calcPorcentajesSesiones, pacientesMap } from '../../utils/utils';
+import { calcPorcentajesSesiones, getPaciente, getSesionesPaciente, removeSession, getSession } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
 import { WidgetSesionesRestantes, WidgetSesionesUsadas } from '../Widgets/WidgetsAuxiliares';
 
@@ -34,7 +34,6 @@ class Paciente extends Component {
             errorValorConsulta: false,
             errorPrepaga: false,            
             errorPago: false,
-            pacientesMap: {},
             sesionesPaciente: [],
             showDeleteModal: false
         }; // <- set up react state
@@ -66,32 +65,25 @@ class Paciente extends Component {
 
         this.loading(true);
 
-        pacientesMap().then( () => {
-            this.setState({pacientesMap: window.pacientesMap});
-        }).then( () => {
-            if (!nuevo){
-                // cargo paciente y sus sesiones
-                db.collection("pacientes").doc(id).get().then( pac => {
-                    // console.log(pac.id, pac.data());
-                    this.loadPaciente(pac.data());
-                }).then( () => {
-                    db.collection("sesiones")
-		            .where("paciente","==",id)
-		            .orderBy("fecha","desc")
-		            .get().then( querySnapshot => {
-                        let sesionesPaciente = [];
-                        querySnapshot.docs.forEach( doc => {
-                            sesionesPaciente.push(doc.id);
-                        });
-                        this.setState({sesionesPaciente});
-                        this.loading(false);
-                    });
-                });
-            } else {
+        if (!nuevo){
+            // cargo paciente y sus sesiones
+            getPaciente(id).then( pac => {
+                this.loadPaciente(pac);
+            }).then(getSesionesPaciente(id).then( sesionesPaciente => {
+                console.log('sesiones del paciente', sesionesPaciente);
+                this.setState({sesionesPaciente});
                 this.loading(false);
-            }
-        });
-        
+            })).catch(error => { 
+                console.log('Error al cargar los datos del paciente', error);
+                NotificationManager.error(errores.errorCargarDatosPaciente, 'Error');
+                this.loading(false);
+                this.goBack();
+            });
+        } else {
+            this.loading(false);
+        }
+        // cargo pacientes map
+        this.pacientes = getSession('pacientes');
     }
 
     loading(val){
@@ -212,8 +204,10 @@ class Paciente extends Component {
                 db.collection("pacientes").add(paciente)
                 .then(docRef => {
                     this.loading(false);
+                    removeSession('pacientes');
                     //console.log("Paciente generado con ID: ", docRef.id);
                     NotificationManager.success('Los datos han sido guardados');
+                    
                     this.goBack();
                 })
                 .catch(function(error) {
@@ -228,6 +222,7 @@ class Paciente extends Component {
                 db.collection("pacientes").doc(this.state.id).update(paciente)
                 .then(() => {
                     this.loading(false);
+                    removeSession('pacientes');
                     //console.log("Paciente actualizado con ID:", this.state.id);
                     NotificationManager.success('Los datos han sido actualizados');
                     this.goBack();
@@ -291,18 +286,29 @@ class Paciente extends Component {
 
     checkExistePaciente() {
         if (this.inputNombre.value && this.inputApellido.value) {
-            //console.log('chequeando si existe paciente', this.inputNombre.value, this.inputApellido.value);
-            //console.log('pacientes map', this.state.pacientesMap);
+            console.log('chequeando si existe paciente', this.inputNombre.value, this.inputApellido.value);
+            console.log('pacientes map', this.pacientes);
 
-            for (const id in this.state.pacientesMap) {
-                let obj = this.state.pacientesMap[id];
-                if (_.lowerCase(obj.nombre) == _.lowerCase(this.inputNombre.value) && _.lowerCase(obj.apellido) == _.lowerCase(this.inputApellido.value)
-                    && id !== this.state.id
+            let existe = _.find(this.pacientes, pac => {
+                if (_.lowerCase(pac.nombre) == _.lowerCase(this.inputNombre.value) && _.lowerCase(pac.apellido) == _.lowerCase(this.inputApellido.value)
+                    && pac.id !== this.state.id
                 ){
-                    NotificationManager.warning(errores.existePacienteNombre);
                     return true;
                 }
+            });
+            if (existe){
+                NotificationManager.warning(errores.existePacienteNombre);
             }
+
+            // for (const id in this.state.pacientesMap) {
+            //     let obj = this.state.pacientesMap[id];
+            //     if (_.lowerCase(obj.nombre) == _.lowerCase(this.inputNombre.value) && _.lowerCase(obj.apellido) == _.lowerCase(this.inputApellido.value)
+            //         && id !== this.state.id
+            //     ){
+            //         NotificationManager.warning(errores.existePacienteNombre);
+            //         return true;
+            //     }
+            // }
         }
         return false;
     }
@@ -319,14 +325,15 @@ class Paciente extends Component {
         batch.delete(refPaciente);
 
 		this.state.sesionesPaciente.forEach( sesion => {			
-			let refSession = db.collection("sesiones").doc(sesion);
+			let refSession = db.collection("sesiones").doc(sesion.id);
 			// elimino sesiones del paciente
 			batch.delete(refSession);
 		});
 
 		//Commit the batch
 		batch.commit().then(() => {			
-			console.log("Paciente eliminado correctamente");
+            console.log("Paciente eliminado correctamente");
+            removeSession('pacientes');
             NotificationManager.success('El Paciente ha sido eliminado');
             this.goBack();
 		})

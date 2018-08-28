@@ -1,8 +1,25 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { pacientePrivado, pacientePrepaga, prepagas } from '../config/constants';
+import { pacientePrivado, pacientePrepaga, prepagas, estadosPaciente } from '../config/constants';
 import { mailHabilitados } from '../config/firebaseConfig';
 import db from '../fire';
+
+// ---------------------- SESSION HANDLER --------------------------------
+
+export const getSession = (key) => {
+    if (key === 'pacientes') {
+        return JSON.parse(localStorage.getItem(key));
+    }
+    return localStorage.getItem(key);
+}
+
+export const setSession = (key, value) => {
+    return localStorage.setItem(key, value);
+}
+
+export const removeSession = (key) => {
+    return localStorage.removeItem(key);
+}
 
 // ---------------------- COMMON FUNCTIONS --------------------------------
 
@@ -43,7 +60,7 @@ export const isHabilitado = (email) =>{
 // ---------------------- DASHBOARD --------------------------------
 
 export const getEstadisticas = () => {
-    
+    console.log('GetEstadisticas');
     let promise = new Promise( (resolve, reject) => {
         
         let data = {
@@ -60,11 +77,11 @@ export const getEstadisticas = () => {
         data.prepagas.forEach( i => {
             data[i.id] = 0;
         });
-        // query db
-        db.collection("pacientes").get().then((querySnapshot)=> {
-            querySnapshot.docs.forEach( doc => {
+
+        // con GET Pacientes
+        getPacientes().then( pacientes => {
+            pacientes.forEach( pac => {
                 data.total += 1;
-                let pac = doc.data();
                 pac.activo ? data.activos += 1 : data.inactivos += 1;
                 switch (pac.tipo) {
                     case pacientePrepaga:
@@ -94,6 +111,7 @@ export const getEstadisticas = () => {
     
             resolve(data);
         });
+
     });
     return promise;
 
@@ -101,37 +119,45 @@ export const getEstadisticas = () => {
 
 // ---------------------- PACIENTES --------------------------------
 
-export const pacientesMap = () => {
+export const getPaciente = (id) => {
     let promise = new Promise( (resolve, reject) => {
-        let pacientes = [];
-        // query database
-        db.collection("pacientes").get().then( querySnapshot => {
-            querySnapshot.docs.forEach( doc => {            
-                let paciente = doc.data();
-                paciente.id = doc.id;
-                paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;          
-                pacientes[paciente.id] = paciente;                
-            });
-            resolve(setPacientesWindow(pacientes));
+        db.collection("pacientes").doc(id).get().then( doc => {
+            resolve(doc.data());
         });
     });
     return promise;
 }
 
-export const getPacientes = (estado) => {
+export const getSesionesPaciente = (id) => {
     let promise = new Promise( (resolve, reject) => {
-        
-        if (estado === 'T') { // filtro por TODOS
+        db.collection("sesiones").where("paciente","==",id).orderBy("fecha","desc").get().then( querySnapshot => {
+            let sesiones = [];
+            querySnapshot.docs.forEach( doc => {
+                let sesion = doc.data();
+                sesion.id = doc.id;
+                sesiones.push(sesion);
+            });
+            resolve(sesiones);
+        });
+    });
+    return promise;
+}
+
+export const getPacientes = () => {
+    let promise = new Promise( (resolve, reject) => {
+
+        // chequeo si ya tengo pacientes cargados en sesion (cache)
+        let pacientes = getSession('pacientes');
+
+        if (pacientes) {
+            console.log('Pacientes cache', pacientes);
+            resolve(pacientes);
+        } else {
+            console.log('Pacientes DB', pacientes);
             db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
                 resolve(loadPacientes(querySnapshot));
-            });	
-        } else { // filtro por algún estado ACTIVO/INACTIVO
-            let activo = estado === 'A';
-            db.collection("pacientes").where('activo','==',activo).orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
-                resolve(loadPacientes(querySnapshot));
-            });	
+            });
         }
-
     });
     return promise;
 }
@@ -149,14 +175,24 @@ function loadPacientes(querySnapshot) {
         paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;
         let fchNacMoment = moment(paciente.fchNac, 'DD/MM/YYYY');
         paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : 0;
+        // datos para options en select
+        paciente.value = paciente.id;
+        paciente.label = paciente.nombreCompleto;		
+        // agrego paciente a la colección final
         pacientes.push(paciente);
     });
-    //console.log('pacientes', pacientes);	
+    setSession('pacientes',JSON.stringify(pacientes));
     return pacientes;	
 }
 
-function setPacientesWindow(pacientes) {
-    window.pacientesMap = pacientes;
+export const filterPacientesEstado = (pacientes, estado) => {
+    if (!estado || estado === estadosPaciente[0].value) {
+        // no aplicó filtro, devuelvo todos
+        return pacientes;
+    } else { //si filtro por algun estado
+        let activo = estado === 'A';
+        return _.filter(pacientes, {'activo': activo});
+    }
 }
 
 export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
@@ -166,6 +202,32 @@ export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
 }
 
 // ---------------------- SESIONES --------------------------------
+
+export const getSesionesMes = (mes, anio) => {
+    let promise = new Promise( (resolve, reject) => {
+        getPacientes().then( pacientes => {
+            db.collection("sesiones")
+            .where("mes","==",parseInt(mes))
+            .where("anio","==",parseInt(anio))		
+            .orderBy("dia","desc")
+            .get().then( querySnapshot => {
+                let sesiones = [];
+                querySnapshot.docs.forEach( doc => {            
+                    let sesion = doc.data();
+                    sesion.id = doc.id;
+                    sesion.fecha = sesion.fecha.seconds;
+                    let paciente = _.find(pacientes, {'id': sesion.paciente});
+                    sesion.nombreCompleto = paciente.nombreCompleto;
+                    sesion.credencial = paciente.credencial;
+                    sesiones.push(sesion);
+                });
+                resolve(sesiones);
+            });
+        });
+    });
+    return promise;
+}
+
 
 export const createFechaSesion = (value) =>{
     let fecha = moment(value);

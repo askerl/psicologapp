@@ -9,14 +9,13 @@ import { meses, overlay, tableColumnClasses } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { tablasFormatter } from '../../utils/formatters';
-import { arrayRemoveDuplicates, pacientesMap } from '../../utils/utils';
+import { arrayRemoveDuplicates, getSesionesMes, getSession, removeSession } from '../../utils/utils';
 
 class ListaSesiones extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			sesiones: [],
-			pacientesMap: {},
 			loading: true,
 			showDeleteModal: false,
 			selected: [],
@@ -27,7 +26,6 @@ class ListaSesiones extends Component {
 		this.borrarSesiones = this.borrarSesiones.bind(this);
 		this.deleteSesiones = this.deleteSesiones.bind(this);
 		this.loading = this.loading.bind(this);
-		this.loadSesiones = this.loadSesiones.bind(this);
 		this.toggleDelete = this.toggleDelete.bind(this);
 		this.onSelectAll = this.onSelectAll.bind(this);
 		this.onRowSelect = this.onRowSelect.bind(this);
@@ -36,12 +34,8 @@ class ListaSesiones extends Component {
 	}
 	
 	componentDidMount(){
-		this.loading(true);
 		this.initFiltros();
-		pacientesMap().then( () => {
-			this.setState({pacientesMap: window.pacientesMap});
-			this.cargarSesiones();
-		});			
+		this.cargarSesiones();
 	}
 
 	initFiltros(){
@@ -53,28 +47,12 @@ class ListaSesiones extends Component {
 	}
 
 	cargarSesiones(){
-		db.collection("sesiones")
-		.where("mes","==",parseInt(this.inputMes.value))
-		.where("anio","==",parseInt(this.inputAnio.value))		
-		.orderBy("dia","desc")
-		.get().then( querySnapshot => {			
-			this.loadSesiones(querySnapshot);
+		this.loading(true);
+		getSesionesMes(this.inputMes.value, this.inputAnio.value).then( sesiones => {
+			this.pacientes = getSession('pacientes');
+			this.setState({sesiones});
 			this.loading(false);
 		});
-	}
-
-	loadSesiones(querySnapshot){
-		let sesiones = [];
-		querySnapshot.docs.forEach( doc => {            
-			let sesion = doc.data();
-			sesion.id = doc.id;
-			sesion.fecha = sesion.fecha.seconds;
-			sesion.nombreCompleto = this.state.pacientesMap[sesion.paciente].nombreCompleto;
-			sesion.credencial = this.state.pacientesMap[sesion.paciente].credencial;
-			sesiones.push(sesion);
-		});
-		this.setState({sesiones});
-		//console.log('sesiones', this.state.sesiones);
 	}
 
 	loading(val){
@@ -101,23 +79,21 @@ class ListaSesiones extends Component {
 		// Get a new write batch
 		let batch = db.batch();                
 		
-		this.state.selected.forEach( sesion => {			
+		this.state.selected.forEach( sesion => {
+			// elimino sesion	
 			let refSession = db.collection("sesiones").doc(sesion);
-			// elimino sesion
 			batch.delete(refSession);
 		});
 
-		// resto 1 a los pocientes seleccionados
-		let selectedPacientes = arrayRemoveDuplicates(this.state.selectedPacientes);
-		selectedPacientes.forEach( pac => {			
-			// busco al paciente en la lista de sesiones y
-			// resto 1 sesion utilizada al paciente
-			let pacRef = db.collection("pacientes").doc(pac);
-			let sesionesPac = this.state.pacientesMap[pac].sesiones;
-			if (sesionesPac > 0){
-				batch.update(pacRef, { sesiones: sesionesPac -1 })
-			}
-		});
+		// resto las sesiones de los pacientes seleccionados
+		let sesionesPaciente = _.countBy(this.state.selectedPacientes);
+		for (const idPac in sesionesPaciente) {
+			const cant = sesionesPaciente[idPac];
+			let pacRef = db.collection("pacientes").doc(idPac);
+			let sesionesPac = _.find(this.pacientes, {'id': idPac}).sesiones;
+			let newCant = sesionesPac - cant >= 0 ? sesionesPac - cant : 0;
+			batch.update(pacRef, { sesiones: newCant });
+		}
 
 		//Commit the batch
 		batch.commit().then(() => {			
@@ -125,6 +101,8 @@ class ListaSesiones extends Component {
 			NotificationManager.success('Las sesiones han sido borradas');
 			// recargo datos y limpio selección
 			this.setState({selected: []});
+			this.setState({selectedPacientes: []});
+			removeSession('pacientes');
 			this.cargarSesiones();
 		})
 		.catch((error) => {
@@ -143,17 +121,26 @@ class ListaSesiones extends Component {
 			this.setState({selected: [...this.state.selected, id]});
 			this.setState({selectedPacientes: [...this.state.selectedPacientes, paciente]});
 		} else {
-			this.setState({ selected: this.state.selected.filter(it => it !== id) });
-			this.setState({ selectedPacientes: this.state.selectedPacientes.filter(it => it !== paciente) });
+			this.setState({ selected: this.state.selected.filter(elem => elem !== id) });
+			
+			let auxArr = [...this.state.selectedPacientes].concat([]);
+			let posDelete = _.indexOf(this.state.selectedPacientes, paciente);
+			auxArr.splice(posDelete,1);
+			this.setState({ selectedPacientes: auxArr});
 		}
 		return false;
 	}
 
 	onSelectAll(isSelected) {
 		if (!isSelected) {
-			this.setState({ selected: [] });
+			this.setState({ selected: [], selectedPacientes: [] });
 		} else {
-			this.setState({ selected: this.state.sesiones.map( s => s.id)});
+			let allSes = [], allPac = [];
+			this.state.sesiones.forEach( s => {
+				allSes.push(s.id);
+				allPac.push(s.paciente);
+			});
+			this.setState({ selected: allSes, selectedPacientes: allPac });
 		}
 		return false;
 	}

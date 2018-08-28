@@ -4,15 +4,16 @@ import filterFactory, { numberFilter, selectFilter, textFilter } from 'react-boo
 import LoadingOverlay from 'react-loading-overlay';
 import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
 import { breakpoints, estadosPaciente, filtroPrepagas, filtroTipoPaciente, overlay } from '../../config/constants';
+import db from '../../fire';
 import { tablasFormatter } from '../../utils/formatters';
-import { getPacientes } from '../../utils/utils';
+import { filterPacientesEstado, getPacientes, getSession, setSession, removeSession } from '../../utils/utils';
 
 class ListaPacientes extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			pacientes: [],
-			filtroEstado: localStorage.getItem('filtroEstado') || estadosPaciente[1].value, //activos por defecto,
+			filtroEstado: getSession('filtroEstado') || estadosPaciente[1].value, //activos por defecto,
 			loading: true,
 			size: ''
 		};
@@ -29,7 +30,6 @@ class ListaPacientes extends Component {
 		// resize listener
 		window.addEventListener("resize", this.resize);
 		this.resize();
-		// load data
 		this.cargarPacientes();
 	}
 
@@ -38,13 +38,13 @@ class ListaPacientes extends Component {
 	}
 
 	resize(){
-		console.log
 		this.setState({size: window.innerWidth});
 	}
 
 	cargarPacientes() {
 		this.loading(true);
-		getPacientes(this.filtroEstado.value).then( pacientes => {
+		getPacientes().then( result => {
+			let pacientes = filterPacientesEstado(result, this.filtroEstado.value);
 			this.setState({pacientes: [...pacientes].concat([])});
 			this.loading(false);
 		});
@@ -59,7 +59,7 @@ class ListaPacientes extends Component {
 	}
 
 	changeEstado(){
-		localStorage.setItem('filtroEstado', this.filtroEstado.value);
+		setSession('filtroEstado', this.filtroEstado.value);
 		this.setState({filtroEstado: this.filtroEstado.value});
 		this.cargarPacientes();
 	}

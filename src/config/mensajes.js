@@ -11,7 +11,8 @@ export const errores = {
     pacientesVacios: "Seleccione algún paciente",
     sesionesVacias: "Seleccione alguna sesión",
     periodoInvalido: "Debe seleccionar un período válido",
-    existePacienteNombre: "Ya ingresó un Paciente con ese nombre y apellido"
+    existePacienteNombre: "Ya ingresó un Paciente con ese nombre y apellido",
+    errorCargarDatosPaciente: "Ocurrió un error al cargar los datos del paciente"
 }
 
 export const mensajes = {
