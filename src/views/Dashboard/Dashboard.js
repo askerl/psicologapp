@@ -24,13 +24,11 @@ class Dashboard extends Component {
 	}
 
 	componentDidMount(){
-		
 		this.loading(true);
 		getEstadisticas().then( data => {
 			this.setState({data});
 			this.loading(false);
 		});
-
 	}
 
 	render() {

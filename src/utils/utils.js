@@ -21,6 +21,13 @@ export const removeSession = (key) => {
     return localStorage.removeItem(key);
 }
 
+// clears session in storage
+export const clearSession = () => {
+    removeSession('pacientes');
+    removeSession('sesiones');
+    removeSession('filtroEstado');
+}
+
 // ---------------------- COMMON FUNCTIONS --------------------------------
 
 export const arrayRemoveDuplicates = (arr) => {

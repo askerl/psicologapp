@@ -7,7 +7,7 @@ import Footer from '../../components/Footer/';
 import Header from '../../components/Header/';
 import Sidebar from '../../components/Sidebar/';
 import db, { auth, logout } from '../../fire';
-import { isHabilitado, removeSession } from '../../utils/utils';
+import { isHabilitado, removeSession, clearSession } from '../../utils/utils';
 import Dashboard from '../../views/Dashboard/dashboard';
 import Facturaciones from '../../views/Facturaciones/facturaciones';
 import ListaPacientes from '../../views/Pacientes/listaPacientes';
@@ -16,6 +16,11 @@ import ListaSesiones from '../../views/Sesiones/listaSesiones';
 import Sesion from '../../views/Sesiones/sesion';
 
 class Full extends Component {
+
+	componentWillMount() {
+		// clear previously stored session when rendering the Full component
+		clearSession();
+	}
 
 	componentDidMount() {
 
