@@ -3,10 +3,9 @@ import LoadingOverlay from 'react-loading-overlay';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, Col, Row } from 'reactstrap';
 import { overlay, prepagas } from '../../config/constants';
-import { getEstadisticas, setSession, removeSession } from '../../utils/utils';
+import { getEstadisticas, setSession } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
 import { Callout, StatItem } from '../Widgets/WidgetsAuxiliares';
-import db from '../../fire';
 	
 class Dashboard extends Component {
   

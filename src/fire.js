@@ -27,10 +27,7 @@ export const uiConfig = {
 };
 const settings = {timestampsInSnapshots: true};
 const db = firebase.firestore();
-let auxAuth = firebase.auth();
-auxAuth.languageCode = 'es';
-export const auth = auxAuth;
-
+export const auth = firebase.auth();
 
 export const logout = () => {
     console.log('Logout...');
@@ -41,7 +38,6 @@ export const logout = () => {
         // An error happened.
         console.log('Error signout');
       });
-
 }
 
 db.settings(settings);

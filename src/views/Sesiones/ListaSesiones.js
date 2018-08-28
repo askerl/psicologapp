@@ -9,7 +9,7 @@ import { meses, overlay, tableColumnClasses } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { tablasFormatter } from '../../utils/formatters';
-import { arrayRemoveDuplicates, getSesionesMes, getSession, removeSession } from '../../utils/utils';
+import { getSesionesMes, getSession, removeSession, removeSessionSesionesMes } from '../../utils/utils';
 
 class ListaSesiones extends Component {
 	constructor(props) {
@@ -103,6 +103,7 @@ class ListaSesiones extends Component {
 			this.setState({selected: []});
 			this.setState({selectedPacientes: []});
 			removeSession('pacientes');
+			removeSessionSesionesMes(this.inputMes.value, this.inputAnio.value);
 			this.cargarSesiones();
 		})
 		.catch((error) => {

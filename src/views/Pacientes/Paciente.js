@@ -70,7 +70,7 @@ class Paciente extends Component {
             getPaciente(id).then( pac => {
                 this.loadPaciente(pac);
             }).then(getSesionesPaciente(id).then( sesionesPaciente => {
-                console.log('sesiones del paciente', sesionesPaciente);
+                // console.log('sesiones del paciente', sesionesPaciente);
                 this.setState({sesionesPaciente});
                 this.loading(false);
             })).catch(error => { 

@@ -7,7 +7,7 @@ import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormG
 import { overlay, pacientePrivado, prepagasById } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
-import { createFechaSesion, getSelectPacientes, removeSession } from '../../utils/utils';
+import { createFechaSesion, getSelectPacientes, removeSession, removeSessionSesionesMes } from '../../utils/utils';
 
 class Sesion extends Component {
 
@@ -95,6 +95,7 @@ class Sesion extends Component {
                             NotificationManager.warning('Algunas sesiones ya estaban cargadas');
                         }
                         removeSession('pacientes');
+                        removeSessionSesionesMes(fecha.mes, fecha.anio);
                         this.goBack();
                     })
                     .catch((error) => {

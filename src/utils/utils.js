@@ -7,13 +7,16 @@ import db from '../fire';
 // ---------------------- SESSION HANDLER --------------------------------
 
 export const getSession = (key) => {
-    if (key === 'pacientes') {
+    if (key === 'pacientes' || key === 'sesiones') {
         return JSON.parse(localStorage.getItem(key));
     }
     return localStorage.getItem(key);
 }
 
 export const setSession = (key, value) => {
+    if (key === 'pacientes' || key === 'sesiones') {
+        value = JSON.stringify(value);
+    }
     return localStorage.setItem(key, value);
 }
 
@@ -26,6 +29,13 @@ export const clearSession = () => {
     removeSession('pacientes');
     removeSession('sesiones');
     removeSession('filtroEstado');
+}
+
+export const removeSessionSesionesMes = (mes, anio) => {
+    let sesionesStorage = getSession('sesiones') || {};
+    const key = `${mes}-${anio}`;
+    delete sesionesStorage[key];
+    setSession('sesiones', sesionesStorage);
 }
 
 // ---------------------- COMMON FUNCTIONS --------------------------------
@@ -67,7 +77,6 @@ export const isHabilitado = (email) =>{
 // ---------------------- DASHBOARD --------------------------------
 
 export const getEstadisticas = () => {
-    console.log('GetEstadisticas');
     let promise = new Promise( (resolve, reject) => {
         
         let data = {
@@ -188,7 +197,9 @@ function loadPacientes(querySnapshot) {
         // agrego paciente a la colección final
         pacientes.push(paciente);
     });
-    setSession('pacientes',JSON.stringify(pacientes));
+    // almaceno pacientes en sesion para cache
+    setSession('pacientes',pacientes);
+    // devuelvo resultado
     return pacientes;	
 }
 
@@ -212,25 +223,37 @@ export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
 
 export const getSesionesMes = (mes, anio) => {
     let promise = new Promise( (resolve, reject) => {
-        getPacientes().then( pacientes => {
-            db.collection("sesiones")
-            .where("mes","==",parseInt(mes))
-            .where("anio","==",parseInt(anio))		
-            .orderBy("dia","desc")
-            .get().then( querySnapshot => {
-                let sesiones = [];
-                querySnapshot.docs.forEach( doc => {            
-                    let sesion = doc.data();
-                    sesion.id = doc.id;
-                    sesion.fecha = sesion.fecha.seconds;
-                    let paciente = _.find(pacientes, {'id': sesion.paciente});
-                    sesion.nombreCompleto = paciente.nombreCompleto;
-                    sesion.credencial = paciente.credencial;
-                    sesiones.push(sesion);
+
+        let sesionesStorage = getSession('sesiones') || {};
+        const key = `${mes}-${anio}`;
+        let sesionesMes = _.get(sesionesStorage, key);
+        if (sesionesMes) {
+            console.log('Sesiones ' + key + ' cache', sesionesMes);
+            resolve(sesionesMes);
+        } else {
+            console.log('Sesiones ' + key + ' DB', sesionesStorage);
+            getPacientes().then( pacientes => {
+                db.collection("sesiones")
+                .where("mes","==",parseInt(mes))
+                .where("anio","==",parseInt(anio))		
+                .orderBy("dia","desc")
+                .get().then( querySnapshot => {
+                    let sesiones = [];
+                    querySnapshot.docs.forEach( doc => {            
+                        let sesion = doc.data();
+                        sesion.id = doc.id;
+                        sesion.fecha = sesion.fecha.seconds;
+                        let paciente = _.find(pacientes, {'id': sesion.paciente});
+                        sesion.nombreCompleto = paciente.nombreCompleto;
+                        sesion.credencial = paciente.credencial;
+                        sesiones.push(sesion);
+                    });
+                    sesionesStorage[key] = sesiones;
+                    setSession('sesiones',sesionesStorage);
+                    resolve(sesiones);
                 });
-                resolve(sesiones);
             });
-        });
+        }
     });
     return promise;
 }
