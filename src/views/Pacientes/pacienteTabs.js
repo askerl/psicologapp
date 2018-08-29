@@ -53,7 +53,7 @@ class PacienteTabs extends Component {
                         </Nav>
                         <TabContent activeTab={this.state.activeTab}>
                             <TabPane tabId="tabDatos">
-                                <Paciente id={this.state.id}/>
+                                <Paciente id={this.state.id} goBack={() => this.props.history.push('/pacientes')}/>
                             </TabPane>
                             <TabPane tabId="tabSesiones">
                                 Acá van a ir las sesiones del paciente...
