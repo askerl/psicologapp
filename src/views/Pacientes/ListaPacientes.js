@@ -148,7 +148,7 @@ class ListaPacientes extends Component {
 									<div className="d-flex flex-row mb-2">
 										<div className="mr-auto">
 											<Link to={'/pacientes/new'} title="Nuevo Paciente" className="linkButton">
-												<Button color="primary" size="sm"><i className="fa fa-plus"></i> Nuevo paciente</Button>
+												<Button color="primary" size="sm"><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>
 											</Link>
 										</div>
 										<div className="filtros">

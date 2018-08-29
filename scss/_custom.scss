@@ -3,18 +3,31 @@
     background-color: khaki;
 }
 
-.progress {
-    border-radius: 10rem;
+.card {
+    border-radius: .25rem;
+    .card-header:first-child {
+        border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+    }
+    .card-footer:last-child {
+        border-radius: 0 0 calc(.25rem - 1px) calc(.25rem - 1px);
+    }
 }
 
-.mainCard {
-    @include media-breakpoint-down(xs) {
-        border-left: none;
-        border-right: none;
-        .card-body {
-            padding: 1rem;
-        }
-    }
+.form-control, .input-group-text, .btn {
+    border-radius: .25rem;
+}
+
+.input-group>.form-control:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.input-group>.input-group-append:last-child>.btn:not(:last-child):not(.dropdown-toggle), .input-group>.input-group-append:last-child>.input-group-text:not(:last-child), .input-group>.input-group-append:not(:last-child)>.btn, .input-group>.input-group-append:not(:last-child)>.input-group-text, .input-group>.input-group-prepend>.btn, .input-group>.input-group-prepend>.input-group-text {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.progress {
+    border-radius: 10rem;
 }
 
 .nav-tabs {  
@@ -83,7 +96,7 @@ span.thTitle{
 
 // select styles
 .Select-control{
-    border-radius: 0;
+    border-radius: .25rem;
 }
 
 .Select.is-focused:not(.is-open) > .Select-control{
@@ -129,16 +142,6 @@ span.thTitle{
     .filtros {
         .filtroEstado {
             width: 80px;
-        }
-    }
-    .tablaPacientes {
-        // .react-bs-table-no-data {
-        //     display: none;
-        // }
-        @include media-breakpoint-down(xs) {
-            td, th {
-                padding: 0.3rem;
-            }
         }
     }
 }
@@ -187,4 +190,35 @@ span.thTitle{
 
 .react-bootstrap-table td>.selection-input-4, .react-bootstrap-table th>.selection-input-4 {
     margin: 0;
+}
+
+#botonesPaciente {
+    display: flex;
+}
+
+// mobile
+@include media-breakpoint-down(xs) {
+    .mainCard {
+        border-left: none;
+        border-right: none;
+        .card-body {
+            padding: 1rem;
+        }
+    }
+    .tab-content {
+        border-left: none;
+        border-right: none;
+    }
+    // .tablaPacientes {
+    //     td, th {
+    //         padding: 0.3rem;
+    //     }
+    // }
+    #botonesPaciente {
+        justify-content: space-between;
+        flex-wrap: wrap;
+        .btn {
+            width: 50%;
+        }
+    }
 }

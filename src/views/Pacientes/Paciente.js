@@ -348,13 +348,13 @@ class Paciente extends Component {
 
     render() {
         return (
-            <div className="animated fadeIn paciente">
+            <div className="paciente">
                 <LoadingOverlay
                     active={this.state.loading}
                     animate
                     spinner
                     color={overlay.color}
-                    background={overlay.backgroundWhite}>
+                    background={overlay.background}>
                     <Row>
                         <Col>
                             { !this.state.activo &&
@@ -581,7 +581,9 @@ class Paciente extends Component {
                             </Form>
                             <hr className="mt-3 mb-3"/>
                             <div id="botonesPaciente">
-                                <Button type="submit" color="primary" onClick={() => this.savePaciente()}>Guardar</Button>
+                                <Button type="submit" color="primary" onClick={() => this.savePaciente()}>
+                                    {this.state.loading && <Spinner/>}Guardar
+                                </Button>
                                 {!this.state.nuevo &&
                                     <Button type="submit" color={this.state.activo ? 'warning' : 'success'} onClick={this.toggleActivar}>
                                         {this.state.activo ? 'Desactivar' : 'Activar'}
