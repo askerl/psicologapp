@@ -11,6 +11,7 @@ import db from '../../fire';
 import { calcPorcentajesSesiones, getPaciente, getPacientes, getSesionesPaciente, getSession, removeSession } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
 import { WidgetSesionesRestantes, WidgetSesionesUsadas } from '../Widgets/WidgetsAuxiliares';
+import Spinner from '../../components/Spinner/Spinner';
 
 class Paciente extends Component {
 
@@ -22,6 +23,7 @@ class Paciente extends Component {
             nuevo: true,
             tipo: '',
             activo: true,
+            setActivo: true,
             facturaPrepaga: true,
             pagos: [],
             sesiones: 0,
@@ -40,7 +42,7 @@ class Paciente extends Component {
         }; // <- set up react state
         this.loadPaciente = this.loadPaciente.bind(this);
         this.savePaciente = this.savePaciente.bind(this);
-        this.deletePacient = this.deletePacient.bind(this);
+        this.deletePaciente = this.deletePaciente.bind(this);
         this.getPagosPrepaga = this.getPagosPrepaga.bind(this);
         this.goBack = this.goBack.bind(this);
         this.changeNombre = this.changeNombre.bind(this);
@@ -108,7 +110,7 @@ class Paciente extends Component {
         this.inputFchNac.value      = moment(p.fchNac, "DD/MM/YYYY").format("YYYY-MM-DD");
         this.inputNotas.value       = p.notas;
         this.inputTipo.value        = p.tipo;
-        this.setState({activo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
+        this.setState({activo: p.activo, setActivo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
         if (p.tipo === pacientePrivado){
             this.inputValorConsulta.value = p.valorConsulta; 
         } else {
@@ -204,7 +206,7 @@ class Paciente extends Component {
             if (this.state.nuevo){
                 // console.log('Nuevo paciente', paciente);
                 paciente.sesiones = 0;
-                paciente.activo = true;
+                paciente.activo = true; // nuevos pacientes siempre son activos
                 // db save
                 db.collection("pacientes").add(paciente)
                 .then(docRef => {
@@ -221,7 +223,7 @@ class Paciente extends Component {
                     this.loading(false);
                 });
             } else {
-                paciente.activo = this.state.activo; 
+                paciente.activo = this.state.setActivo; 
                 paciente.sesiones = this.state.sesiones;               
                 // console.log('Editando paciente', paciente);
                 db.collection("pacientes").doc(this.state.id).update(paciente)
@@ -309,14 +311,14 @@ class Paciente extends Component {
     }
 
     toggleActivar() {
-        this.setState({showActivarModal: !this.state.showActivarModal});
+        this.setState({showActivarModal: !this.state.showActivarModal, setActivo: !this.state.setActivo});
     }
 
     toggleDelete(){
 		this.setState({showDeleteModal: !this.state.showDeleteModal});
     }
     
-    deletePacient(){
+    deletePaciente(){
         // Get a new write batch
 		let batch = db.batch();                
         
@@ -355,16 +357,6 @@ class Paciente extends Component {
                     background={overlay.backgroundWhite}>
                     <Row>
                         <Col>
-                            {/* {!this.state.nuevo && !this.state.loading &&
-                                <div className="card-actions">
-                                    <span id='activo-label'><small>{this.state.activo ? 'Activo' : 'Inactivo'}</small></span>
-                                    <Toggle
-                                        id='activo'
-                                        checked={this.state.activo}
-                                        aria-labelledby='activo-label'
-                                        onChange={(value) => { this.setState({ activo: !this.state.activo }) }} />
-                                </div>
-                            } */}
                             { !this.state.activo &&
                             <Alert color="danger">
                                 El Paciente se encuentra <strong>INACTIVO</strong>. Para volver a activarlo utilice la opción <span className="alert-link">Activar</span>.
@@ -590,8 +582,10 @@ class Paciente extends Component {
                             <hr className="mt-3 mb-3"/>
                             <div id="botonesPaciente">
                                 <Button type="submit" color="primary" onClick={() => this.savePaciente()}>Guardar</Button>
-                                {!this.state.activo &&
-                                    <Button type="submit" color="success" onClick={this.toggleActivar}>Activar</Button>
+                                {!this.state.nuevo &&
+                                    <Button type="submit" color={this.state.activo ? 'warning' : 'success'} onClick={this.toggleActivar}>
+                                        {this.state.activo ? 'Desactivar' : 'Activar'}
+                                    </Button>
                                 }
                                 {!this.state.nuevo &&
                                     <Button color="danger" onClick={this.toggleDelete}>Eliminar</Button>
@@ -606,18 +600,20 @@ class Paciente extends Component {
                             Confirme la eliminación del Paciente. Se eliminarán todas sus sesiones ({this.state.sesionesPaciente.length}) e impactará en las facturaciones . Esta acción no podrá deshacerse.
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="danger" size="sm" onClick={e => this.deletePacient(e)}>Eliminar</Button>
-                            <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>{' '}
+                            <Button color="danger" size="sm" onClick={this.deletePaciente}>Eliminar</Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>
                         </ModalFooter>
                     </Modal>
-                    <Modal isOpen={this.state.showActivarModal} toggle={this.toggleActivar} className={'modal-md modal-success'}>
-                        <ModalHeader toggle={this.toggleDelete}>Activar Paciente</ModalHeader>
+                    <Modal isOpen={this.state.showActivarModal} toggle={this.toggleActivar} className={'modal-md ' + (this.state.setActivo ? 'modal-success' : 'modal-warning')}>
+                        <ModalHeader toggle={this.toggleActivar}>{this.state.setActivo ? 'Activar' : 'Desactivar'} Paciente</ModalHeader>
                         <ModalBody>
-                            Esta acción activará al Paciente y se guardarán los datos ingresados.
+                            Esta acción {this.state.setActivo ? 'activará' : 'desactivará'} al Paciente y se guardarán los cambios realizados.
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="success" size="sm" onClick={e => console.log('Activar')}>Aceptar</Button>
-                            <Button color="secondary" size="sm" onClick={this.toggleActivar}>Cancelar</Button>{' '}
+                            <Button color={this.state.setActivo ? 'success' : 'warning'} size="sm" onClick={this.savePaciente}>
+                                {this.state.loading && <Spinner />}Aceptar
+                            </Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleActivar}>Cancelar</Button>
                         </ModalFooter>
                     </Modal>
                 </LoadingOverlay>

@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
-import {
-  Nav,
-  NavItem,
-  NavbarToggler,
-  NavbarBrand,
-} from 'reactstrap';
+import { Nav, NavbarBrand, NavbarToggler } from 'reactstrap';
+import { env, envs } from '../../config/envs';
 import HeaderDropdown from './HeaderDropdown';
 
 class Header extends Component {
@@ -31,7 +27,7 @@ class Header extends Component {
 
   render() {
     return (
-      <header className="app-header navbar">
+      <header className={"app-header navbar " + (env == envs.TEST ? 'testHeader': '')}>
         <NavbarBrand href="#"></NavbarBrand>
         <NavbarToggler className="d-lg-none" onClick={this.mobileSidebarToggle}>
           <span className="navbar-toggler-icon"></span>
