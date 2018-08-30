@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Badge, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
 import Paciente from './paciente';
+import SesionesPaciente from './pacienteSesiones';
 
 class PacienteTabs extends Component {
 
@@ -24,6 +25,7 @@ class PacienteTabs extends Component {
     }
 
     render() {
+        let nuevo = this.state.id == 'new';
         return (
             <div className="animated fadeIn">
                 <Row>
@@ -36,10 +38,11 @@ class PacienteTabs extends Component {
                                     <div className="d-flex d-flex align-items-center">
                                         <i className="icon-notebook mr-2"></i>
                                         <span>Datos</span>
-                                        <Badge className={this.id === 'new'? 'badge-pill ml-2' : 'd-none'} color="success">Nuevo</Badge>
+                                        <Badge className={nuevo ? 'badge-pill ml-2' : 'd-none'} color="success">Nuevo</Badge>
                                     </div>
                                 </NavLink>
                             </NavItem>
+                            {!nuevo &&
                             <NavItem>
                                 <NavLink
                                     className={classnames({ active: this.state.activeTab === 'tabSesiones' })}
@@ -50,14 +53,17 @@ class PacienteTabs extends Component {
                                     </div>
                                 </NavLink>
                             </NavItem>
+                            }
                         </Nav>
                         <TabContent activeTab={this.state.activeTab}>
                             <TabPane tabId="tabDatos">
                                 <Paciente id={this.state.id} goBack={() => this.props.history.push('/pacientes')}/>
                             </TabPane>
+                            {!nuevo &&
                             <TabPane tabId="tabSesiones">
-                                Acá van a ir las sesiones del paciente...
+                                <SesionesPaciente id={this.state.id} goBack={() => this.props.history.push('/pacientes')}/>
                             </TabPane>
+                            }
                         </TabContent>
                     </Col>
                 </Row>

@@ -354,7 +354,7 @@ class Paciente extends Component {
                     animate
                     spinner
                     color={overlay.color}
-                    background={overlay.background}>
+                    background={overlay.backgroundWhite}>
                     <Row>
                         <Col>
                             { !this.state.activo &&
