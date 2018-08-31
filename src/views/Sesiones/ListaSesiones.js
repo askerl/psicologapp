@@ -5,7 +5,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import { Button, Card, CardBody, CardHeader, Col, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { meses, overlay, tableColumnClasses } from '../../config/constants';
+import { meses, overlay, tableColumnClasses, breakpoints } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { tablasFormatter } from '../../utils/formatters';
@@ -20,7 +20,8 @@ class ListaSesiones extends Component {
 			loading: true,
 			showDeleteModal: false,
 			selected: [],
-			selectedPacientes: []
+			selectedPacientes: [],
+			size: ''
 		};
 		this.nuevaSesion = this.nuevaSesion.bind(this);
 		this.cargarSesiones = this.cargarSesiones.bind(this);
@@ -32,11 +33,14 @@ class ListaSesiones extends Component {
 		this.onRowSelect = this.onRowSelect.bind(this);
 		this.changePeriodo = this.changePeriodo.bind(this);
 		this.initFiltros = this.initFiltros.bind(this);
+		this.resize = this.resize.bind(this);
 	}
 	
 	componentDidMount(){
 		this.initFiltros();
 		this.cargarSesiones();
+		window.addEventListener("resize", this.resize);
+		this.resize();
 	}
 
 	initFiltros(){
@@ -156,6 +160,10 @@ class ListaSesiones extends Component {
 		});
 	}
 
+	resize(){
+		this.setState({size: window.innerWidth});
+	}
+
 	render() {
 
 		const selectRow = {
@@ -185,19 +193,16 @@ class ListaSesiones extends Component {
 			text: 'Tipo',
 			headerAttrs: { width: '90px' },
 			formatter: tablasFormatter.tipoPaciente,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			hidden: this.state.size < breakpoints.sm
 		}, {
 			dataField: 'prepaga',
 			text: 'Prepaga',
 			formatter: tablasFormatter.prepaga,
-			headerClasses: tableColumnClasses.showLarge,
-			classes: tableColumnClasses.showLarge
+			hidden: this.state.size < breakpoints.lg
 		}, {
 			dataField: 'credencial',
 			text: 'Credencial',
-			headerClasses: tableColumnClasses.showLarge,
-			classes: tableColumnClasses.showLarge
+			hidden: this.state.size < breakpoints.lg
 		}, {
 			dataField: 'facturaPrepaga',
 			text: 'Factura',
@@ -205,22 +210,19 @@ class ListaSesiones extends Component {
 			align: 'center', headerAlign: 'center',
 			formatter: tablasFormatter.factura,
 			formatExtraData: tablasFormatter.boolFormatter,
-			headerClasses: tableColumnClasses.showLarge,
-			classes: tableColumnClasses.showLarge
+			hidden: this.state.size < breakpoints.lg
 		}, {
 			dataField: 'valor',
 			text: 'Valor',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			hidden: this.state.size < breakpoints.sm
 		}, {
 			dataField: 'copago',
 			text: 'Copago',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			hidden: this.state.size < breakpoints.sm
 		}];
 
 		return (

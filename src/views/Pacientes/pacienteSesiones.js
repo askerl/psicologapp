@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Col, Row, Badge } from 'reactstrap';
 import { getPaciente, getSesionesPaciente } from '../../utils/utils';
-import { overlay, tableColumnClasses } from '../../config/constants';
+import { overlay, tableColumnClasses, breakpoints } from '../../config/constants';
 import LoadingOverlay from 'react-loading-overlay';
 import { tablasFormatter } from '../../utils/formatters';
 import { NotificationManager } from 'react-notifications';
@@ -16,9 +16,11 @@ class SesionesPaciente extends Component {
         this.state = {
             loading: true,
             paciente: {},
-            sesiones: []
+            sesiones: [],
+            size: ''
         };
         this.loading = this.loading.bind(this);
+        this.resize = this.resize.bind(this);
     }
 
     componentDidMount() {
@@ -35,12 +37,21 @@ class SesionesPaciente extends Component {
             this.loading(false);
             this.props.goBack();
         });
-
+        window.addEventListener("resize", this.resize);
+		this.resize();
     }
+
+    componentWillUnmount() {
+		window.removeEventListener("resize", this.resize);
+	}
 
     loading(loading) {
         this.setState({loading});
     }
+
+    resize(){
+		this.setState({size: window.innerWidth});
+	}
 
     render() {
         let paciente = this.state.paciente;
@@ -61,21 +72,19 @@ class SesionesPaciente extends Component {
 			text: 'Valor',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			hidden: this.state.size < breakpoints.sm
 		}, {
 			dataField: 'copago',
 			text: 'Copago',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
-			headerClasses: tableColumnClasses.showSmall,
-			classes: tableColumnClasses.showSmall
+			hidden: this.state.size < breakpoints.sm
         }];
         
         const expandRow = {
 			renderer: rowData => {
 				return (
-                    <div>PONER COMPONENTE PARA EDITAR LA HISTORIA CLÍNICA</div>
+                    <div>Próximamente edición de historia clínica...</div>
                 )
 			},
 			showExpandColumn: true,

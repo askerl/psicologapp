@@ -205,6 +205,13 @@ span.thTitle{
             padding: 1rem;
         }
     }
+    .nav-tabs {  
+        .nav-item:first-child {
+            .active.nav-link {
+                border-left: none;
+            }
+        }
+    }
     .tab-content {
         border-left: none;
         border-right: none;
