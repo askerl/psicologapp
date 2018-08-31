@@ -1,16 +1,17 @@
 import _ from 'lodash';
 import moment from 'moment';
 import React, { Component } from 'react';
-import Loader from 'react-loaders';
+import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import Toggle from 'react-toggle';
-import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { pacientePrepaga, pacientePrivado, prepagas, prepagasById, tipoLoader, tipoPaciente } from '../../config/constants';
-import { errores } from '../../config/mensajes';
+import { Alert, Button, Col, CardFooter, Form, FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import { pacientePrepaga, pacientePrivado, prepagas, prepagasById, tipoLoader, tipoPaciente, overlay } from '../../config/constants';
+import { errores, mensajes } from '../../config/mensajes';
 import db from '../../fire';
-import { calcPorcentajesSesiones, getPaciente, getSesionesPaciente, removeSession, getSession } from '../../utils/utils';
+import { calcPorcentajesSesiones, getPaciente, getPacientes, getSesionesPaciente, getSession, removeSession } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
 import { WidgetSesionesRestantes, WidgetSesionesUsadas } from '../Widgets/WidgetsAuxiliares';
+import Spinner from '../../components/Spinner/Spinner';
 
 class Paciente extends Component {
 
@@ -22,6 +23,7 @@ class Paciente extends Component {
             nuevo: true,
             tipo: '',
             activo: true,
+            setActivo: true,
             facturaPrepaga: true,
             pagos: [],
             sesiones: 0,
@@ -35,11 +37,12 @@ class Paciente extends Component {
             errorPrepaga: false,            
             errorPago: false,
             sesionesPaciente: [],
-            showDeleteModal: false
+            showDeleteModal: false,
+            showActivarModal: false
         }; // <- set up react state
         this.loadPaciente = this.loadPaciente.bind(this);
-        this.savePacient = this.savePacient.bind(this);
-        this.deletePacient = this.deletePacient.bind(this);
+        this.savePaciente = this.savePaciente.bind(this);
+        this.deletePaciente = this.deletePaciente.bind(this);
         this.getPagosPrepaga = this.getPagosPrepaga.bind(this);
         this.goBack = this.goBack.bind(this);
         this.changeNombre = this.changeNombre.bind(this);
@@ -55,11 +58,12 @@ class Paciente extends Component {
         this.resetSesiones = this.resetSesiones.bind(this);
         this.checkExistePaciente = this.checkExistePaciente.bind(this);
         this.toggleDelete = this.toggleDelete.bind(this);
+        this.toggleActivar = this.toggleActivar.bind(this);
     }
 
     componentDidMount(){
         // id del paciente
-        let id = this.props.match.params.id;
+        let id = this.props.id;
         let nuevo = id === 'new';
         this.setState({id, nuevo});
 
@@ -83,7 +87,12 @@ class Paciente extends Component {
             this.loading(false);
         }
         // cargo pacientes map
-        this.pacientes = getSession('pacientes');
+        let pacientesSesion = getSession('pacientes');
+        if (pacientesSesion) {
+            this.pacientes = pacientesSesion;
+        } else {
+            getPacientes().then( pacientes => {this.pacientes = pacientes});
+        }
     }
 
     loading(val){
@@ -101,7 +110,7 @@ class Paciente extends Component {
         this.inputFchNac.value      = moment(p.fchNac, "DD/MM/YYYY").format("YYYY-MM-DD");
         this.inputNotas.value       = p.notas;
         this.inputTipo.value        = p.tipo;
-        this.setState({activo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
+        this.setState({activo: p.activo, setActivo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
         if (p.tipo === pacientePrivado){
             this.inputValorConsulta.value = p.valorConsulta; 
         } else {
@@ -165,9 +174,7 @@ class Paciente extends Component {
         this.setState({sesionesAut: this.inputSesiones.value});
     }
 
-    savePacient(e){
-        e.preventDefault(); // <- prevent form submit from reloading the page
-
+    savePaciente(){
         this.loading(true);
 
         if(this.validate()){
@@ -199,7 +206,7 @@ class Paciente extends Component {
             if (this.state.nuevo){
                 // console.log('Nuevo paciente', paciente);
                 paciente.sesiones = 0;
-                paciente.activo = true;
+                paciente.activo = true; // nuevos pacientes siempre son activos
                 // db save
                 db.collection("pacientes").add(paciente)
                 .then(docRef => {
@@ -216,7 +223,7 @@ class Paciente extends Component {
                     this.loading(false);
                 });
             } else {
-                paciente.activo = this.state.activo; 
+                paciente.activo = this.state.setActivo; 
                 paciente.sesiones = this.state.sesiones;               
                 // console.log('Editando paciente', paciente);
                 db.collection("pacientes").doc(this.state.id).update(paciente)
@@ -227,7 +234,7 @@ class Paciente extends Component {
                     NotificationManager.success('Los datos han sido actualizados');
                     this.goBack();
                 })
-                .catch(function(error) {
+                .catch(error => {
                     console.error("Error guardando paciente: ", error);
                     NotificationManager.error(errores.errorGuardar, 'Error');
                     this.loading(false);
@@ -240,7 +247,7 @@ class Paciente extends Component {
     }
 
     goBack(){
-        this.props.history.push('/pacientes');
+        this.props.goBack();
     }
 
     validate(field){
@@ -299,25 +306,19 @@ class Paciente extends Component {
             if (existe){
                 NotificationManager.warning(errores.existePacienteNombre);
             }
-
-            // for (const id in this.state.pacientesMap) {
-            //     let obj = this.state.pacientesMap[id];
-            //     if (_.lowerCase(obj.nombre) == _.lowerCase(this.inputNombre.value) && _.lowerCase(obj.apellido) == _.lowerCase(this.inputApellido.value)
-            //         && id !== this.state.id
-            //     ){
-            //         NotificationManager.warning(errores.existePacienteNombre);
-            //         return true;
-            //     }
-            // }
         }
         return false;
+    }
+
+    toggleActivar() {
+        this.setState({showActivarModal: !this.state.showActivarModal, setActivo: !this.state.setActivo});
     }
 
     toggleDelete(){
 		this.setState({showDeleteModal: !this.state.showDeleteModal});
     }
     
-    deletePacient(){
+    deletePaciente(){
         // Get a new write batch
 		let batch = db.batch();                
         
@@ -347,256 +348,252 @@ class Paciente extends Component {
 
     render() {
         return (
-            <div className="animated fadeIn">
-                <Loader type={tipoLoader} active={this.state.loading} />
-                <div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn paciente"}>                
+            <div className="paciente">
+                <LoadingOverlay
+                    active={this.state.loading}
+                    animate
+                    spinner
+                    color={overlay.color}
+                    background={overlay.backgroundWhite}>
                     <Row>
                         <Col>
-                            <Card className="mainCard">
-                                <CardHeader>
-                                    <i className="fa fa-user-circle fa-lg"></i>
-                                    <strong>Paciente</strong>                                
-                                    { this.state.nuevo &&
-                                        <a><Badge color="success" className="badge-pill ml-2">Nuevo</Badge></a>
-                                    }
-                                    { !this.state.nuevo && !this.state.loading &&
-                                        <div className="card-actions">
-                                        <span id='activo-label'><small>{this.state.activo ? 'Activo' : 'Inactivo'}</small></span>
-                                        <Toggle
-                                            id='activo'
-                                            checked={this.state.activo}                                        
-                                            aria-labelledby='activo-label'
-                                            onChange={(value)=>{this.setState({activo: !this.state.activo})}} />
-                                        </div>
-                                    }
-                                </CardHeader>
-                                <CardBody>
-                                    <Form>
-                                        <Row>
-                                            <Col xs="12" sm="6">
-                                                <FormGroup>
-                                                    <Label for="nombre">Nombre(s)</Label>
-                                                    <Input type="text" name="nombre" id="nombre" innerRef={ el => this.inputNombre = el } required
-                                                        className={this.state.errorNombre ? 'is-invalid' : ''} onChange={this.changeNombre} onBlur={this.checkExistePaciente}/>
-                                                    <FormFeedback>{errores.nombreVacio}</FormFeedback>
-                                                </FormGroup>    
-                                            </Col>
-                                            <Col xs="12" sm="6">    
-                                                <FormGroup>    
-                                                    <Label htmlFor="apellido">Apellido(s)</Label>
-                                                    <Input type="text" id="apellido" innerRef={ el => this.inputApellido = el } required 
-                                                        className={this.state.errorApellido ? 'is-invalid' : ''} onChange={this.changeApellido} onBlur={this.checkExistePaciente}/>
-                                                    <FormFeedback>{errores.apellidoVacio}</FormFeedback>
-                                                </FormGroup>
-                                            </Col> 
-                                        </Row>
-                                        <Row>
-                                            <Col xs="12" sm="6">
-                                                <FormGroup>
-                                                    <Label htmlFor="dni">DNI</Label>
-                                                    <InputGroup>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-id-card-o"></i></InputGroupText>
-                                                        </InputGroupAddon>
-                                                        <Input type="text" id="dni" innerRef={el => this.inputDNI = el} />
-                                                    </InputGroup>
-                                                    <FormText>ej: 95001002</FormText>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col xs="12" sm="6">
-                                                <FormGroup>
-                                                    <Label htmlFor="fchNac">Fecha de nacimiento</Label>
-                                                    <InputGroup>
-                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-calendar"></i></InputGroupText></InputGroupAddon>
-                                                        <Input type="date" id="fchNac" name="Fecha nacimiento" innerRef={el => this.inputFchNac = el} />
-                                                    </InputGroup>
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col xs="12" sm="6">
-                                                <FormGroup>
-                                                    <Label htmlFor="tel">Teléfono</Label>
-                                                    <InputGroup>
-                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-phone"></i></InputGroupText></InputGroupAddon>
-                                                        <Input type="text" id="tel" innerRef={el => this.inputTel = el} />
-                                                    </InputGroup>
-                                                    <FormText>ej: 1134567890</FormText>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col xs="12" sm="6">
-                                                <FormGroup>
-                                                    <Label htmlFor="telFlia">Contacto familiar</Label>
-                                                    <InputGroup>
-                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-phone-square"></i></InputGroupText></InputGroupAddon>
-                                                        <Input type="text" id="telFlia" innerRef={el => this.inputTelFlia = el} />
-                                                    </InputGroup>
-                                                    <FormText>ej: 11123456780 - padre/madre</FormText>
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col xs="12" sm="6">
-                                                <FormGroup>
-                                                    <Label htmlFor="dir">Dirección</Label>
-                                                    <InputGroup>
-                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-address-book-o"></i></InputGroupText></InputGroupAddon>
-                                                        <Input type="text" id="dir" innerRef={el => this.inputDir = el} />
-                                                    </InputGroup>
-                                                    <FormText>ej: Rivadavia 3456</FormText>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col xs="12" sm="6">
-                                                <FormGroup>
-                                                    <Label htmlFor="email">Email</Label>
-                                                    <InputGroup>
-                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-envelope-o"></i></InputGroupText></InputGroupAddon>
-                                                        <Input type="email" id="email" innerRef={el => this.inputEmail = el} />
-                                                    </InputGroup>
-                                                    <FormText>ej: alguien@example.com</FormText>
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col>
-                                                <FormGroup>
-                                                    <Label htmlFor="tipo">Tipo de Paciente</Label>
-                                                    <Input type="select" name="tipoPaciente" id="tipo" innerRef={el => this.inputTipo = el} required onChange={this.changeTipoPaciente}
-                                                        className={this.state.errorTipo ? 'is-invalid' : ''}>
-                                                        <option value="">Seleccione...</option>
-                                                        {tipoPaciente.map(item => <option key={item.key} value={item.key}>{item.name}</option>)}
-                                                    </Input>
-                                                    <FormFeedback>{errores.tipoPacienteVacio}</FormFeedback>
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        { this.state.tipo === pacientePrivado &&
-                                            <Row>
-                                                <Col>
-                                                    <FormGroup className="errorAddon">
-                                                        <Label htmlFor="valorConsulta">Valor de consulta</Label>
-                                                        <InputGroup>
-                                                            <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
-                                                            <Input type="number" id="valorConsulta" name="valorConsulta" innerRef={el => this.inputValorConsulta = el} required
-                                                                className={this.state.errorValorConsulta ? 'is-invalid' : ''} onChange={this.changeValorConsulta} />
-                                                        </InputGroup>
-                                                        {this.state.errorValorConsulta &&
-                                                            <div className="invalid-feedback">{errores.valorConsultaVacio}</div>
-                                                        }
-                                                    </FormGroup>
-                                                </Col>
-                                            </Row>
-                                        }
-                                        { this.state.tipo === pacientePrivado && !this.state.nuevo &&
-                                            <Row>
-                                                <Col>
-                                                    <Widget02 color="info" header={`${this.state.sesiones}`} mainText="Sesiones realizadas" icon="fa fa-comments-o"/>                                                
-                                                </Col>
-                                            </Row>
-                                        }
-                                        { this.state.tipo === pacientePrepaga &&
-                                            <Row>
-                                                <Col xs="12" sm="6">
-                                                    <FormGroup>
-                                                        <Label htmlFor="prepaga">Prepaga</Label>
-                                                        <Input type="select" name="prepaga" id="prepaga" innerRef={ el => this.inputPrepaga = el } required 
-                                                            onChange={this.changePrepaga} className={this.state.errorPrepaga ? 'is-invalid' : ''}>
-                                                            <option value="">Seleccione prepaga...</option>
-                                                            {prepagas.map( item => <option key={item.id} value={item.id}>{item.nombre}</option>)}
-                                                        </Input>
-                                                        <FormFeedback>{errores.prepagaVacia}</FormFeedback>
-                                                    </FormGroup>
-                                                </Col>
-                                                <Col xs="12" sm="6">
-                                                    <FormGroup>
-                                                        <Label htmlFor="facturaPrepaga">Factura para prepaga</Label>
-                                                        <div className="input-toggle">
-                                                            <Toggle
-                                                                id='facturaPrepaga'                                                            
-                                                                checked={this.state.facturaPrepaga}                                      
-                                                                onChange={(value)=>{this.setState({facturaPrepaga: !this.state.facturaPrepaga})}} />
-                                                        </div>
-                                                    </FormGroup>    
-                                                </Col>
-                                            </Row>
-                                        }
-                                        { this.state.tipo === pacientePrepaga &&
-                                            <Row>
-                                                <Col xs="12" sm="6">
-                                                    <FormGroup>
-                                                        <Label htmlFor="pago">Pago por paciente</Label>
-                                                        <Input type="select" name="pago" id="pago" innerRef={ el => this.inputPago = el } required 
-                                                            onChange={this.changePago} className={this.state.errorPago ? 'is-invalid' : ''}>
-                                                            <option value="-1">Seleccione pago...</option>
-                                                            {this.state.pagos.map( (value,index) => <option key={index} value={index}>$ {value}</option>)}
-                                                        </Input>
-                                                        <FormFeedback>{errores.pagoPrepagaVacio}</FormFeedback>
-                                                    </FormGroup>    
-                                                </Col>
-                                                <Col xs="12" sm="6">
-                                                    <FormGroup className="errorAddon">
-                                                        <Label htmlFor="copago">Copago</Label>
-                                                        <InputGroup>
-                                                            <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
-                                                            <Input type="number" id="copago" name="copago" innerRef={el => this.inputCopago = el} onChange={this.changeCopago} />
-                                                        </InputGroup>                                                        
-                                                    </FormGroup>
-                                                </Col>
-                                            </Row>
-                                        }
-                                        { this.state.tipo === pacientePrepaga &&
-                                            <Row>
-                                                <Col xs="12" sm="6">
-                                                    <FormGroup>
-                                                        <Label htmlFor="tipo">Sesiones autorizadas</Label>
-                                                        <InputGroup>
-                                                            <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-comments-o"></i></InputGroupText></InputGroupAddon>
-                                                            <Input type="number" id="sesionesAutorizadas" name="sesionesAutorizadas" innerRef={ el => this.inputSesiones = el } onChange={this.changeSesionesAut}/>
-                                                        </InputGroup>
-                                                    </FormGroup>    
-                                                </Col>
-                                                <Col xs="12" sm="6">
-                                                    <FormGroup>
-                                                        <Label htmlFor="credencial">Credencial</Label>
-                                                        <InputGroup>
-                                                            <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-vcard"></i></InputGroupText></InputGroupAddon>
-                                                            <Input type="text" id="credencial" innerRef={el => this.inputCredencial = el} />
-                                                        </InputGroup>
-                                                    </FormGroup>
-                                                </Col>                                            
-                                            </Row>
-                                        }
-                                        { this.state.tipo === pacientePrepaga && !this.state.nuevo &&
-                                            <Row>
-                                                <Col xs="12" sm="6">                                                    
-                                                    <WidgetSesionesUsadas title="Sesiones usadas" value={`${this.state.sesiones}`} porc={`${this.state.porcUsadas}`} resetAction={this.resetSesiones}/>
-                                                </Col>
-                                                <Col xs="12" sm="6">
-                                                    <WidgetSesionesRestantes title="Sesiones restantes" value={`${this.state.sesionesAut - this.state.sesiones}`} porc={`${this.state.porcRestantes}`}/>
-                                                </Col>
-                                            </Row>                                    
-                                        }
-                                        <Row>
-                                            <Col xs="12">
-                                                <FormGroup>
-                                                    <Label htmlFor="notas">Notas</Label>
-                                                    <InputGroup>
-                                                        <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-book"></i></InputGroupText></InputGroupAddon>
-                                                        <Input type="textarea" id="notas" innerRef={el => this.inputNotas = el} rows="2" />
-                                                    </InputGroup>
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>                      
-                                    </Form>
-                                </CardBody>
-                                <CardFooter>
-                                    <Button type="submit" color="primary" onClick={ e => this.savePacient(e)}>Guardar</Button>
-                                    { !this.state.nuevo &&
+                            { !this.state.activo &&
+                            <Alert color="danger">
+                                El Paciente se encuentra <strong>INACTIVO</strong>. Para volver a activarlo utilice la opción <span className="alert-link">Activar</span>.
+                            </Alert>
+                            }
+                            <Form>
+                                <Row>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label for="nombre">Nombre(s)</Label>
+                                            <Input type="text" name="nombre" id="nombre" innerRef={el => this.inputNombre = el} required
+                                                className={this.state.errorNombre ? 'is-invalid' : ''} onChange={this.changeNombre} onBlur={this.checkExistePaciente} />
+                                            <FormFeedback>{errores.nombreVacio}</FormFeedback>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label htmlFor="apellido">Apellido(s)</Label>
+                                            <Input type="text" id="apellido" innerRef={el => this.inputApellido = el} required
+                                                className={this.state.errorApellido ? 'is-invalid' : ''} onChange={this.changeApellido} onBlur={this.checkExistePaciente} />
+                                            <FormFeedback>{errores.apellidoVacio}</FormFeedback>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label htmlFor="dni">DNI</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend">
+                                                    <InputGroupText><i className="fa fa-id-card-o"></i></InputGroupText>
+                                                </InputGroupAddon>
+                                                <Input type="text" id="dni" innerRef={el => this.inputDNI = el} />
+                                            </InputGroup>
+                                            <FormText>ej: 95001002</FormText>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label htmlFor="fchNac">Fecha de nacimiento</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-calendar"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="date" id="fchNac" name="Fecha nacimiento" innerRef={el => this.inputFchNac = el} />
+                                            </InputGroup>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label htmlFor="tel">Teléfono</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-phone"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="text" id="tel" innerRef={el => this.inputTel = el} />
+                                            </InputGroup>
+                                            <FormText>ej: 1134567890</FormText>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label htmlFor="telFlia">Contacto familiar</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-phone-square"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="text" id="telFlia" innerRef={el => this.inputTelFlia = el} />
+                                            </InputGroup>
+                                            <FormText>ej: 11123456780 - padre/madre</FormText>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label htmlFor="dir">Dirección</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-address-book-o"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="text" id="dir" innerRef={el => this.inputDir = el} />
+                                            </InputGroup>
+                                            <FormText>ej: Rivadavia 3456</FormText>
+                                        </FormGroup>
+                                    </Col>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label htmlFor="email">Email</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-envelope-o"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="email" id="email" innerRef={el => this.inputEmail = el} />
+                                            </InputGroup>
+                                            <FormText>ej: alguien@example.com</FormText>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <FormGroup>
+                                            <Label htmlFor="tipo">Tipo de Paciente</Label>
+                                            <Input type="select" name="tipoPaciente" id="tipo" innerRef={el => this.inputTipo = el} required onChange={this.changeTipoPaciente}
+                                                className={this.state.errorTipo ? 'is-invalid' : ''}>
+                                                <option value="">Seleccione...</option>
+                                                {tipoPaciente.map(item => <option key={item.key} value={item.key}>{item.name}</option>)}
+                                            </Input>
+                                            <FormFeedback>{errores.tipoPacienteVacio}</FormFeedback>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                {this.state.tipo === pacientePrivado &&
+                                    <Row>
+                                        <Col>
+                                            <FormGroup className="errorAddon">
+                                                <Label htmlFor="valorConsulta">Valor de consulta</Label>
+                                                <InputGroup>
+                                                    <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
+                                                    <Input type="number" id="valorConsulta" name="valorConsulta" innerRef={el => this.inputValorConsulta = el} required
+                                                        className={this.state.errorValorConsulta ? 'is-invalid' : ''} onChange={this.changeValorConsulta} />
+                                                </InputGroup>
+                                                {this.state.errorValorConsulta &&
+                                                    <div className="invalid-feedback">{errores.valorConsultaVacio}</div>
+                                                }
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                }
+                                {this.state.tipo === pacientePrivado && !this.state.nuevo &&
+                                    <Row>
+                                        <Col>
+                                            <Widget02 color="info" header={`${this.state.sesiones}`} mainText="Sesiones realizadas" icon="fa fa-comments-o" />
+                                        </Col>
+                                    </Row>
+                                }
+                                {this.state.tipo === pacientePrepaga &&
+                                    <Row>
+                                        <Col xs="12" sm="6">
+                                            <FormGroup>
+                                                <Label htmlFor="prepaga">Prepaga</Label>
+                                                <Input type="select" name="prepaga" id="prepaga" innerRef={el => this.inputPrepaga = el} required
+                                                    onChange={this.changePrepaga} className={this.state.errorPrepaga ? 'is-invalid' : ''}>
+                                                    <option value="">Seleccione prepaga...</option>
+                                                    {prepagas.map(item => <option key={item.id} value={item.id}>{item.nombre}</option>)}
+                                                </Input>
+                                                <FormFeedback>{errores.prepagaVacia}</FormFeedback>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col xs="12" sm="6">
+                                            <FormGroup>
+                                                <Label htmlFor="facturaPrepaga">Factura para prepaga</Label>
+                                                <div className="input-toggle">
+                                                    <Toggle
+                                                        id='facturaPrepaga'
+                                                        checked={this.state.facturaPrepaga}
+                                                        onChange={(value) => { this.setState({ facturaPrepaga: !this.state.facturaPrepaga }) }} />
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                }
+                                {this.state.tipo === pacientePrepaga &&
+                                    <Row>
+                                        <Col xs="12" sm="6">
+                                            <FormGroup>
+                                                <Label htmlFor="pago">Pago por paciente</Label>
+                                                <Input type="select" name="pago" id="pago" innerRef={el => this.inputPago = el} required
+                                                    onChange={this.changePago} className={this.state.errorPago ? 'is-invalid' : ''}>
+                                                    <option value="-1">Seleccione pago...</option>
+                                                    {this.state.pagos.map((value, index) => <option key={index} value={index}>$ {value}</option>)}
+                                                </Input>
+                                                <FormFeedback>{errores.pagoPrepagaVacio}</FormFeedback>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col xs="12" sm="6">
+                                            <FormGroup className="errorAddon">
+                                                <Label htmlFor="copago">Copago</Label>
+                                                <InputGroup>
+                                                    <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
+                                                    <Input type="number" id="copago" name="copago" innerRef={el => this.inputCopago = el} onChange={this.changeCopago} />
+                                                </InputGroup>
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                }
+                                {this.state.tipo === pacientePrepaga &&
+                                    <Row>
+                                        <Col xs="12" sm="6">
+                                            <FormGroup>
+                                                <Label htmlFor="tipo">Sesiones autorizadas</Label>
+                                                <InputGroup>
+                                                    <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-comments-o"></i></InputGroupText></InputGroupAddon>
+                                                    <Input type="number" id="sesionesAutorizadas" name="sesionesAutorizadas" innerRef={el => this.inputSesiones = el} onChange={this.changeSesionesAut} />
+                                                </InputGroup>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col xs="12" sm="6">
+                                            <FormGroup>
+                                                <Label htmlFor="credencial">Credencial</Label>
+                                                <InputGroup>
+                                                    <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-vcard"></i></InputGroupText></InputGroupAddon>
+                                                    <Input type="text" id="credencial" innerRef={el => this.inputCredencial = el} />
+                                                </InputGroup>
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                }
+                                {this.state.tipo === pacientePrepaga && !this.state.nuevo &&
+                                    <Row>
+                                        <Col xs="12" sm="6">
+                                            <WidgetSesionesUsadas title="Sesiones usadas" value={`${this.state.sesiones}`} porc={`${this.state.porcUsadas}`} resetAction={this.resetSesiones} />
+                                        </Col>
+                                        <Col xs="12" sm="6">
+                                            <WidgetSesionesRestantes title="Sesiones restantes" value={`${this.state.sesionesAut - this.state.sesiones}`} porc={`${this.state.porcRestantes}`} />
+                                        </Col>
+                                    </Row>
+                                }
+                                <Row>
+                                    <Col xs="12">
+                                        <FormGroup>
+                                            <Label htmlFor="notas">Notas</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-book"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="textarea" id="notas" innerRef={el => this.inputNotas = el} rows="2" />
+                                            </InputGroup>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                            </Form>
+                            <hr className="mt-3 mb-3"/>
+                            <div id="botonesPaciente">
+                                <Button type="submit" color="primary" onClick={() => this.savePaciente()}>
+                                    {this.state.loading && <Spinner/>}Guardar
+                                </Button>
+                                {!this.state.nuevo &&
+                                    <Button type="submit" color={this.state.activo ? 'warning' : 'success'} onClick={this.toggleActivar}>
+                                        {this.state.activo ? 'Desactivar' : 'Activar'}
+                                    </Button>
+                                }
+                                {!this.state.nuevo &&
                                     <Button color="danger" onClick={this.toggleDelete}>Eliminar</Button>
-                                    }
-                                    <Button type="reset" color="secondary" onClick={this.goBack}>Cancelar</Button>
-                                </CardFooter>
-                            </Card>
+                                }
+                                <Button type="reset" color="secondary" onClick={this.goBack}>Cancelar</Button>
+                            </div>
                         </Col>
                     </Row>
                     <Modal isOpen={this.state.showDeleteModal} toggle={this.toggleDelete} className={'modal-md modal-danger'}>
@@ -605,11 +602,23 @@ class Paciente extends Component {
                             Confirme la eliminación del Paciente. Se eliminarán todas sus sesiones ({this.state.sesionesPaciente.length}) e impactará en las facturaciones . Esta acción no podrá deshacerse.
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="danger" size="sm" onClick={e => this.deletePacient(e)}>Eliminar</Button>
-                            <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>{' '}
+                            <Button color="danger" size="sm" onClick={this.deletePaciente}>Eliminar</Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>
                         </ModalFooter>
                     </Modal>
-                </div>
+                    <Modal isOpen={this.state.showActivarModal} toggle={this.toggleActivar} className={'modal-md ' + (this.state.setActivo ? 'modal-success' : 'modal-warning')}>
+                        <ModalHeader toggle={this.toggleActivar}>{this.state.setActivo ? 'Activar' : 'Desactivar'} Paciente</ModalHeader>
+                        <ModalBody>
+                            Esta acción {this.state.setActivo ? 'activará' : 'desactivará'} al Paciente y se guardarán los cambios realizados.
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color={this.state.setActivo ? 'success' : 'warning'} size="sm" onClick={this.savePaciente}>
+                                {this.state.loading && <Spinner />}Aceptar
+                            </Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleActivar}>Cancelar</Button>
+                        </ModalFooter>
+                    </Modal>
+                </LoadingOverlay>
             </div>
         );
     }

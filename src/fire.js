@@ -1,10 +1,11 @@
 import firebase from 'firebase';
 import { firebaseConfig as config } from './config/firebaseConfig';
+import { env } from './config/envs';
 
 // Required for side-effects
 require("firebase/firestore");
 
-firebase.initializeApp(config.PROD);
+firebase.initializeApp(config[env]);
 
 // Configure FirebaseUI.
 export const uiConfig = {

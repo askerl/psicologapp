@@ -7,7 +7,8 @@ import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormG
 import { overlay, pacientePrivado, prepagasById } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
-import { createFechaSesion, getSelectPacientes, removeSession, removeSessionSesionesMes } from '../../utils/utils';
+import { createFechaSesion, getPacientes, removeSession, removeSessionSesionesMes } from '../../utils/utils';
+import Spinner from '../../components/Spinner/Spinner';
 
 class Sesion extends Component {
 
@@ -38,7 +39,7 @@ class Sesion extends Component {
         this.inputFecha.value = moment().format('YYYY-MM-DD');
 
         this.loading(true);
-        getSelectPacientes().then( pacientes => {
+        getPacientes().then( pacientes => {
             this.setState({pacientes});
             this.loading(false);
         });
@@ -234,7 +235,9 @@ class Sesion extends Component {
                                     </Form>
                                 </CardBody>
                                 <CardFooter>
-                                    <Button type="submit" color="primary" onClick={ e => this.saveSesion(e)}>Guardar</Button>
+                                    <Button type="submit" color="primary" onClick={ e => this.saveSesion(e)}>
+                                        {this.state.loading && <Spinner/>}Guardar
+                                    </Button>
                                     <Button type="reset" color="secondary" onClick={this.goBack}>Cancelar</Button>
                                 </CardFooter>
                             </Card>

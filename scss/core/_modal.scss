@@ -3,11 +3,14 @@
 
     .modal-content {
       border-color: $value;
+      border-radius: .25rem;
     }
 
     .modal-header {
       color: #fff;
       background-color: $value;
+      border-top-left-radius: .25rem;
+      border-top-right-radius: .25rem;
     }
   }
 }

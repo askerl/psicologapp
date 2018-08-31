@@ -12,6 +12,7 @@ import { tablasFormatter } from '../../utils/formatters';
 import { round } from '../../utils/utils';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
 import _ from 'lodash';
+import Spinner from '../../components/Spinner/Spinner';
 
 class Facturaciones extends Component {
 	constructor(props) {
@@ -235,7 +236,9 @@ class Facturaciones extends Component {
 										<Col>
 											<FormGroup>
 												<InputGroup>
-													<Button color="primary" size="sm" onClick={this.getFacturacion}><i className="fa fa-search"></i> Consultar</Button>							
+													<Button color="primary" size="sm" onClick={this.getFacturacion}>
+													{this.state.loading ? <Spinner/> : <i className="fa fa-search mr-2"></i>}Consultar
+													</Button>							
 												</InputGroup>
 											</FormGroup>
 										</Col>

@@ -6,12 +6,12 @@ import Breadcrumb from '../../components/Breadcrumb/';
 import Footer from '../../components/Footer/';
 import Header from '../../components/Header/';
 import Sidebar from '../../components/Sidebar/';
-import db, { auth, logout } from '../../fire';
-import { isHabilitado, removeSession, clearSession } from '../../utils/utils';
+import { auth, logout } from '../../fire';
+import { clearSession, isHabilitado } from '../../utils/utils';
 import Dashboard from '../../views/Dashboard/dashboard';
 import Facturaciones from '../../views/Facturaciones/facturaciones';
 import ListaPacientes from '../../views/Pacientes/listaPacientes';
-import Paciente from '../../views/Pacientes/paciente';
+import PacienteTabs from '../../views/Pacientes/pacienteTabs';
 import ListaSesiones from '../../views/Sesiones/listaSesiones';
 import Sesion from '../../views/Sesiones/sesion';
 
@@ -46,7 +46,7 @@ class Full extends Component {
 	render() {
 		return (
 			<div className="app">
-				<Header />
+				<Header/>
 				<div className="app-body">
 					<Sidebar {...this.props} />
 					<main className="main">
@@ -55,7 +55,7 @@ class Full extends Component {
 							<Switch>
 								<Route path="/dashboard" name="Dashboard" component={Dashboard} />
 								<Route exact path="/pacientes" name="Pacientes" component={ListaPacientes} />
-								<Route path='/pacientes/:id' name="Paciente" component={Paciente} />
+								<Route path='/pacientes/:id' name="Paciente" component={PacienteTabs} />
 								<Route exact path="/sesiones" name="Sesiones" component={ListaSesiones} />
 								<Route path='/sesiones/:id' name="Sesion" component={Sesion} />
 								<Route exact path="/facturaciones" name="Facturaciones" component={Facturaciones} />

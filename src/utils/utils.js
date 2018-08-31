@@ -137,8 +137,9 @@ export const getEstadisticas = () => {
 
 export const getPaciente = (id) => {
     let promise = new Promise( (resolve, reject) => {
-        db.collection("pacientes").doc(id).get().then( doc => {
-            resolve(doc.data());
+        getPacientes().then( pacientes => {
+            let paciente = _.find(pacientes, {'id': id});           
+            resolve(paciente);
         });
     });
     return promise;
@@ -280,20 +281,4 @@ export const getColorPorcentaje = (p) => {
         color = "danger";
     }
     return color;
-}
-
-export const getSelectPacientes = () => {
-    let promise = new Promise( (resolve, reject) => {
-        db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
-            let pacientes = [];
-		    querySnapshot.docs.forEach( doc => {            
-                let paciente = doc.data();
-                paciente.value = doc.id;
-                paciente.label = `${doc.data().apellido}, ${doc.data().nombre}`;			
-                pacientes.push(paciente);
-            });
-            resolve(pacientes);
-        });
-    });
-    return promise;
 }

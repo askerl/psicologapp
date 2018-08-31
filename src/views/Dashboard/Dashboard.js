@@ -47,12 +47,12 @@ class Dashboard extends Component {
 									<div className="mb-3"><span className="h6">Pacientes</span></div>
 									<Row>
 										<Col xs="12" sm="6">
-											<Link to={'/pacientes'} title="Ver pacientes activos" className="linkPacientes" onClick={() => setSession('filtroEstado', 'A')}>
+											<Link to={'/pacientes'} title="Ver pacientes activos" className="linkButton" onClick={() => setSession('filtroEstado', 'A')}>
 												<Widget02 header={`${data.activos}`} mainText="Activos" icon="icon-people icons" color="success" variant="1"/>
 											</Link>
 										</Col>
 										<Col xs="12" sm="6">
-											<Link to={'/pacientes'} title="Ver pacientes inactivos" className="linkPacientes" onClick={() => setSession('filtroEstado', 'I')}>
+											<Link to={'/pacientes'} title="Ver pacientes inactivos" className="linkButton" onClick={() => setSession('filtroEstado', 'I')}>
 												<Widget02 header={`${data.inactivos}`} mainText="Inactivos" icon="icon-user-unfollow icons" color="danger" variant="1"/>
 											</Link>
 										</Col>
