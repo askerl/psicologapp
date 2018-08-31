@@ -7,8 +7,9 @@ import { tablasFormatter } from '../../utils/formatters';
 import { NotificationManager } from 'react-notifications';
 import BootstrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import EvolucionSesion from './pacienteEvolucion';
 
-class SesionesPaciente extends Component {
+class HistoriaClinica extends Component {
 
     constructor(props) {
         super(props);
@@ -61,32 +62,28 @@ class SesionesPaciente extends Component {
         const columns = [{
 			dataField: 'id',
 			text: 'Session ID',
-			hidden: true
+            hidden: true
+        }, {
+			dataField: 'nro',
+			text: 'Nro.',
+            headerAttrs: { width: '60px' },
+            align: 'right', headerAlign: 'right',
+            sort: true
 		}, {
 			dataField: 'fecha.seconds',
 			text: 'Fecha',
 			headerAttrs: { width: '100px' },
-			formatter: tablasFormatter.fecha
+            formatter: tablasFormatter.fecha,
+            sort: true
 		}, {
-			dataField: 'valor',
-			text: 'Valor',
-			align: 'right', headerAlign: 'right',
-			formatter: tablasFormatter.precio,
-			hidden: this.state.size < breakpoints.sm
-		}, {
-			dataField: 'copago',
-			text: 'Copago',
-			align: 'right', headerAlign: 'right',
-			formatter: tablasFormatter.precio,
-			hidden: this.state.size < breakpoints.sm
+			dataField: 'evolucion',
+			text: 'Evolución',
         }];
         
         const expandRow = {
 			renderer: rowData => {
-				return (
-                    <div>Próximamente edición de historia clínica...</div>
-                )
-			},
+                return <EvolucionSesion id={rowData.id}/>
+            },
 			showExpandColumn: true,
 			expandHeaderColumnRenderer: ({ isAnyExpands }) => {
 				return <span title={isAnyExpands ? 'Contraer todo' : 'Expandir todo'}><i className={"fa " + (isAnyExpands ? 'fa-minus' : 'fa-plus')}/></span>;
@@ -97,7 +94,7 @@ class SesionesPaciente extends Component {
 		}
 
         return (
-            <div className="animated fadeIn">
+            <div className="animated fadeIn historiaClinica">
                 <LoadingOverlay
                     active={this.state.loading}
                     animate
@@ -125,7 +122,7 @@ class SesionesPaciente extends Component {
                                                 placeholder="Buscar..."
                                                 className={`${tablasFormatter.filterClass} mb-2`} />
                                             <BootstrapTable	{...props.baseProps}
-                                                classes="tablaSesiones"
+                                                classes="tablaHC"
                                                 defaultSortDirection="asc"
                                                 noDataIndication='No hay sesiones registradas'
                                                 expandRow={expandRow}
@@ -145,4 +142,4 @@ class SesionesPaciente extends Component {
     }
 }
 
-export default SesionesPaciente;
+export default HistoriaClinica;

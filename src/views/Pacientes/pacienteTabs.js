@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Badge, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
 import Paciente from './paciente';
-import SesionesPaciente from './pacienteSesiones';
+import HistoriaClinica from './pacienteHistoriaClinica';
 
 class PacienteTabs extends Component {
 
@@ -12,7 +12,7 @@ class PacienteTabs extends Component {
         this.toggle = this.toggle.bind(this);
         this.state = {
             id: props.match.params.id,
-            activeTab: 'tabDatos',
+            activeTab: '1',
         };
     }
 
@@ -33,8 +33,8 @@ class PacienteTabs extends Component {
                         <Nav tabs>
                             <NavItem>
                                 <NavLink
-                                    className={classnames({ active: this.state.activeTab === 'tabDatos' })}
-                                    onClick={() => { this.toggle('tabDatos'); }}>
+                                    className={classnames({ active: this.state.activeTab === '1' })}
+                                    onClick={() => { this.toggle('1'); }}>
                                     <div className="d-flex d-flex align-items-center">
                                         <i className="icon-notebook mr-2"></i>
                                         <span>Datos</span>
@@ -45,23 +45,23 @@ class PacienteTabs extends Component {
                             {!nuevo &&
                             <NavItem>
                                 <NavLink
-                                    className={classnames({ active: this.state.activeTab === 'tabSesiones' })}
-                                    onClick={() => { this.toggle('tabSesiones'); }}>
+                                    className={classnames({ active: this.state.activeTab === '2' })}
+                                    onClick={() => { this.toggle('2'); }}>
                                     <div className="d-flex d-flex align-items-center">
                                         <i className="icon-bubbles mr-2"></i>
-                                        <span>Sesiones</span>
+                                        <span>Historia Clínica</span>
                                     </div>
                                 </NavLink>
                             </NavItem>
                             }
                         </Nav>
                         <TabContent activeTab={this.state.activeTab}>
-                            <TabPane tabId="tabDatos">
+                            <TabPane tabId="1">
                                 <Paciente id={this.state.id} goBack={() => this.props.history.push('/pacientes')}/>
                             </TabPane>
                             {!nuevo &&
-                            <TabPane tabId="tabSesiones">
-                                <SesionesPaciente id={this.state.id} goBack={() => this.props.history.push('/pacientes')}/>
+                            <TabPane tabId="2">
+                                <HistoriaClinica id={this.state.id} goBack={() => this.props.history.push('/pacientes')}/>
                             </TabPane>
                             }
                         </TabContent>
