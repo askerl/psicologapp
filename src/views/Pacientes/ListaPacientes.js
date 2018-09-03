@@ -19,6 +19,7 @@ class ListaPacientes extends Component {
 		};
 		this.cargarPacientes = this.cargarPacientes.bind(this);
 		this.nuevoPaciente = this.nuevoPaciente.bind(this);
+		this.editarPaciente = this.editarPaciente.bind(this);
 		this.changeEstado = this.changeEstado.bind(this);
 		this.loading = this.loading.bind(this);
 		this.resize = this.resize.bind(this);
@@ -54,8 +55,12 @@ class ListaPacientes extends Component {
         this.setState({loading: val});
     }
 
-	nuevoPaciente(){
+	nuevoPaciente() {
 		this.props.history.push('/pacientes/new');
+	}
+
+	editarPaciente(id) {
+		this.props.history.push(`/pacientes/${id}`);
 	}
 
 	changeEstado(){
@@ -70,11 +75,11 @@ class ListaPacientes extends Component {
 			dataField: 'id',
 			text: '',
 			headerAttrs: { width: '36px' },
-			formatter: tablasFormatter.actionsPaciente
+			formatter: tablasFormatter.actionsPaciente,
+			formatExtraData: this.editarPaciente
 		}, {
 			dataField: 'nombreCompleto',
 			text: 'Paciente',
-			//headerAttrs: { 'min-width': '200px' },
 			formatter: tablasFormatter.nombrePaciente,
 			sort: true,
 			filter: textFilter({placeholder:' ', className:tablasFormatter.filterClass})

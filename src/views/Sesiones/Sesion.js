@@ -128,8 +128,8 @@ class Sesion extends Component {
             anio: fecha.anio,
             fecha: fecha.fechaTS,
             paciente: p.value,
-            // determinar campos por tipo de paciente (privado/prepaga)
-            tipo: p.tipo
+            tipo: p.tipo,
+            evolucion: ''
         }
 
         if (p.tipo == pacientePrivado){

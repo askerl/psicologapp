@@ -62,17 +62,20 @@ class Paciente extends Component {
     }
 
     componentDidMount(){
+        console.log('PACIENTE');
         // id del paciente
-        let id = this.props.id;
-        let nuevo = id === 'new';
+        let id = this.props.id,
+            nuevo = id === 'new';
         this.setState({id, nuevo});
-
+        
         this.loading(true);
 
         if (!nuevo){
             // cargo paciente y sus sesiones
             getPaciente(id).then( pac => {
                 this.loadPaciente(pac);
+                // cargo pacientes para la verificación de nombre
+                this.pacientes = getSession('pacientes'); 
             }).then(getSesionesPaciente(id).then( sesionesPaciente => {
                 // console.log('sesiones del paciente', sesionesPaciente);
                 this.setState({sesionesPaciente});
@@ -84,14 +87,10 @@ class Paciente extends Component {
                 this.goBack();
             });
         } else {
-            this.loading(false);
-        }
-        // cargo pacientes map
-        let pacientesSesion = getSession('pacientes');
-        if (pacientesSesion) {
-            this.pacientes = pacientesSesion;
-        } else {
-            getPacientes().then( pacientes => {this.pacientes = pacientes});
+            getPacientes().then( () => {
+                this.pacientes = getSession('pacientes'); 
+                this.loading(false);
+            });
         }
     }
 

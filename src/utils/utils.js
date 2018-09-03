@@ -173,7 +173,10 @@ export const getPacientes = () => {
         } else {
             console.log('Pacientes DB', pacientes);
             db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
-                resolve(loadPacientes(querySnapshot));
+                let result = loadPacientes(querySnapshot);
+                // almaceno pacientes en sesion para cache
+                setSession('pacientes',result);
+                resolve(result);
             });
         }
     });
@@ -199,8 +202,6 @@ function loadPacientes(querySnapshot) {
         // agrego paciente a la colección final
         pacientes.push(paciente);
     });
-    // almaceno pacientes en sesion para cache
-    setSession('pacientes',pacientes);
     // devuelvo resultado
     return pacientes;	
 }
@@ -260,6 +261,16 @@ export const getSesionesMes = (mes, anio) => {
     return promise;
 }
 
+export const updateEvolucionSesion = (idSesion, newValue) => {
+    let promise = new Promise( (resolve, reject) => {
+        db.collection("sesiones").doc(idSesion).update({evolucion: newValue}).then(() => {
+            resolve(); 
+        }).catch( error => {
+            reject(error);
+        });
+    });
+    return promise;
+}
 
 export const createFechaSesion = (value) =>{
     let fecha = moment(value);

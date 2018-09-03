@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { Col, Row, Badge } from 'reactstrap';
-import { getPaciente, getSesionesPaciente } from '../../utils/utils';
-import { overlay, tableColumnClasses, breakpoints } from '../../config/constants';
-import LoadingOverlay from 'react-loading-overlay';
-import { tablasFormatter } from '../../utils/formatters';
-import { NotificationManager } from 'react-notifications';
 import BootstrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import EvolucionSesion from './pacienteEvolucion';
+import LoadingOverlay from 'react-loading-overlay';
+import { NotificationManager } from 'react-notifications';
+import { Col, Row, Modal, ModalBody, ModalHeader, ModalFooter, Button, Input } from 'reactstrap';
+import { overlay, breakpoints } from '../../config/constants';
+import { tablasFormatter } from '../../utils/formatters';
+import { getPaciente, getSesionesPaciente, updateEvolucionSesion } from '../../utils/utils';
+import Spinner from '../../components/Spinner/Spinner';
+import { errores } from '../../config/mensajes';
 
 class HistoriaClinica extends Component {
 
@@ -18,13 +19,19 @@ class HistoriaClinica extends Component {
             loading: true,
             paciente: {},
             sesiones: [],
-            size: ''
+            size: '',
+            showEditModal: false,
+            idEditSesion: '',
+            evolucion: ''
         };
         this.loading = this.loading.bind(this);
         this.resize = this.resize.bind(this);
+        this.toggleEdit = this.toggleEdit.bind(this);
+        this.updateEvolucion = this.updateEvolucion.bind(this);
     }
 
     componentDidMount() {
+        console.log('HISTORIA CLINICA');
         let id = this.props.id;
         getPaciente(id).then( paciente => {
             this.setState({paciente});
@@ -39,7 +46,7 @@ class HistoriaClinica extends Component {
             this.props.goBack();
         });
         window.addEventListener("resize", this.resize);
-		this.resize();
+        this.resize();
     }
 
     componentWillUnmount() {
@@ -52,7 +59,43 @@ class HistoriaClinica extends Component {
 
     resize(){
 		this.setState({size: window.innerWidth});
-	}
+    }
+    
+    toggleEdit(row) {
+        this.setState({
+            showEditModal: !this.state.showEditModal, 
+            idEditSesion: row ? row.id : '',
+            evolucion: row ? row.evolucion : ''
+        });
+    }
+
+    updateEvolucion() {
+        console.log('Update evolucion', this.state.idEditSesion);
+        console.log('Valor viejo', this.state.evolucion);
+        console.log('Valor nuevo', this.inputEvolucion.value);
+
+        let idSesion = this.state.idEditSesion,
+            oldValue = _.trim(this.state.evolucion),
+            newValue = _.trim(this.inputEvolucion.value);
+
+        // veo si cambió el valor, sino no hago nada
+        if ( idSesion && (newValue !== oldValue) ) {            
+            this.loading(true);
+            updateEvolucionSesion(idSesion, newValue).then(() => {
+                console.log("Evolución actualizada correctamente");
+                NotificationManager.success('Los datos han sido guardados');
+                this.toggleEdit();
+                this.loading(false);
+            }).catch( error => {
+                console.log('Error actualizando evolución de sesión', error);
+                NotificationManager.error(errores.errorGuardar, 'Error');
+                this.toggleEdit();
+                this.loading(false);
+            });
+        } else {
+            NotificationManager.warning(errores.datosSinModificar, 'Advertencia');
+        }
+    }
 
     render() {
         let paciente = this.state.paciente;
@@ -62,45 +105,32 @@ class HistoriaClinica extends Component {
         const columns = [{
 			dataField: 'id',
 			text: 'Session ID',
-            hidden: true
+            headerAttrs: { width: '36px' },
+            formatter: tablasFormatter.actionsHistoriaClinica,
+            formatExtraData: this.toggleEdit
         }, {
 			dataField: 'nro',
 			text: 'Nro.',
             headerAttrs: { width: '60px' },
             align: 'right', headerAlign: 'right',
-            sort: true
+            sort: true,
+            editable: false,
+            hidden: this.state.size < breakpoints.sm
 		}, {
 			dataField: 'fecha.seconds',
 			text: 'Fecha',
 			headerAttrs: { width: '100px' },
             formatter: tablasFormatter.fecha,
-            sort: true
+            sort: true,
+            editable: false
 		}, {
 			dataField: 'evolucion',
-			text: 'Evolución',
+            text: 'Evolución'
         }];
         
-        const expandRow = {
-			renderer: rowData => {
-                return <EvolucionSesion id={rowData.id}/>
-            },
-			showExpandColumn: true,
-			expandHeaderColumnRenderer: ({ isAnyExpands }) => {
-				return <span title={isAnyExpands ? 'Contraer todo' : 'Expandir todo'}><i className={"fa " + (isAnyExpands ? 'fa-minus' : 'fa-plus')}/></span>;
-			},
-			expandColumnRenderer: ({ expanded }) => {
-				return <span title={expanded ? 'Contraer fila' : 'Expandir fila'}><i className={"fa " + (expanded ? 'fa-minus' : 'fa-plus')}/></span>;
-			}
-		}
-
         return (
             <div className="animated fadeIn historiaClinica">
-                <LoadingOverlay
-                    active={this.state.loading}
-                    animate
-                    spinner
-                    color={overlay.color}
-                    background={overlay.backgroundWhite}>
+                
                     <Row>
                         <Col>
                             <div className="d-flex align-items-center mb-3">
@@ -121,22 +151,40 @@ class HistoriaClinica extends Component {
                                             <SearchBar {...props.searchProps}
                                                 placeholder="Buscar..."
                                                 className={`${tablasFormatter.filterClass} mb-2`} />
+                                            <LoadingOverlay
+                                            active={this.state.loading}
+                                            animate
+                                            spinner
+                                            color={overlay.color}
+                                            background={overlay.background}>
                                             <BootstrapTable	{...props.baseProps}
                                                 classes="tablaHC"
                                                 defaultSortDirection="asc"
                                                 noDataIndication='No hay sesiones registradas'
-                                                expandRow={expandRow}
                                                 bootstrap4
                                                 bordered={false}
                                                 striped
-                                                hover />
+                                                hover 
+                                                />
+                                            </LoadingOverlay>
                                         </div>
                                     )
                                 }
                             </ToolkitProvider>
                         </Col>
                     </Row>
-                </LoadingOverlay>
+                    <Modal isOpen={this.state.showEditModal} toggle={this.toggleEdit} className={'modal-lg modal-teal'}>
+                        <ModalHeader toggle={this.toggleEdit}>{this.state.evolucion ? 'Editar' : 'Agregar'} Evolución</ModalHeader>
+                        <ModalBody>
+                            <Input defaultValue={this.state.evolucion} type="textarea" id="evolucion" innerRef={el => this.inputEvolucion = el} rows="5" />
+					</ModalBody>
+                        <ModalFooter>
+                            <Button color="success" size="sm" onClick={this.updateEvolucion}>
+                                {this.state.loading && <Spinner />}Guardar
+						</Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleEdit}>Cancelar</Button>
+                        </ModalFooter>
+                    </Modal>
             </div>
         );
     }

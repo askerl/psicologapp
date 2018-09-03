@@ -3,13 +3,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Progress, Badge } from 'reactstrap';
 import { filtroTipoPaciente, pacientePrepaga, pacientePrivado, prepagasById } from '../config/constants';
-import { formatMonth, getColorPorcentaje } from './utils';
+import { formatMonth, getColorPorcentaje, getPacientes } from './utils';
 
 export const tablasFormatter = {
     filterClass: 'form-control-sm',
-    actionsPaciente(cell, row) {
+    actionsPaciente(cell, row, rowIndex, formatExtraData) {
         return (
-            <Link to={`/pacientes/${cell}`} title="Editar paciente"><i className="fa fa-edit fa-lg"></i></Link>
+            // <Link to={`/pacientes/${cell}`} title="Editar paciente"><i className="fa fa-edit fa-lg"></i></Link>
+            <i className="fa fa-edit fa-lg" title="Editar Paciente" onClick={() => formatExtraData(cell)}></i>
+        );
+    },
+    actionsHistoriaClinica(cell, row, rowIndex, formatExtraData) {
+        return (
+            <i className="fa fa-edit fa-lg" title="Editar Evolución" onClick={() => formatExtraData(row)}></i>
         );
     },
     nombrePaciente(cell, row){
