@@ -206,6 +206,10 @@ span.thTitle{
     display: flex;
 }
 
+.btn-info {
+    color: white;
+}
+
 // mobile
 @include media-breakpoint-down(xs) {
     .mainCard {

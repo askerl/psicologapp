@@ -105,6 +105,17 @@ class HistoriaClinica extends Component {
         
         const { SearchBar } = Search;
 
+        const ExportCSV = (props) => {
+            const handleClick = () => {
+              props.onExport();
+            };
+            return (
+                <div>
+                    <Button color="info" size="sm" onClick={handleClick}><i className="fa fa-file-excel-o mr-2"></i>Exportar a CSV</Button>                    
+                </div>
+            );
+        };
+
         const columns = [{
 			dataField: 'id',
 			text: '',
@@ -130,6 +141,11 @@ class HistoriaClinica extends Component {
 			dataField: 'evolucion',
             text: 'Evolución'
         }];
+
+        const defaultSorted = [{
+            dataField: 'nro',
+            order: 'asc'
+          }];
         
         return (
             <div className="animated fadeIn historiaClinica">
@@ -146,13 +162,17 @@ class HistoriaClinica extends Component {
                                 keyField='id'
                                 data={this.state.sesiones}
                                 columns={columns}
-                                search={{ searchFormatted: true }}>
+                                search={{ searchFormatted: true }}
+                                exportCSV>
                                 {
                                     props => (
                                         <div>
-                                            <SearchBar {...props.searchProps}
-                                                placeholder="Buscar..."
-                                                className={`${tablasFormatter.filterClass} mb-2`} />
+                                            <div className="hcToolbar d-flex">
+                                                <SearchBar {...props.searchProps}
+                                                    placeholder="Buscar..."
+                                                    className={`${tablasFormatter.filterClass} mb-2 mr-2`} />
+                                                <ExportCSV { ...props.csvProps } />
+                                            </div>
                                             <LoadingOverlay
                                             active={this.state.loading}
                                             animate
@@ -162,6 +182,7 @@ class HistoriaClinica extends Component {
                                             <BootstrapTable	{...props.baseProps}
                                                 classes="tablaHC"
                                                 defaultSortDirection="asc"
+                                                defaultSorted={ defaultSorted }
                                                 noDataIndication='No hay sesiones registradas'
                                                 bootstrap4
                                                 bordered={false}
