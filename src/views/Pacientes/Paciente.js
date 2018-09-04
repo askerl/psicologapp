@@ -8,7 +8,7 @@ import { Alert, Button, Col, CardFooter, Form, FormFeedback, FormGroup, FormText
 import { pacientePrepaga, pacientePrivado, prepagas, prepagasById, tipoLoader, tipoPaciente, overlay } from '../../config/constants';
 import { errores, mensajes } from '../../config/mensajes';
 import db from '../../fire';
-import { calcPorcentajesSesiones, getPaciente, getPacientes, getSesionesPaciente, getSession, removeSession } from '../../utils/utils';
+import { calcPorcentajesSesiones, getPaciente, getPacientes, getSession, removeSession, borrarPaciente } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
 import { WidgetSesionesRestantes, WidgetSesionesUsadas } from '../Widgets/WidgetsAuxiliares';
 import Spinner from '../../components/Spinner/Spinner';
@@ -36,7 +36,6 @@ class Paciente extends Component {
             errorValorConsulta: false,
             errorPrepaga: false,            
             errorPago: false,
-            sesionesPaciente: [],
             showDeleteModal: false,
             showActivarModal: false
         }; // <- set up react state
@@ -62,7 +61,6 @@ class Paciente extends Component {
     }
 
     componentDidMount(){
-        console.log('PACIENTE');
         // id del paciente
         let id = this.props.id,
             nuevo = id === 'new';
@@ -76,11 +74,8 @@ class Paciente extends Component {
                 this.loadPaciente(pac);
                 // cargo pacientes para la verificación de nombre
                 this.pacientes = getSession('pacientes'); 
-            }).then(getSesionesPaciente(id).then( sesionesPaciente => {
-                // console.log('sesiones del paciente', sesionesPaciente);
-                this.setState({sesionesPaciente});
                 this.loading(false);
-            })).catch(error => { 
+            }).catch(error => { 
                 console.log('Error al cargar los datos del paciente', error);
                 NotificationManager.error(errores.errorCargarDatosPaciente, 'Error');
                 this.loading(false);
@@ -318,20 +313,8 @@ class Paciente extends Component {
     }
     
     deletePaciente(){
-        // Get a new write batch
-		let batch = db.batch();                
-        
-        let refPaciente = db.collection("pacientes").doc(this.state.id);
-        batch.delete(refPaciente);
-
-		this.state.sesionesPaciente.forEach( sesion => {			
-			let refSession = db.collection("sesiones").doc(sesion.id);
-			// elimino sesiones del paciente
-			batch.delete(refSession);
-		});
-
-		//Commit the batch
-		batch.commit().then(() => {			
+        this.loading(true);
+        borrarPaciente(this.state.id).then(() => {			
             console.log("Paciente eliminado correctamente");
             removeSession('pacientes');
             NotificationManager.success('El Paciente ha sido eliminado');
@@ -342,7 +325,6 @@ class Paciente extends Component {
 			NotificationManager.error(errores.errorBorrar, 'Error');
 			this.loading(false);
 		});
-
     }
 
     render() {
@@ -598,10 +580,12 @@ class Paciente extends Component {
                     <Modal isOpen={this.state.showDeleteModal} toggle={this.toggleDelete} className={'modal-md modal-danger'}>
                         <ModalHeader toggle={this.toggleDelete}>Eliminar Paciente</ModalHeader>
                         <ModalBody>
-                            Confirme la eliminación del Paciente. Se eliminarán todas sus sesiones ({this.state.sesionesPaciente.length}) e impactará en las facturaciones . Esta acción no podrá deshacerse.
+                            Confirme la eliminación del Paciente. Se eliminarán todas sus sesiones e impactará en las facturaciones . Esta acción no podrá deshacerse.
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="danger" size="sm" onClick={this.deletePaciente}>Eliminar</Button>
+                            <Button color="danger" size="sm" onClick={this.deletePaciente}>
+                                {this.state.loading && <Spinner />}Eliminar
+                            </Button>
                             <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>
                         </ModalFooter>
                     </Modal>

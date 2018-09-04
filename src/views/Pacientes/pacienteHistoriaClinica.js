@@ -31,7 +31,6 @@ class HistoriaClinica extends Component {
     }
 
     componentDidMount() {
-        console.log('HISTORIA CLINICA');
         let id = this.props.id;
         getPaciente(id).then( paciente => {
             this.setState({paciente});
@@ -70,10 +69,6 @@ class HistoriaClinica extends Component {
     }
 
     updateEvolucion() {
-        console.log('Update evolucion', this.state.idEditSesion);
-        console.log('Valor viejo', this.state.evolucion);
-        console.log('Valor nuevo', this.inputEvolucion.value);
-
         let idSesion = this.state.idEditSesion,
             oldValue = _.trim(this.state.evolucion),
             newValue = _.trim(this.inputEvolucion.value);
@@ -82,7 +77,6 @@ class HistoriaClinica extends Component {
         if ( idSesion && (newValue !== oldValue) ) {            
             this.loading(true);
             updateEvolucionSesion(idSesion, newValue).then(() => {
-                console.log("Evolución actualizada correctamente");
                 NotificationManager.success('Los datos han sido guardados');
                 this.toggleEdit();
                 this.loading(false);

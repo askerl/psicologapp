@@ -206,6 +206,30 @@ function loadPacientes(querySnapshot) {
     return pacientes;	
 }
 
+export const borrarPaciente = (id) => {
+    let promise = new Promise( (resolve, reject) => {
+        // Get a new write batch
+		let batch = db.batch();                
+        
+        let refPaciente = db.collection("pacientes").doc(id);
+        batch.delete(refPaciente);
+
+        db.collection("sesiones").where("paciente","==",id).get().then( querySnapshot => {
+            querySnapshot.docs.forEach( doc => {			
+                // elimino sesiones del paciente
+                batch.delete(doc.ref);
+            });
+        });
+
+		//Commit the batch
+        batch.commit().then( () => resolve()
+        ).catch( error => {
+            reject(error);
+        });
+    });
+    return promise;
+}
+
 export const filterPacientesEstado = (pacientes, estado) => {
     if (!estado || estado === estadosPaciente[0].value) {
         // no aplicó filtro, devuelvo todos
