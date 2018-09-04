@@ -44,13 +44,17 @@ class Facturaciones extends Component {
 	}
 
 	initFiltros(){
-		let hoy = moment(new Date());
-		let mes = hoy.month()+1;
-		let anio = hoy.year();
-		this.mesIni.value = mes;
-		this.anioIni.value = anio;
-		this.mesFin.value = mes; 
-		this.anioFin.value = anio;
+		let desde = moment().subtract(1,'months'),
+			mesDes = desde.month()+1,
+			anioDes = desde.year(),
+			hasta = moment(),
+			mesHas = hasta.month()+1,
+			anioHas = hasta.year();
+
+		this.mesIni.value = mesDes;
+		this.anioIni.value = anioDes;
+		this.mesFin.value = mesHas; 
+		this.anioFin.value = anioHas;
 	}
 
 	loading(val){
