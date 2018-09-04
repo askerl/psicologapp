@@ -172,9 +172,9 @@ export const getPacientes = () => {
             console.log('Pacientes cache', pacientes);
             resolve(pacientes);
         } else {
-            console.log('Pacientes DB', pacientes);
             db.collection("pacientes").orderBy("apellido","asc").orderBy("nombre","asc").get().then( querySnapshot => {
                 let result = loadPacientes(querySnapshot);
+                console.log('Pacientes DB', result);
                 // almaceno pacientes en sesion para cache
                 setSession('pacientes',result);
                 resolve(result);
@@ -196,7 +196,8 @@ function loadPacientes(querySnapshot) {
         }
         paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;
         let fchNacMoment = moment(paciente.fchNac, 'DD/MM/YYYY');
-        paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : 0;
+        paciente.fchNac = fchNacMoment.isValid() ? paciente.fchNac : '';
+        paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : '';
         // datos para options en select
         paciente.value = paciente.id;
         paciente.label = paciente.nombreCompleto;		

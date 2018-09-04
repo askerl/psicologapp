@@ -174,27 +174,27 @@ class Paciente extends Component {
         if(this.validate()){
 
             let paciente = {
-                "nombre": this.inputNombre.value || null,
-                "apellido": this.inputApellido.value || null,
-                "dni": this.inputDNI.value || null,
-                "tel": this.inputTel.value || null,
-                "fchNac": moment(this.inputFchNac.value).format('DD/MM/YYYY') || null,
-                "telFlia": this.inputTelFlia.value || null,
-                "dir": this.inputDir.value || null,
-                "notas": this.inputNotas.value || null,
-                "tipo": this.inputTipo.value || null,
-                "email": this.inputEmail.value || null
+                nombre: _.trim(this.inputNombre.value) || '',
+                apellido: _.trim(this.inputApellido.value) || '',
+                dni: this.inputDNI.value ? _.trim(this.inputDNI.value.split('.').join("")) : '',
+                tel: _.trim(this.inputTel.value) || '',
+                fchNac: moment(this.inputFchNac.value).format('DD/MM/YYYY') || '',
+                telFlia: _.trim(this.inputTelFlia.value) || '',
+                dir: _.trim(this.inputDir.value) || '',
+                notas: _.trim(this.inputNotas.value) || '',
+                tipo: this.inputTipo.value || null,
+                email: _.trim(this.inputEmail.value) || ''
             };
 
             if (this.state.tipo === pacientePrivado){
-                paciente.valorConsulta = this.inputValorConsulta.value || 0;
+                paciente.valorConsulta = parseFloat(this.inputValorConsulta.value) || 0;
             } else {
                 paciente.prepaga = this.inputPrepaga.value || null;
                 paciente.facturaPrepaga = this.state.facturaPrepaga;
                 paciente.pago = parseInt(this.inputPago.value);
-                paciente.copago = this.inputCopago.value || 0;
+                paciente.copago = parseFloat(this.inputCopago.value) || 0;
                 paciente.sesionesAut = parseInt(this.inputSesiones.value) || 0;
-                paciente.credencial = this.inputCredencial.value || null;
+                paciente.credencial = _.trim(this.inputCredencial.value) || '';
             }
 
             if (this.state.nuevo){

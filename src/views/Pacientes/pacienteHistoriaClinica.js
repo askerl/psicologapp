@@ -3,12 +3,13 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
-import { Col, Row, Modal, ModalBody, ModalHeader, ModalFooter, Button, Input } from 'reactstrap';
-import { overlay, breakpoints } from '../../config/constants';
+import { Button, Col, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import ExportCSV from '../../components/ExportCSV/exportCSV';
+import Spinner from '../../components/Spinner/Spinner';
+import { breakpoints, overlay } from '../../config/constants';
+import { errores } from '../../config/mensajes';
 import { tablasFormatter } from '../../utils/formatters';
 import { getPaciente, getSesionesPaciente, updateEvolucionSesion } from '../../utils/utils';
-import Spinner from '../../components/Spinner/Spinner';
-import { errores } from '../../config/mensajes';
 
 class HistoriaClinica extends Component {
 
@@ -104,17 +105,6 @@ class HistoriaClinica extends Component {
         let paciente = this.state.paciente;
         
         const { SearchBar } = Search;
-
-        const ExportCSV = (props) => {
-            const handleClick = () => {
-              props.onExport();
-            };
-            return (
-                <div>
-                    <Button color="info" size="sm" onClick={handleClick}><i className="fa fa-file-excel-o mr-2"></i>Exportar a CSV</Button>                    
-                </div>
-            );
-        };
 
         const csvFileName = `${_.trim(paciente.apellido)}-${_.trim(paciente.nombre)}.csv`;
 

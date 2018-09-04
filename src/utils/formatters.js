@@ -29,9 +29,6 @@ export const tablasFormatter = {
             );
         }
     },
-    edad(cell,row) {
-        return cell > 0 ? cell : '';
-    },
     sesionesRestantes(cell, row) {
         if (!cell) {
             return '';
@@ -51,7 +48,7 @@ export const tablasFormatter = {
             )
         }
     },
-    tipoPaciente(cell, row) {
+    tipoPaciente(cell) {
         if (cell === pacientePrivado) {
             return (
                 <Badge color="warning" className="badge-pill">{filtroTipoPaciente[pacientePrivado]}</Badge>
@@ -63,13 +60,13 @@ export const tablasFormatter = {
             );
         }
     },
-    prepaga(cell, row) {
+    prepaga(cell) {
         return cell ? prepagasById[cell].nombre : '';
     },
-    fecha(cell, row) {
+    fecha(cell) {
         return moment.unix(cell).format('DD/MM/YYYY');
     },
-    precio(cell, row) {
+    precio(cell) {
         if (cell > 0) {
             return (
                 <span><i className="fa fa-usd"></i> {cell}</span>
@@ -79,7 +76,7 @@ export const tablasFormatter = {
         }
     },
     factura(cell, row, rowIndex, formatExtraData) {
-        return formatExtraData[cell];
+        return cell ? formatExtraData[cell] : '';
     },
     boolFormatter: {
         true: 'Sí',
@@ -88,5 +85,26 @@ export const tablasFormatter = {
     mes(cell, row, rowIndex, formatExtraData) {
         return _.capitalize(formatMonth(cell, formatExtraData));
     }
+};
 
-}
+export const csvFormatter = {
+    tipoPaciente(cell) {
+        return filtroTipoPaciente[cell];
+    },
+    credencial(cell) {
+        return cell || '';
+    },
+    sesiones(cell) {
+        return cell || '';
+    },
+    valorConsulta(cell, row) {
+        if (row.tipo == pacientePrivado) {
+            return cell || ''
+        } else {
+            return prepagasById[row.prepaga].pagos[row.pago] || '';
+        }
+    },
+    copago(cell) {
+        return cell > 0 ? cell : '';
+    },
+};

@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { numberFilter, selectFilter, textFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import ExportCSV from '../../components/ExportCSV/exportCSV';
 import { breakpoints, estadosPaciente, filtroPrepagas, filtroTipoPaciente, overlay } from '../../config/constants';
-import { tablasFormatter } from '../../utils/formatters';
+import { tablasFormatter, csvFormatter } from '../../utils/formatters';
 import { filterPacientesEstado, getPacientes, getSession, setSession } from '../../utils/utils';
 
 class ListaPacientes extends Component {
@@ -76,19 +78,27 @@ class ListaPacientes extends Component {
 			text: '',
 			headerAttrs: { width: '36px' },
 			formatter: tablasFormatter.actionsPaciente,
-			formatExtraData: this.editarPaciente
-		}, {
+			formatExtraData: this.editarPaciente,
+			csvExport: false
+		},{
 			dataField: 'nombreCompleto',
 			text: 'Paciente',
 			formatter: tablasFormatter.nombrePaciente,
 			sort: true,
 			filter: textFilter({placeholder:' ', className:tablasFormatter.filterClass})
 		},{
+			dataField: 'dni',
+			text: 'DNI',
+			hidden: true
+		},{
+			dataField: 'fchNac',
+			text: 'Fch. Nac.',
+			hidden: true
+		},{
 			dataField: 'edad',
 			text: 'Edad',
 			align: 'center', headerAlign: 'center',
 			headerAttrs: { width: '130px' },
-			formatter: tablasFormatter.edad,
 			sort: true,
 			filter: numberFilter({
 				placeholder:' ', 
@@ -97,10 +107,27 @@ class ListaPacientes extends Component {
 			}),
 			hidden: this.state.size < breakpoints.sm
 		},{
+			dataField: 'tel',
+			text: 'Teléfono',
+			hidden: true
+		},{
+			dataField: 'telFlia',
+			text: 'Contacto Flia.',
+			hidden: true
+		},{
+			dataField: 'dir',
+			text: 'Dirección',
+			hidden: true
+		},{
+			dataField: 'email',
+			text: 'Email',
+			hidden: true
+		},{
 			dataField: 'tipo',
 			text: 'Tipo',
 			headerAttrs: { width: '130px' },
 			formatter: tablasFormatter.tipoPaciente,
+			csvFormatter: csvFormatter.tipoPaciente,
 			sort: true,
 			filter: selectFilter({
 				options: filtroTipoPaciente,
@@ -113,6 +140,7 @@ class ListaPacientes extends Component {
 			text: 'Prepaga',
 			headerAttrs: { width: '130px' },
 			formatter: tablasFormatter.prepaga,
+			csvFormatter: tablasFormatter.prepaga,
 			sort: true,
 			filter: selectFilter({
 				options: filtroPrepagas,
@@ -123,13 +151,36 @@ class ListaPacientes extends Component {
 		},{
 			dataField: 'credencial',
 			text: 'Credencial',
+			csvFormatter: csvFormatter.credencial,
 			sort: true,
 			filter: textFilter({placeholder:' ', className:tablasFormatter.filterClass}),
 			hidden: this.state.size < breakpoints.md
 		},{
+			dataField: 'facturaPrepaga',
+			text: 'Factura prepaga',
+			csvFormatter: tablasFormatter.factura,
+			formatExtraData: tablasFormatter.boolFormatter,
+			hidden: true
+		},{
+			dataField: 'valorConsulta',
+			text: 'Valor consulta',
+			csvFormatter: csvFormatter.valorConsulta,
+			hidden: true
+		},{
+			dataField: 'copago',
+			text: 'Copago',
+			csvFormatter: csvFormatter.copago,
+			hidden: true
+		},{
+			dataField: 'sesiones',
+			text: 'Sesiones',
+			csvFormatter: csvFormatter.sesiones,
+			hidden: true
+		},{
 			dataField: 'sesionesRestantes',
 			text: 'Sesiones restantes',
 			formatter: tablasFormatter.sesionesRestantes,
+			csvFormatter: csvFormatter.sesiones,
 			sort: true,
 			filter: numberFilter({
 				placeholder:' ', 
@@ -137,6 +188,11 @@ class ListaPacientes extends Component {
 				numberClassName: tablasFormatter.filterClass
 			}),
 			hidden: this.state.size < breakpoints.lg
+		},{
+			dataField: 'sesionesAut',
+			text: 'Autorizadas',
+			csvFormatter: csvFormatter.sesiones,
+			hidden: true
 		}];
 
 		return (
@@ -148,40 +204,55 @@ class ListaPacientes extends Component {
 								<i className="fa fa-address-book-o fa-lg"></i> Pacientes
 								</CardHeader>
 							<CardBody>
-								<Row>
-								<Col>
-									<div className="d-flex flex-row mb-2">
-										<div className="mr-auto">
-											<Link to={'/pacientes/new'} title="Nuevo Paciente" className="linkButton">
-												<Button color="primary" size="sm"><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>
-											</Link>
-										</div>
-										<div className="filtros">
-											<Input id="filtroEstado" className="filtroEstado" type="select" title="Filtrar por estado"
-												bsSize="sm" name="filtroEstado"  innerRef={el => this.filtroEstado = el} onChange={this.changeEstado}>
-												{estadosPaciente.map((item, index) => <option key={index} value={item.value}>{item.title}</option>)}
-											</Input>
-										</div>
+							<ToolkitProvider
+								keyField='id'
+								data={this.state.pacientes}
+								columns={columns}
+                               	exportCSV={{fileName: 'pacientes.csv'}}
+							>
+							{
+								props => (
+									<div>
+										<Row>
+											<Col xs="12" sm="6">
+												<div className="d-flex flex-row mb-2 mr-auto">										
+													<Button color="success" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>													
+													<ExportCSV { ...props.csvProps } />
+												</div>
+											</Col>
+											<Col xs="12" sm="6">
+												<div className="filtros d-flex flex-row mb-2 justify-content-sm-end">
+													<Input id="filtroEstado" className="filtroEstado" type="select" title="Filtrar por estado"
+														bsSize="sm" name="filtroEstado" innerRef={el => this.filtroEstado = el} onChange={this.changeEstado}>
+														{estadosPaciente.map((item, index) => <option key={index} value={item.value}>{item.title}</option>)}
+													</Input>
+												</div>
+											</Col>
+										</Row>
+										<Row>
+											<Col>
+												<LoadingOverlay
+													active={this.state.loading}
+													animate
+													spinner
+													color={overlay.color}
+													background={overlay.background}>
+													<BootstrapTable {...props.baseProps}
+														classes="tablaPacientes"
+														filter={filterFactory()}
+														defaultSortDirection="asc"
+														noDataIndication='No hay pacientes registrados'
+														bordered={false}
+														bootstrap4
+														striped
+														hover />
+												</LoadingOverlay>
+											</Col>
+										</Row>
 									</div>
-								</Col>
-								</Row>
-									<LoadingOverlay
-										active={this.state.loading}
-										animate
-										spinner
-										color={overlay.color}
-										background={overlay.background}>
-										<BootstrapTable keyField='id' classes="tablaPacientes"
-											data={this.state.pacientes} 
-											columns={columns} 
-											filter={filterFactory()}
-											defaultSortDirection="asc"
-											noDataIndication='No hay pacientes registrados'
-											bordered={false}
-											bootstrap4
-											striped
-											hover/>
-									</LoadingOverlay>
+								)
+							}
+							</ToolkitProvider>
 							</CardBody>
 						</Card>
 					</Col>
