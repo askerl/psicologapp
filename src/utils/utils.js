@@ -211,21 +211,24 @@ export const borrarPaciente = (id) => {
         // Get a new write batch
 		let batch = db.batch();                
         
+        // borro paciente
         let refPaciente = db.collection("pacientes").doc(id);
         batch.delete(refPaciente);
 
+        // borro sesiones del paciente
         db.collection("sesiones").where("paciente","==",id).get().then( querySnapshot => {
-            querySnapshot.docs.forEach( doc => {			
+            querySnapshot.docs.forEach( doc => {
                 // elimino sesiones del paciente
                 batch.delete(doc.ref);
             });
+            //Commit the batch
+            batch.commit().then( () => {
+                resolve()
+            }).catch( error => {
+                reject(error);
+            });
         });
-
-		//Commit the batch
-        batch.commit().then( () => resolve()
-        ).catch( error => {
-            reject(error);
-        });
+        
     });
     return promise;
 }
