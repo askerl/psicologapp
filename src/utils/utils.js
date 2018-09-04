@@ -147,12 +147,13 @@ export const getPaciente = (id) => {
 
 export const getSesionesPaciente = (id) => {
     let promise = new Promise( (resolve, reject) => {
-        db.collection("sesiones").where("paciente","==",id).orderBy("fecha","desc").get().then( querySnapshot => {
-            let sesiones = [], nro = querySnapshot.docs.length;
+        db.collection("sesiones").where("paciente","==",id).orderBy("fecha","asc").get().then( querySnapshot => {
+            let sesiones = [], nro = 1;
             querySnapshot.docs.forEach( doc => {
                 let sesion = doc.data();
                 sesion.id = doc.id;
-                sesion.nro = nro--;
+                sesion.nro = nro++;
+                sesion.evolucion = sesion.evolucion || '';
                 sesiones.push(sesion);
             });
             resolve(sesiones);

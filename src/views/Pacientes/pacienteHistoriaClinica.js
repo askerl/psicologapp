@@ -116,12 +116,15 @@ class HistoriaClinica extends Component {
             );
         };
 
+        const csvFileName = `${_.trim(paciente.apellido)}-${_.trim(paciente.nombre)}.csv`;
+
         const columns = [{
 			dataField: 'id',
 			text: '',
             headerAttrs: { width: '36px' },
             formatter: tablasFormatter.actionsHistoriaClinica,
-            formatExtraData: this.toggleEdit
+            formatExtraData: this.toggleEdit,
+            csvExport: false
         }, {
 			dataField: 'nro',
 			text: 'Nro.',
@@ -135,6 +138,7 @@ class HistoriaClinica extends Component {
 			text: 'Fecha',
 			headerAttrs: { width: '100px' },
             formatter: tablasFormatter.fecha,
+            csvFormatter: tablasFormatter.fecha,
             sort: true,
             editable: false
 		}, {
@@ -162,8 +166,8 @@ class HistoriaClinica extends Component {
                                 keyField='id'
                                 data={this.state.sesiones}
                                 columns={columns}
-                                search={{ searchFormatted: true }}
-                                exportCSV>
+                                search={{searchFormatted: true}}
+                                exportCSV={{fileName: csvFileName}}>
                                 {
                                     props => (
                                         <div>
