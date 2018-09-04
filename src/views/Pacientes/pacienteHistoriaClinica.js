@@ -3,7 +3,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
-import { Button, Col, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import { Badge, Button, Col, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import ExportCSV from '../../components/ExportCSV/exportCSV';
 import Spinner from '../../components/Spinner/Spinner';
 import { breakpoints, overlay } from '../../config/constants';
@@ -121,7 +121,6 @@ class HistoriaClinica extends Component {
             headerAttrs: { width: '60px' },
             align: 'right', headerAlign: 'right',
             sort: true,
-            editable: false,
             hidden: this.state.size < breakpoints.sm
 		}, {
 			dataField: 'fecha.seconds',
@@ -129,8 +128,7 @@ class HistoriaClinica extends Component {
 			headerAttrs: { width: '100px' },
             formatter: tablasFormatter.fecha,
             csvFormatter: tablasFormatter.fecha,
-            sort: true,
-            editable: false
+            sort: true
 		}, {
 			dataField: 'evolucion',
             text: 'Evolución'
@@ -140,13 +138,17 @@ class HistoriaClinica extends Component {
             dataField: 'nro',
             order: 'asc'
           }];
+
+        const totalSesiones = this.state.sesiones.length;
         
         return (
             <div className="animated fadeIn historiaClinica">
                     <Row>
                         <Col>
                             <div className="d-flex align-items-center mb-3">
-                                <h5 className="mr-2 mb-0">{paciente.nombreCompleto}</h5>{tablasFormatter.tipoPaciente(paciente.tipo)}
+                                <h5 className="mr-2 mb-0">{paciente.nombreCompleto}</h5>
+                                {tablasFormatter.tipoPaciente(paciente.tipo)}
+                                <Badge color="purple" className="badge-pill ml-2">{totalSesiones}</Badge>
                             </div>
                         </Col>
                     </Row>

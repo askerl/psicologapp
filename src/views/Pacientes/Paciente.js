@@ -459,13 +459,13 @@ class Paciente extends Component {
                                         </Col>
                                     </Row>
                                 }
-                                {this.state.tipo === pacientePrivado && !this.state.nuevo &&
+                                {/* {this.state.tipo === pacientePrivado && !this.state.nuevo &&
                                     <Row>
                                         <Col>
                                             <Widget02 color="info" header={`${this.state.sesiones}`} mainText="Sesiones realizadas" icon="fa fa-comments-o" />
                                         </Col>
                                     </Row>
-                                }
+                                } */}
                                 {this.state.tipo === pacientePrepaga &&
                                     <Row>
                                         <Col xs="12" sm="6">
