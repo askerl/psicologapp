@@ -16,6 +16,7 @@ class HistoriaClinica extends Component {
         super(props);
 
         this.state = {
+            id: this.props.id,
             loading: true,
             paciente: {},
             sesiones: [],
@@ -26,12 +27,28 @@ class HistoriaClinica extends Component {
         };
         this.loading = this.loading.bind(this);
         this.resize = this.resize.bind(this);
+        this.cargarHC = this.cargarHC.bind(this);
         this.toggleEdit = this.toggleEdit.bind(this);
         this.updateEvolucion = this.updateEvolucion.bind(this);
     }
 
     componentDidMount() {
-        let id = this.props.id;
+        window.addEventListener("resize", this.resize);
+        this.resize();
+        this.loading(true);
+        this.cargarHC();
+    }
+
+    componentWillUnmount() {
+		window.removeEventListener("resize", this.resize);
+	}
+
+    loading(loading) {
+        this.setState({loading});
+    }
+
+    cargarHC() {
+        let id = this.state.id;
         getPaciente(id).then( paciente => {
             this.setState({paciente});
         }).then(getSesionesPaciente(id).then( sesiones => {
@@ -44,27 +61,19 @@ class HistoriaClinica extends Component {
             this.loading(false);
             this.props.goBack();
         });
-        window.addEventListener("resize", this.resize);
-        this.resize();
-    }
-
-    componentWillUnmount() {
-		window.removeEventListener("resize", this.resize);
-	}
-
-    loading(loading) {
-        this.setState({loading});
     }
 
     resize(){
 		this.setState({size: window.innerWidth});
     }
     
-    toggleEdit(row) {
+    toggleEdit(id) {
+        console.log('cell', id);
+        let oldValue = _.get(_.find(this.state.sesiones, {'id': id}),'evolucion','');
         this.setState({
             showEditModal: !this.state.showEditModal, 
-            idEditSesion: row ? row.id : '',
-            evolucion: row ? row.evolucion : ''
+            idEditSesion: id || '',
+            evolucion: oldValue
         });
     }
 
@@ -79,7 +88,7 @@ class HistoriaClinica extends Component {
             updateEvolucionSesion(idSesion, newValue).then(() => {
                 NotificationManager.success('Los datos han sido guardados');
                 this.toggleEdit();
-                this.loading(false);
+                this.cargarHC();
             }).catch( error => {
                 console.log('Error actualizando evolución de sesión', error);
                 NotificationManager.error(errores.errorGuardar, 'Error');
@@ -98,7 +107,7 @@ class HistoriaClinica extends Component {
 
         const columns = [{
 			dataField: 'id',
-			text: 'Session ID',
+			text: '',
             headerAttrs: { width: '36px' },
             formatter: tablasFormatter.actionsHistoriaClinica,
             formatExtraData: this.toggleEdit
@@ -124,7 +133,6 @@ class HistoriaClinica extends Component {
         
         return (
             <div className="animated fadeIn historiaClinica">
-                
                     <Row>
                         <Col>
                             <div className="d-flex align-items-center mb-3">
@@ -170,7 +178,7 @@ class HistoriaClinica extends Component {
                     <Modal isOpen={this.state.showEditModal} toggle={this.toggleEdit} className={'modal-lg modal-teal'}>
                         <ModalHeader toggle={this.toggleEdit}>{this.state.evolucion ? 'Editar' : 'Agregar'} Evolución</ModalHeader>
                         <ModalBody>
-                            <Input defaultValue={this.state.evolucion} type="textarea" id="evolucion" innerRef={el => this.inputEvolucion = el} rows="5" />
+                            <Input type="textarea" id="evolucion" defaultValue={this.state.evolucion} innerRef={el => this.inputEvolucion = el} rows="5" />  
 					</ModalBody>
                         <ModalFooter>
                             <Button color="success" size="sm" onClick={this.updateEvolucion}>

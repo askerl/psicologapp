@@ -15,7 +15,7 @@ export const tablasFormatter = {
     },
     actionsHistoriaClinica(cell, row, rowIndex, formatExtraData) {
         return (
-            <i className="fa fa-edit fa-lg" title="Editar Evolución" onClick={() => formatExtraData(row)}></i>
+            <i className="fa fa-edit fa-lg" title="Editar Evolución" onClick={() => formatExtraData(cell)}></i>
         );
     },
     nombrePaciente(cell, row){
