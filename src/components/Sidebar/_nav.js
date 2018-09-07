@@ -6,6 +6,11 @@ export default {
       icon: 'icon-home'
     },
     {
+      name: 'Administración',
+      url: '/admin',
+      icon: 'icon-settings'
+    },
+    {
       name: 'Pacientes',
       url: '/pacientes',
       icon: 'icon-people'
@@ -18,7 +23,7 @@ export default {
     {
       name: 'Facturaciones',
       url: '/facturaciones',
-      icon: 'icon-book-open'
+      icon: 'icon-chart'
     }
   ]
 };

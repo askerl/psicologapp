@@ -1,21 +1,8 @@
 import React, { Component } from 'react';
-import db from '../../fire';
-import { pacientePrepaga, pacientePrivado, prepagas, round } from '../../constants';
-import Loader from 'react-loaders';
-
-import {
-	Row,
-	Col,
-	Progress,
-	Card,
-	CardHeader,
-	CardBody,
-	CardFooter,
-	CardTitle
-} from 'reactstrap';
-	
-import Widget02 from '../Widgets/Widget02';
-import {StatItem, Callout} from '../Widgets/WidgetsAuxiliares';
+import { Card, CardBody, Col, Row } from 'reactstrap';
+import { NotificationManager } from 'react-notifications';
+import { backup } from '../../utils/backup';
+import { errores, mensajes } from '../../config/mensajes';
 	
 class AdminPanel extends Component {
   
@@ -32,30 +19,35 @@ class AdminPanel extends Component {
 
 	componentDidMount(){
 		this.loading(true);
-        // cargo datos
-        this.loading(false);
+
+		backup().then( data =>{
+
+			NotificationManager.success(mensajes.okBackup);
+			// cargo datos
+			this.loading(false);
+
+		}).catch( error => {
+			NotificationManager.error(errores.errorBackup, 'Error');
+		});
+
+        
 	}
 
 	render() {
-		let data = this.state;
 		return (
 			<div className="animated fadeIn">
-				<Loader type="ball-scale-ripple-multiple" active={this.state.loading} />
-				<div className={(this.state.loading ? 'invisible' : 'visible') + " animated fadeIn dashboard"}>           
-					<Row>
-						<Col>
-							<Card>
-								<CardBody>									
-									<span className="h6">Panel administrativo</span>
-								</CardBody>
-							</Card>
-						</Col>
-					</Row>
-
-				</div>
+				<Row>
+					<Col>
+						<Card>
+							<CardBody>									
+								<span className="h6">Administración</span>
+							</CardBody>
+						</Card>
+					</Col>
+				</Row>
 			</div>
 		);
 	}
 }
 
-export default Dashboard;
+export default AdminPanel;
