@@ -61,6 +61,8 @@ export const mesesFormat = {
     long: 'MMMM' //January February ... November December
 }
 
+export const backupDateFormat = 'YYYYMMDD-HHmmss';
+
 export const tableColumnClasses = {
     showLarge: 'd-none d-lg-table-cell',
     showMedium: 'd-none d-md-table-cell',

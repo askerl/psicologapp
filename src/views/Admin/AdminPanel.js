@@ -11,26 +11,26 @@ class AdminPanel extends Component {
 		this.state = {
 			loading: false
 		};
+		this.respaldar = this.respaldar.bind(this);
 	}
 
 	loading(val){
 		this.setState({loading: val});
 	}
 
-	componentDidMount(){
+	componentDidMount() {
+		// nada por ahora        
+	}
+
+	respaldar() {
 		this.loading(true);
-
 		backup().then( data =>{
-
 			NotificationManager.success(mensajes.okBackup);
 			// cargo datos
 			this.loading(false);
-
 		}).catch( error => {
 			NotificationManager.error(errores.errorBackup, 'Error');
 		});
-
-        
 	}
 
 	render() {

@@ -32,7 +32,7 @@ export const auth = firebase.auth();
 
 export const logout = () => {
     console.log('Logout...');
-    auxAuth.signOut().then(function() {
+    auth.signOut().then(function() {
         // Sign-out successful.
         console.log('Sign out');
       }).catch(function(error) {
@@ -41,6 +41,13 @@ export const logout = () => {
       });
 }
 
+// Storage refs
+// Points to the root reference
+export const storageRef = firebase.storage().ref();
+// Points to 'backup'
+export const backupRef = storageRef.child('backup');
+
+// apply settings
 db.settings(settings);
 
 export default db;

@@ -1,6 +1,8 @@
 // backup/restore functions
 
-import db from '../fire';
+import db, { backupRef } from '../fire';
+import moment from 'moment';
+import { backupDateFormat } from '../config/constants';
 
 // require('fs-extra');
 
@@ -21,15 +23,22 @@ export const backup = () => {
             data['sesiones'] = sesiones;
             console.log('Respaldo', data);
 
-            // Write collection to JSON file
-            //   fs.writeFile("firestore-export.json", JSON.stringify(dt), function(err) {
-            //       if(err) {
-            //           return console.log(err);
-            //       }
-            //       console.log("The file was saved!");
-            //   });
+            let fileName = `backup-${moment().format(backupDateFormat)}.json`;
+            console.log('Filename:',fileName);
+            
+            let fileRef = backupRef.child(fileName);
+            
+            // File path is 'images/space.jpg'
+            let path = fileRef.fullPath
+            
+            // File name is 'space.jpg'
+            let name = fileRef.name
 
-            resolve(data);
+            fileRef.putString(JSON.stringify(data)).then(function(snapshot) {
+                console.log('Respaldo subido...');
+                resolve(data);
+            });
+            
         })).catch(error => {
             console.log(error);
             reject(error);
