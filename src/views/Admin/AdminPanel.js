@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Card, CardBody, Col, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, Col, Row } from 'reactstrap';
 import { NotificationManager } from 'react-notifications';
 import { backup } from '../../utils/backup';
 import { errores, mensajes } from '../../config/mensajes';
+import Spinner from '../../components/Spinner/Spinner';
 	
 class AdminPanel extends Component {
   
@@ -19,7 +20,7 @@ class AdminPanel extends Component {
 	}
 
 	componentDidMount() {
-		// nada por ahora        
+		// nada por ahora
 	}
 
 	respaldar() {
@@ -39,8 +40,13 @@ class AdminPanel extends Component {
 				<Row>
 					<Col>
 						<Card>
-							<CardBody>									
-								<span className="h6">Administración</span>
+							<CardHeader>
+								<i className="icon-settings"></i> Administración
+							</CardHeader>
+							<CardBody>
+								<Button color="primary" size="sm" onClick={this.respaldar}>
+									{this.state.loading ? <Spinner/> : <i className="fa fa-cloud-upload mr-2"></i>}Respaldar
+								</Button>
 							</CardBody>
 						</Card>
 					</Col>

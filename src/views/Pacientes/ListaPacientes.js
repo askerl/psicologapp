@@ -202,7 +202,7 @@ class ListaPacientes extends Component {
 						<Card className="mainCard">
 							<CardHeader>
 								<i className="fa fa-address-book-o fa-lg"></i> Pacientes
-								</CardHeader>
+							</CardHeader>
 							<CardBody>
 							<ToolkitProvider
 								keyField='id'
