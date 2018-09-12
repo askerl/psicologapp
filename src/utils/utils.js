@@ -2,19 +2,21 @@ import _ from 'lodash';
 import moment from 'moment';
 import { pacientePrivado, pacientePrepaga, prepagas, estadosPaciente } from '../config/constants';
 import { mailHabilitados } from '../config/firebaseConfig';
-import db from '../fire';
+import db, { backupRef } from '../fire';
+import axios from 'axios';
+import FileSaver from 'file-saver';
 
 // ---------------------- SESSION HANDLER --------------------------------
 
 export const getSession = (key) => {
-    if (key === 'pacientes' || key === 'sesiones') {
+    if (key === 'pacientes' || key === 'sesiones' || key === 'respaldos') {
         return JSON.parse(localStorage.getItem(key));
     }
     return localStorage.getItem(key);
 }
 
 export const setSession = (key, value) => {
-    if (key === 'pacientes' || key === 'sesiones') {
+    if (key === 'pacientes' || key === 'sesiones' || key === 'respaldos') {
         value = JSON.stringify(value);
     }
     return localStorage.setItem(key, value);
@@ -29,6 +31,7 @@ export const clearSession = () => {
     removeSession('pacientes');
     removeSession('sesiones');
     removeSession('filtroEstado');
+    removeSession('respaldos');
 }
 
 export const removeSessionSesionesMes = (mes, anio) => {
@@ -323,3 +326,26 @@ export const getColorPorcentaje = (p) => {
     }
     return color;
 }
+
+// ---------------------- ARCHIVOS --------------------------------
+
+export const downloadFile = (fileName) => {
+    let promise = new Promise( (resolve, reject) => {
+        backupRef.child(fileName).getDownloadURL().then( url => {
+            axios({
+                url: url,
+                method: 'GET',
+                responseType: 'blob' // important
+            }).then((response) => {
+                resolve(FileSaver.saveAs(new Blob([response.data]), fileName));
+            }).catch(error => {
+                reject(error);
+            });
+        }).catch(error => {
+            reject(error);
+        });
+    });
+    return promise;
+};
+
+

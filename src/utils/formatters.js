@@ -2,20 +2,24 @@ import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Progress, Badge } from 'reactstrap';
-import { filtroTipoPaciente, pacientePrepaga, pacientePrivado, prepagasById } from '../config/constants';
-import { formatMonth, getColorPorcentaje, getPacientes } from './utils';
+import { filtroTipoPaciente, pacientePrepaga, pacientePrivado, prepagasById, fechaFormat } from '../config/constants';
+import { formatMonth, getColorPorcentaje, getPacientes, round } from './utils';
 
 export const tablasFormatter = {
     filterClass: 'form-control-sm',
     actionsPaciente(cell, row, rowIndex, formatExtraData) {
         return (
-            // <Link to={`/pacientes/${cell}`} title="Editar paciente"><i className="fa fa-edit fa-lg"></i></Link>
             <i className="fa fa-edit fa-lg" title="Editar Paciente" onClick={() => formatExtraData(cell)}></i>
         );
     },
     actionsHistoriaClinica(cell, row, rowIndex, formatExtraData) {
         return (
             <i className="fa fa-edit fa-lg" title="Editar Evolución" onClick={() => formatExtraData(cell)}></i>
+        );
+    },
+    actionsRespaldo(cell, row, rowIndex, formatExtraData) {
+        return (
+            <i className="fa fa-cloud-download fa-lg" title="Descargar respaldo" onClick={() => formatExtraData(row.nombre)}></i>
         );
     },
     nombrePaciente(cell, row){
@@ -64,7 +68,10 @@ export const tablasFormatter = {
         return cell ? prepagasById[cell].nombre : '';
     },
     fecha(cell) {
-        return moment.unix(cell).format('DD/MM/YYYY');
+        return moment.unix(cell).format(fechaFormat.fecha);
+    },
+    fechaHora(cell) {
+        return moment.unix(cell).format(fechaFormat.fechaHora);
     },
     precio(cell) {
         if (cell > 0) {
@@ -84,6 +91,22 @@ export const tablasFormatter = {
     },
     mes(cell, row, rowIndex, formatExtraData) {
         return _.capitalize(formatMonth(cell, formatExtraData));
+    },
+    fileSize(cell) {
+        let k = 1024;
+        // Bytes
+        if (cell < k) {
+            return cell + ' B';
+        }
+        // KBytes
+        if (cell < k*k) {
+            return round(cell/k,2) + ' KB';
+        }
+        // MBytes
+        if (cell < k*k*k) {
+            return round(cell/(k*k),2) + ' MB';
+        }
+        return cell;
     }
 };
 

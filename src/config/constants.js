@@ -59,16 +59,21 @@ export const mesesFormat = {
     number: 'M', //1 2 ... 11 12
     short: 'MMM', //Jan Feb ... Nov Dec
     long: 'MMMM' //January February ... November December
-}
+};
 
 export const backupDateFormat = 'YYYYMMDD-HHmmss';
+
+export const fechaFormat = {
+    fecha: 'DD/MM/YYYY',
+    fechaHora: 'DD/MM/YYYY HH:mm:ss'
+};
 
 export const tableColumnClasses = {
     showLarge: 'd-none d-lg-table-cell',
     showMedium: 'd-none d-md-table-cell',
     showSmall: 'd-none d-sm-table-cell',
     hide: 'd-none'
-}
+};
 
 // valores para grafica de facturaciones
 export const brandColors = {
@@ -79,13 +84,13 @@ export const brandColors = {
     brandDanger:    '#f86c6b',
     brandPurple:    '#6f42c1',
     brandTeal:      '#20c997'
-}
+};
 
 export const overlay = {
     color: brandColors.brandInfo,
     background: 'rgba(192,192,192,0.3)',
     backgroundWhite: 'white'
-}
+};
 
 // breakpoints Bootstrap 4
 export const breakpoints = {
@@ -93,7 +98,7 @@ export const breakpoints = {
     md: 768,
     lg: 992,
     xl: 1200
-}
+};
 
 export const initialSizes = {
     xs: false,
@@ -101,4 +106,4 @@ export const initialSizes = {
     md: false,
     lg: false,
     xl: false
-}
+};

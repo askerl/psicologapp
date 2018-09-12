@@ -136,7 +136,7 @@ class HistoriaClinica extends Component {
 
         const defaultSorted = [{
             dataField: 'nro',
-            order: 'asc'
+            order: 'desc'
           }];
 
         const totalSesiones = this.state.sesiones.length;

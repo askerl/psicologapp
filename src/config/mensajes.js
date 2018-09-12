@@ -14,7 +14,8 @@ export const errores = {
     existePacienteNombre: "Ya ingresó un Paciente con ese nombre y apellido",
     errorCargarDatosPaciente: "Ocurrió un error al cargar los datos del paciente",
     datosSinModificar: "No ha modificado ningún dato",
-    errorBackup: "Ocurrió un error al respaldar los datos"
+    errorBackup: "Ocurrió un error al respaldar los datos",
+    errorDescarga: "Ocurrió un error al realizar la descarga"
 }
 
 export const mensajes = {

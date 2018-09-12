@@ -43,6 +43,10 @@ class ListaSesiones extends Component {
 		this.resize();
 	}
 
+	componentWillUnmount() {
+		window.removeEventListener("resize", this.resize);
+	}
+
 	initFiltros(){
 		let hoy = moment(new Date());
 		let mes = hoy.month()+1;
