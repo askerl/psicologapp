@@ -200,6 +200,13 @@ span.thTitle{
             cursor: pointer;
         }
     }
+    .fa-times-circle {
+        color: $red;
+        &:hover {
+            color: $pink;
+            cursor: pointer;
+        }
+    }
 }
 
 #botonesPaciente {

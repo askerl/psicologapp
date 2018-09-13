@@ -3,7 +3,7 @@
 import db, { backupRef } from '../fire';
 import moment from 'moment';
 import { backupDateFormat } from '../config/constants';
-import { setSession, getSession } from './utils';
+import { setSession, getSession, deleteFile } from './utils';
 
 export const getRespaldos = () => {
     let promise = new Promise( (resolve, reject) => {
@@ -113,3 +113,21 @@ const backupCollection = (collectionName) => {
     });
     return promise;
 };
+
+export const deleteBackup = (idBackup, fileName) => {
+    let promise = new Promise( (resolve, reject) => {
+        // borro registro del respaldo
+        db.collection("respaldos").doc(idBackup).delete().then( () => {
+            // borro archivo
+            deleteFile(fileName).then( () => {
+                resolve();         
+            }).catch( error => {
+                // si no pude borrar el archivo aviso con advertencia
+                resolve(error);
+            });
+        }).catch( error => {
+            reject(error); 
+        });
+    });
+    return promise;
+}

@@ -348,4 +348,15 @@ export const downloadFile = (fileName) => {
     return promise;
 };
 
+export const deleteFile = (fileName) => {
+    let promise = new Promise( (resolve, reject) => {
+        backupRef.child(fileName).delete().then( () => {
+            resolve();
+        }).catch(error => {
+            reject(error);
+        });
+    });
+    return promise;
+};
+
 

@@ -20,5 +20,7 @@ export const errores = {
 
 export const mensajes = {
     noFacturacionPrepaga: 'No hubo facturación de prepagas en el mes.',
-    okBackup: 'Los datos han sido respaldados'
+    okBackup: 'Los datos han sido respaldados',
+    okDelete: 'Los datos han sido eliminados',
+    warningArchivo: 'El archivo del respaldo no pudo ser eliminado. Contacte al Administrador.'
 }

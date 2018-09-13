@@ -19,7 +19,10 @@ export const tablasFormatter = {
     },
     actionsRespaldo(cell, row, rowIndex, formatExtraData) {
         return (
-            <i className="fa fa-cloud-download fa-lg" title="Descargar respaldo" onClick={() => formatExtraData(row.nombre)}></i>
+            <div>
+                <i className="fa fa-cloud-download fa-lg mr-1" title="Descargar respaldo" onClick={() => formatExtraData.descargar(row.nombre)}></i>
+                <i className="fa fa-times-circle fa-lg" title="Eliminar respaldo" onClick={() => formatExtraData.eliminar(cell, row.nombre)}></i>
+            </div>
         );
     },
     nombrePaciente(cell, row){

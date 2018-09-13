@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardHeader, Col, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, Col, Row, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { NotificationManager } from 'react-notifications';
-import { backupData, getRespaldos } from '../../utils/backup';
+import { backupData, getRespaldos, deleteBackup } from '../../utils/backup';
 import { errores, mensajes } from '../../config/mensajes';
 import Spinner from '../../components/Spinner/Spinner';
 import { overlay, breakpoints } from '../../config/constants';
@@ -18,12 +18,17 @@ class Respaldos extends Component {
             loading: false,
             respaldando: false,
             respaldos: [],
-            size: ''
+            size: '',
+            showDeleteModal: false,
+            idBackup: '',
+            selectedFileName: ''
         };
         this.cargarRespaldos = this.cargarRespaldos.bind(this);
         this.respaldar = this.respaldar.bind(this);
         this.resize = this.resize.bind(this);
         this.descargarRespaldo = this.descargarRespaldo.bind(this);
+        this.toggleDelete = this.toggleDelete.bind(this);
+        this.borrarRespaldo = this.borrarRespaldo.bind(this);
 	}
 
 	loading(val){
@@ -64,6 +69,7 @@ class Respaldos extends Component {
             // cargo datos de respaldos
             this.cargarRespaldos();
 		}).catch( error => {
+            console.log('Error al respaldar los datos', error);
 			NotificationManager.error(errores.errorBackup, 'Error');
 		});
     }
@@ -74,7 +80,39 @@ class Respaldos extends Component {
             // descarga exitosa
             this.loading(false);
         }).catch( error => {
+            console.log('Error al descargar el respaldo', error);
 			NotificationManager.error(errores.errorDescarga, 'Error');
+		});
+    }
+
+    toggleDelete(idBackup, fileName) {
+        this.setState({
+            showDeleteModal: !this.state.showDeleteModal,
+            idBackup : idBackup || '',
+            selectedFileName: fileName || ''
+        });
+    }
+
+    borrarRespaldo() {
+        this.loading(true);
+        let idBackup = this.state.idBackup,
+            fileName = this.state.selectedFileName;
+        deleteBackup(idBackup, fileName).then( (error) => {
+            if (error) {
+                // no se pudo eliminar el archivo
+                console.log('No se pudo borrar el archivo', error);
+                NotificationManager.warning(mensajes.warningArchivo);    
+            } else {
+                // eliminación exitosa
+                NotificationManager.success(mensajes.okDelete);
+            }
+            this.toggleDelete();
+            // limpio sesión para que recarge los respaldos de la DB
+            removeSession('respaldos');
+            this.cargarRespaldos();
+        }).catch( error => {
+            console.log('Error al eliminar el respaldo', error);
+			NotificationManager.error(errores.errorBorrar, 'Error');
 		});
     }
     
@@ -83,9 +121,12 @@ class Respaldos extends Component {
         const columns = [{
 			dataField: 'id',
 			text: '',
-            headerAttrs: { width: '36px' },
+            headerAttrs: { width: '65px' },
             formatter: tablasFormatter.actionsRespaldo,
-            formatExtraData: this.descargarRespaldo
+            formatExtraData: {
+                descargar: this.descargarRespaldo,
+                eliminar: this.toggleDelete
+            }
 		}, {
 			dataField: 'fecha.seconds',
 			text: 'Fecha',
@@ -147,6 +188,18 @@ class Respaldos extends Component {
                                 </LoadingOverlay>
                             </Col>
                         </Row>
+                        <Modal isOpen={this.state.showDeleteModal} toggle={this.toggleDelete} className={'modal-md modal-danger'}>
+                            <ModalHeader toggle={this.toggleDelete}>Eliminar Respaldo</ModalHeader>
+                            <ModalBody>
+                                Confirme la eliminación del respaldo seleccionado. Esta acción no podrá deshacerse.
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" size="sm" onClick={this.borrarRespaldo}>
+                                    {this.state.loading && <Spinner />}Eliminar
+						        </Button>
+                                <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>
+                            </ModalFooter>
+                        </Modal>
                     </CardBody>
                 </Card>
 			</div>

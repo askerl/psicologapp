@@ -69,7 +69,6 @@ class HistoriaClinica extends Component {
     }
     
     toggleEdit(id) {
-        console.log('cell', id);
         let oldValue = _.get(_.find(this.state.sesiones, {'id': id}),'evolucion','');
         this.setState({
             showEditModal: !this.state.showEditModal, 
