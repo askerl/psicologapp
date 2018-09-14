@@ -38,9 +38,18 @@
     }
 }
 
-.linkButton {
+.linkCard {
     text-decoration: none;
     color: initial;
+    &.successCard .card {
+        border-color: theme-color("success");
+    }
+    &.dangerCard .card{
+        border-color: theme-color("danger");
+    }
+    &:hover {
+        text-decoration: none;
+    }
 }
 
 button{
