@@ -4,6 +4,8 @@ import db, { backupRef } from '../fire';
 import moment from 'moment';
 import { backupDateFormat } from '../config/constants';
 import { setSession, getSession, deleteFile } from './utils';
+import { env } from '../config/envs';
+import axios from 'axios';
 
 export const getRespaldos = () => {
     let promise = new Promise( (resolve, reject) => {
@@ -37,7 +39,7 @@ export const backupData = () => {
 
         let fechaBackup = moment();
 
-        let fileName = `backup-${fechaBackup.format(backupDateFormat)}.json`,
+        let fileName = `backup-${env}-${fechaBackup.format(backupDateFormat)}.json`,
             fileRef = backupRef.child(fileName);
 
         // inicializo backup
@@ -131,3 +133,46 @@ export const deleteBackup = (idBackup, fileName) => {
     });
     return promise;
 }
+
+export const restoreBackup = (idBackup, fileName) => {
+    let promise = new Promise( (resolve, reject) => {
+        
+        backupRef.child(fileName).getDownloadURL().then( url => {
+            axios({
+                url: url,
+                method: 'GET',
+                responseType: 'json' // important
+            }).then((response) => {
+                let backupData = response.data.data;
+                console.log('backupData', backupData);
+                // Get a new write batch
+                let batch = db.batch();
+                for (let collectionName in backupData) {
+                    console.log('col', collectionName);
+                    for (let doc in backupData[collectionName]) {
+                        console.log(doc);
+                        if (backupData[collectionName].hasOwnProperty(doc)) {
+                            console.log(backupData[collectionName][doc]);
+                            let docRef = db.collection(collectionName).doc(doc);
+                            batch.set(docRef, backupData[collectionName][doc], {merge: true});                            
+                        }
+                    }
+                }
+                //Commit the batch
+                batch.commit().then(() => {
+                    resolve();
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+            }).catch(error => {
+                reject(error);
+            });
+        }).catch(error => {
+            reject(error);
+        });
+        
+    });
+    return promise;
+}
+

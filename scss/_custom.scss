@@ -201,11 +201,19 @@ span.thTitle{
     margin: 0;
 }
 
+// botones de Grillas
 .react-bootstrap-table {
     .fa-edit, .fa-cloud-download {
         color: $blue;
         &:hover {
             color: $teal;
+            cursor: pointer;
+        }
+    }
+    .fa-cloud-upload {
+        color: $purple;
+        &:hover {
+            color: $yellow;
             cursor: pointer;
         }
     }

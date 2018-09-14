@@ -15,12 +15,14 @@ export const errores = {
     errorCargarDatosPaciente: "Ocurrió un error al cargar los datos del paciente",
     datosSinModificar: "No ha modificado ningún dato",
     errorBackup: "Ocurrió un error al respaldar los datos",
-    errorDescarga: "Ocurrió un error al realizar la descarga"
+    errorDescarga: "Ocurrió un error al realizar la descarga",
+    errorRestore: "Ocurrió un error al restaurar los datos"
 }
 
 export const mensajes = {
     noFacturacionPrepaga: 'No hubo facturación de prepagas en el mes.',
     okBackup: 'Los datos han sido respaldados',
     okDelete: 'Los datos han sido eliminados',
+    okRestore: 'Los datos han sido restaurados',
     warningArchivo: 'El archivo del respaldo no pudo ser eliminado. Contacte al Administrador.'
 }

@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardHeader, Col, Row, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { NotificationManager } from 'react-notifications';
-import { backupData, getRespaldos, deleteBackup } from '../../utils/backup';
+import { backupData, getRespaldos, deleteBackup, restoreBackup } from '../../utils/backup';
 import { errores, mensajes } from '../../config/mensajes';
 import Spinner from '../../components/Spinner/Spinner';
 import { overlay, breakpoints } from '../../config/constants';
 import { tablasFormatter } from '../../utils/formatters';
 import LoadingOverlay from 'react-loading-overlay';
 import BootstrapTable from 'react-bootstrap-table-next';
-import { downloadFile, removeSession } from '../../utils/utils';
+import { downloadFile, removeSession, clearSession } from '../../utils/utils';
 	
 class Respaldos extends Component {
   
@@ -20,6 +20,7 @@ class Respaldos extends Component {
             respaldos: [],
             size: '',
             showDeleteModal: false,
+            showRestoreModal: false,
             idBackup: '',
             selectedFileName: ''
         };
@@ -28,7 +29,9 @@ class Respaldos extends Component {
         this.resize = this.resize.bind(this);
         this.descargarRespaldo = this.descargarRespaldo.bind(this);
         this.toggleDelete = this.toggleDelete.bind(this);
+        this.toggleRestore = this.toggleRestore.bind(this);
         this.borrarRespaldo = this.borrarRespaldo.bind(this);
+        this.restaurarRespaldo = this.restaurarRespaldo.bind(this);
 	}
 
 	loading(val){
@@ -93,6 +96,14 @@ class Respaldos extends Component {
         });
     }
 
+    toggleRestore(idBackup, fileName) {
+        this.setState({
+            showRestoreModal: !this.state.showRestoreModal,
+            idBackup : idBackup || '',
+            selectedFileName: fileName || ''
+        });
+    }
+
     borrarRespaldo() {
         this.loading(true);
         let idBackup = this.state.idBackup,
@@ -115,17 +126,38 @@ class Respaldos extends Component {
 			NotificationManager.error(errores.errorBorrar, 'Error');
 		});
     }
+
+    restaurarRespaldo() {
+        console.log('Restaurando...');
+        this.loading(true);
+        let idBackup = this.state.idBackup,
+            fileName = this.state.selectedFileName;
+
+        restoreBackup(idBackup, fileName).then( () => {
+            // eliminación exitosa
+            NotificationManager.success(mensajes.okRestore);
+            this.toggleRestore();
+            // limpio sesión para que recarge todos los datos de la DB
+            clearSession();
+            this.cargarRespaldos();
+        }).catch( error => {
+            console.log('Error al restaurar el respaldo', error);
+            NotificationManager.error(errores.errorRestore, 'Error');
+        });
+
+    }
     
 	render() {
 
         const columns = [{
 			dataField: 'id',
 			text: '',
-            headerAttrs: { width: '65px' },
+            headerAttrs: { width: '88px' },
             formatter: tablasFormatter.actionsRespaldo,
             formatExtraData: {
                 descargar: this.descargarRespaldo,
-                eliminar: this.toggleDelete
+                eliminar: this.toggleDelete,
+                restaurar: this.toggleRestore
             }
 		}, {
 			dataField: 'fecha.seconds',
@@ -195,9 +227,23 @@ class Respaldos extends Component {
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" size="sm" onClick={this.borrarRespaldo}>
-                                    {this.state.loading && <Spinner />}Eliminar
+                                    {this.state.loading && <Spinner/>}Eliminar
 						        </Button>
                                 <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>
+                            </ModalFooter>
+                        </Modal>
+                        <Modal isOpen={this.state.showRestoreModal} toggle={this.toggleRestore} className={'modal-lg modal-purple'}>
+                            <ModalHeader toggle={this.toggleRestore}>Restaurar Respaldo</ModalHeader>
+                            <ModalBody>
+                                Al restaurar el respaldo se reemplazarán todos los datos actuales por los del respaldo seleccionado.<br/>
+                                Los pacientes y sesiones ingresados con fecha posterior al respaldo se mantendrán inalterados.<br/>
+                                Esta acción no podrá deshacerse.
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="purple" size="sm" onClick={this.restaurarRespaldo}>
+                                    {this.state.loading && <Spinner/>}Restaurar
+						        </Button>
+                                <Button color="secondary" size="sm" onClick={this.toggleRestore}>Cancelar</Button>
                             </ModalFooter>
                         </Modal>
                     </CardBody>
