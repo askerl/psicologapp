@@ -130,11 +130,6 @@ function armarGrafica(facturaciones) {
         prepagas:   _.map(facturaciones, 'totalPrepaga'),
         copagos:    _.map(facturaciones, 'totalCopago')
     };
-    let minimo = 1000;//_.min(data.totales);
-    data.minimo = [];
-    for (let i = 0; i <= data.totales.length; i++) {
-        data.minimo.push(minimo);
-    }
 
     let grafica = {
         labels: facturaciones.map(item => formatMonth(item.mes,mesesFormat.short)),
@@ -183,12 +178,6 @@ function armarGrafica(facturaciones) {
                 stacked: true
             }],
             yAxes: [{
-                // ticks: {
-                //     beginAtZero: true,
-                //     maxTicksLimit: 10,
-                //     stepSize: 5000,
-                //     // max: maxGraf
-                // },
                 stacked: true
             }]
         },

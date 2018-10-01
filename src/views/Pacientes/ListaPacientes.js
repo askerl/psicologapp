@@ -3,7 +3,6 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { numberFilter, selectFilter, textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
-import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
 import ExportCSV from '../../components/ExportCSV/exportCSV';
 import { breakpoints, estadosPaciente, filtroPrepagas, filtroTipoPaciente, overlay } from '../../config/constants';

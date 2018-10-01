@@ -4,12 +4,11 @@ import React, { Component } from 'react';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import Toggle from 'react-toggle';
-import { Alert, Button, Col, CardFooter, Form, FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { pacientePrepaga, pacientePrivado, prepagas, prepagasById, tipoLoader, tipoPaciente, overlay } from '../../config/constants';
-import { errores, mensajes } from '../../config/mensajes';
+import { Alert, Button, Col, Form, FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import { pacientePrepaga, pacientePrivado, prepagas, tipoPaciente, overlay, fechaFormat } from '../../config/constants';
+import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { calcPorcentajesSesiones, getPaciente, getPacientes, getSession, removeSession, borrarPaciente } from '../../utils/utils';
-import Widget02 from '../Widgets/Widget02';
 import { WidgetSesionesRestantes, WidgetSesionesUsadas } from '../Widgets/WidgetsAuxiliares';
 import Spinner from '../../components/Spinner/Spinner';
 
@@ -25,7 +24,6 @@ class Paciente extends Component {
             activo: true,
             setActivo: true,
             facturaPrepaga: true,
-            pagos: [],
             sesiones: 0,
             sesionesAut: 0,
             porcUsadas: 0,
@@ -34,15 +32,13 @@ class Paciente extends Component {
             errorApellido: false,
             errorTipo: false,
             errorValorConsulta: false,
-            errorPrepaga: false,            
-            errorPago: false,
+            errorPrepaga: false,
             showDeleteModal: false,
             showActivarModal: false
         }; // <- set up react state
         this.loadPaciente = this.loadPaciente.bind(this);
         this.savePaciente = this.savePaciente.bind(this);
         this.deletePaciente = this.deletePaciente.bind(this);
-        this.getPagosPrepaga = this.getPagosPrepaga.bind(this);
         this.goBack = this.goBack.bind(this);
         this.changeNombre = this.changeNombre.bind(this);
         this.changeApellido = this.changeApellido.bind(this);
@@ -50,7 +46,6 @@ class Paciente extends Component {
         this.changeTipoPaciente = this.changeTipoPaciente.bind(this);
         this.changeValorConsulta = this.changeValorConsulta.bind(this);
         this.changeSesionesAut = this.changeSesionesAut.bind(this);
-        this.changePago = this.changePago.bind(this);
         this.validate = this.validate.bind(this);
         this.loading = this.loading.bind(this);
         this.porcentajesSesiones = this.porcentajesSesiones.bind(this);
@@ -104,13 +99,11 @@ class Paciente extends Component {
         this.inputFchNac.value      = moment(p.fchNac, "DD/MM/YYYY").format("YYYY-MM-DD");
         this.inputNotas.value       = p.notas;
         this.inputTipo.value        = p.tipo;
+        this.inputValorConsulta.value = p.valorConsulta;
         this.setState({activo: p.activo, setActivo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
-        if (p.tipo === pacientePrivado){
-            this.inputValorConsulta.value = p.valorConsulta; 
-        } else {
+        if (p.tipo === pacientePrepaga){
             this.inputPrepaga.value     = p.prepaga;
-            this.setState({pagos: this.getPagosPrepaga(p.prepaga), facturaPrepaga: p.facturaPrepaga});
-            this.inputPago.value        = p.pago;
+            this.setState({facturaPrepaga: p.facturaPrepaga});
             this.inputCopago.value      = p.copago;
             this.inputCredencial.value  = p.credencial;
             this.inputSesiones.value    = p.sesionesAut;
@@ -149,19 +142,8 @@ class Paciente extends Component {
     }
 
     changePrepaga() {
-        let selPrepaga = this.inputPrepaga.value;
-        let pagosPrepaga = this.getPagosPrepaga(selPrepaga);
-        this.setState({pagos: [...pagosPrepaga].concat([]), errorPrepaga: false});
+        this.setState({errorPrepaga: false});
         this.validate("prepaga");
-    }
-
-    getPagosPrepaga(prepaga){
-        return prepagasById[prepaga].pagos;
-    }
-
-    changePago(){
-        this.setState({errorPago: false});
-        this.validate("pago");
     }
 
     changeSesionesAut(){
@@ -173,44 +155,42 @@ class Paciente extends Component {
 
         if(this.validate()){
 
+            let fchNacMoment = moment(this.inputFchNac.value);
+
             let paciente = {
                 nombre: _.trim(this.inputNombre.value) || '',
                 apellido: _.trim(this.inputApellido.value) || '',
                 dni: this.inputDNI.value ? _.trim(this.inputDNI.value.split('.').join("")) : '',
                 tel: _.trim(this.inputTel.value) || '',
-                fchNac: moment(this.inputFchNac.value).format('DD/MM/YYYY') || '',
+                fchNac: fchNacMoment.isValid() ? fchNacMoment.format(fechaFormat.fecha) : '',
                 telFlia: _.trim(this.inputTelFlia.value) || '',
                 dir: _.trim(this.inputDir.value) || '',
                 notas: _.trim(this.inputNotas.value) || '',
                 tipo: this.inputTipo.value || null,
-                email: _.trim(this.inputEmail.value) || ''
+                email: _.trim(this.inputEmail.value) || '',
+                valorConsulta: parseFloat(this.inputValorConsulta.value) || 0
             };
 
-            if (this.state.tipo === pacientePrivado){
-                paciente.valorConsulta = parseFloat(this.inputValorConsulta.value) || 0;
-            } else {
+            if (this.state.tipo === pacientePrepaga){
                 paciente.prepaga = this.inputPrepaga.value || null;
                 paciente.facturaPrepaga = this.state.facturaPrepaga;
-                paciente.pago = parseInt(this.inputPago.value);
                 paciente.copago = parseFloat(this.inputCopago.value) || 0;
                 paciente.sesionesAut = parseInt(this.inputSesiones.value) || 0;
                 paciente.credencial = _.trim(this.inputCredencial.value) || '';
             }
 
             if (this.state.nuevo){
-                // console.log('Nuevo paciente', paciente);
                 paciente.sesiones = 0;
                 paciente.activo = true; // nuevos pacientes siempre son activos
                 // db save
                 db.collection("pacientes").add(paciente)
-                .then(docRef => {
-                    this.loading(false);
-                    removeSession('pacientes');
-                    //console.log("Paciente generado con ID: ", docRef.id);
-                    NotificationManager.success('Los datos han sido guardados');
-                    
-                    this.goBack();
-                })
+                .then(() => {
+                        this.loading(false);
+                        removeSession('pacientes');
+                        //console.log("Paciente generado con ID: ", docRef.id);
+                        NotificationManager.success('Los datos han sido guardados');
+                        this.goBack();
+                    })
                 .catch(function(error) {
                     console.error("Error guardando paciente: ", error);
                     NotificationManager.error(errores.errorGuardar, 'Error');
@@ -219,7 +199,6 @@ class Paciente extends Component {
             } else {
                 paciente.activo = this.state.setActivo; 
                 paciente.sesiones = this.state.sesiones;               
-                // console.log('Editando paciente', paciente);
                 db.collection("pacientes").doc(this.state.id).update(paciente)
                 .then(() => {
                     this.loading(false);
@@ -275,10 +254,6 @@ class Paciente extends Component {
                 this.setState({errorPrepaga: true});
                 isFormValid = false;
             }
-            if ((!field || field === "pago") && (!this.inputPago.value || this.inputPago.value === "-1")) {
-                this.setState({errorPago: true});
-                isFormValid = false;
-            }
         }
 
         return isFormValid;
@@ -287,9 +262,6 @@ class Paciente extends Component {
 
     checkExistePaciente() {
         if (this.inputNombre.value && this.inputApellido.value) {
-            console.log('chequeando si existe paciente', this.inputNombre.value, this.inputApellido.value);
-            console.log('pacientes map', this.pacientes);
-
             let existe = _.find(this.pacientes, pac => {
                 if (_.lowerCase(pac.nombre) == _.lowerCase(this.inputNombre.value) && _.lowerCase(pac.apellido) == _.lowerCase(this.inputApellido.value)
                     && pac.id !== this.state.id
@@ -442,30 +414,6 @@ class Paciente extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
-                                {this.state.tipo === pacientePrivado &&
-                                    <Row>
-                                        <Col>
-                                            <FormGroup className="errorAddon">
-                                                <Label htmlFor="valorConsulta">Valor de consulta</Label>
-                                                <InputGroup>
-                                                    <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
-                                                    <Input type="number" id="valorConsulta" name="valorConsulta" innerRef={el => this.inputValorConsulta = el} required
-                                                        className={this.state.errorValorConsulta ? 'is-invalid' : ''} onChange={this.changeValorConsulta} />
-                                                </InputGroup>
-                                                {this.state.errorValorConsulta &&
-                                                    <div className="invalid-feedback">{errores.valorConsultaVacio}</div>
-                                                }
-                                            </FormGroup>
-                                        </Col>
-                                    </Row>
-                                }
-                                {/* {this.state.tipo === pacientePrivado && !this.state.nuevo &&
-                                    <Row>
-                                        <Col>
-                                            <Widget02 color="info" header={`${this.state.sesiones}`} mainText="Sesiones realizadas" icon="fa fa-comments-o" />
-                                        </Col>
-                                    </Row>
-                                } */}
                                 {this.state.tipo === pacientePrepaga &&
                                     <Row>
                                         <Col xs="12" sm="6">
@@ -486,36 +434,38 @@ class Paciente extends Component {
                                                     <Toggle
                                                         id='facturaPrepaga'
                                                         checked={this.state.facturaPrepaga}
-                                                        onChange={(value) => { this.setState({ facturaPrepaga: !this.state.facturaPrepaga }) }} />
+                                                        onChange={() => { this.setState({ facturaPrepaga: !this.state.facturaPrepaga }); }} />
                                                 </div>
                                             </FormGroup>
                                         </Col>
                                     </Row>
                                 }
-                                {this.state.tipo === pacientePrepaga &&
-                                    <Row>
-                                        <Col xs="12" sm="6">
-                                            <FormGroup>
-                                                <Label htmlFor="pago">Pago por paciente</Label>
-                                                <Input type="select" name="pago" id="pago" innerRef={el => this.inputPago = el} required
-                                                    onChange={this.changePago} className={this.state.errorPago ? 'is-invalid' : ''}>
-                                                    <option value="-1">Seleccione pago...</option>
-                                                    {this.state.pagos.map((value, index) => <option key={index} value={index}>$ {value}</option>)}
-                                                </Input>
-                                                <FormFeedback>{errores.pagoPrepagaVacio}</FormFeedback>
-                                            </FormGroup>
-                                        </Col>
-                                        <Col xs="12" sm="6">
-                                            <FormGroup className="errorAddon">
-                                                <Label htmlFor="copago">Copago</Label>
-                                                <InputGroup>
-                                                    <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
-                                                    <Input type="number" id="copago" name="copago" innerRef={el => this.inputCopago = el} onChange={this.changeCopago} />
-                                                </InputGroup>
-                                            </FormGroup>
-                                        </Col>
-                                    </Row>
-                                }
+                                <Row>
+                                    <Col xs="12" sm={this.state.tipo === pacientePrepaga ? "6" : "12"}>
+                                        <FormGroup className="errorAddon">
+                                            <Label htmlFor="valorConsulta">{this.state.tipo === pacientePrivado ? 'Valor de consulta' : 'Pago por paciente'}</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="number" id="valorConsulta" name="valorConsulta" innerRef={el => this.inputValorConsulta = el} required
+                                                    className={this.state.errorValorConsulta ? 'is-invalid' : ''} onChange={this.changeValorConsulta} />
+                                            </InputGroup>
+                                            {this.state.errorValorConsulta &&
+                                                <div className="invalid-feedback">{errores.valorConsultaVacio}</div>
+                                            }
+                                        </FormGroup>
+                                    </Col>
+                                    {this.state.tipo === pacientePrepaga &&
+                                    <Col xs="12" sm="6">
+                                        <FormGroup className="errorAddon">
+                                            <Label htmlFor="copago">Copago</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="number" id="copago" name="copago" innerRef={el => this.inputCopago = el} onChange={this.changeCopago} />
+                                            </InputGroup>
+                                        </FormGroup>
+                                    </Col>
+                                    }
+                                </Row>
                                 {this.state.tipo === pacientePrepaga &&
                                     <Row>
                                         <Col xs="12" sm="6">

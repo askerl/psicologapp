@@ -4,7 +4,7 @@ import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import Select from 'react-select';
 import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
-import { overlay, pacientePrivado, prepagasById } from '../../config/constants';
+import { overlay, pacientePrivado, prepagasById, pacientePrepaga } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { createFechaSesion, getPacientes, removeSession, removeSessionSesionesMes } from '../../utils/utils';
@@ -129,14 +129,12 @@ class Sesion extends Component {
             fecha: fecha.fechaTS,
             paciente: p.value,
             tipo: p.tipo,
-            evolucion: ''
+            evolucion: '',
+            valor: p.valorConsulta
         }
 
-        if (p.tipo == pacientePrivado){
-            sesion.valor = p.valorConsulta;
-        } else {
+        if (p.tipo == pacientePrepaga){
             sesion.prepaga = p.prepaga;
-            sesion.valor = prepagasById[p.prepaga].pagos[p.pago];
             sesion.facturaPrepaga = p.facturaPrepaga;
             sesion.copago = p.copago;
         }

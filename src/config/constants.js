@@ -19,17 +19,17 @@ export const filtroTipoPaciente = auxfiltroTipoPaciente;
 export const prepagasById = {
     "galeno": {
         nombre: "Galeno",
-        pagos: [15, 200, 475],
+        pagos: [15, 200, 475], // ya no se usan
         icono: "fa fa-hospital-o"
     },
     "ososs": {
         nombre: "OSOSS",
-        pagos: [230],
+        pagos: [230], // ya no se usan
         icono: "fa fa-hospital-o"
     },
     "ospacp": {
         nombre: "O.S.P.A.C.P",
-        pagos: [230],
+        pagos: [230], // ya no se usan
         icono: "fa fa-hospital-o"
     }
 }

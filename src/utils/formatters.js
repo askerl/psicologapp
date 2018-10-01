@@ -124,12 +124,8 @@ export const csvFormatter = {
     sesiones(cell) {
         return cell || '';
     },
-    valorConsulta(cell, row) {
-        if (row.tipo == pacientePrivado) {
-            return cell || ''
-        } else {
-            return prepagasById[row.prepaga].pagos[row.pago] || '';
-        }
+    valorConsulta(cell) {   
+        return cell > 0 ? parseFloat(cell) : '';
     },
     copago(cell) {
         return cell > 0 ? cell : '';

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { pacientePrivado, pacientePrepaga, prepagas, estadosPaciente } from '../config/constants';
+import { pacientePrivado, pacientePrepaga, prepagas, estadosPaciente, fechaFormat } from '../config/constants';
 import { mailHabilitados } from '../config/firebaseConfig';
 import db, { backupRef } from '../fire';
 import axios from 'axios';
@@ -198,7 +198,7 @@ function loadPacientes(querySnapshot) {
             paciente.porcRestantes = porcs.porcRestantes;
         }
         paciente.nombreCompleto = `${paciente.apellido}, ${paciente.nombre}`;
-        let fchNacMoment = moment(paciente.fchNac, 'DD/MM/YYYY');
+        let fchNacMoment = moment(paciente.fchNac, fechaFormat.fecha);
         paciente.fchNac = fchNacMoment.isValid() ? paciente.fchNac : '';
         paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : '';
         // datos para options en select
