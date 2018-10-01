@@ -130,10 +130,9 @@ class Respaldos extends Component {
     restaurarRespaldo() {
         console.log('Restaurando...');
         this.loading(true);
-        let idBackup = this.state.idBackup,
-            fileName = this.state.selectedFileName;
+        let fileName = this.state.selectedFileName;
 
-        restoreBackup(idBackup, fileName).then( () => {
+        restoreBackup(fileName).then( () => {
             // eliminación exitosa
             NotificationManager.success(mensajes.okRestore);
             this.toggleRestore();
@@ -240,6 +239,7 @@ class Respaldos extends Component {
                                 Esta acción no podrá deshacerse.
                             </ModalBody>
                             <ModalFooter>
+                                <span className="text-muted mr-auto">{this.state.selectedFileName}</span>
                                 <Button color="purple" size="sm" onClick={this.restaurarRespaldo}>
                                     {this.state.loading && <Spinner/>}Restaurar
 						        </Button>

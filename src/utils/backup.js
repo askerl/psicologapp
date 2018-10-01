@@ -134,7 +134,7 @@ export const deleteBackup = (idBackup, fileName) => {
     return promise;
 }
 
-export const restoreBackup = (idBackup, fileName) => {
+export const restoreBackup = (fileName) => {
     let promise = new Promise( (resolve, reject) => {
         
         backupRef.child(fileName).getDownloadURL().then( url => {
@@ -148,11 +148,9 @@ export const restoreBackup = (idBackup, fileName) => {
                 // Get a new write batch
                 let batch = db.batch();
                 for (let collectionName in backupData) {
-                    console.log('col', collectionName);
+                    console.log('col', collectionName, _.keys(collectionName).length);
                     for (let doc in backupData[collectionName]) {
-                        console.log(doc);
                         if (backupData[collectionName].hasOwnProperty(doc)) {
-                            console.log(backupData[collectionName][doc]);
                             let docRef = db.collection(collectionName).doc(doc);
                             batch.set(docRef, backupData[collectionName][doc], {merge: true});                            
                         }
