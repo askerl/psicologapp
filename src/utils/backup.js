@@ -2,7 +2,7 @@
 
 import db, { backupRef } from '../fire';
 import moment from 'moment';
-import { backupDateFormat } from '../config/constants';
+import { backupDateFormat, maxBatch } from '../config/constants';
 import { setSession, getSession, deleteFile } from './utils';
 import { env } from '../config/envs';
 import axios from 'axios';
@@ -134,42 +134,21 @@ export const deleteBackup = (idBackup, fileName) => {
     return promise;
 }
 
-export const restoreBackup = (fileName) => {
+export const getBackupData = (fileName) => {
     let promise = new Promise( (resolve, reject) => {
-        
         backupRef.child(fileName).getDownloadURL().then( url => {
             axios({
                 url: url,
                 method: 'GET',
                 responseType: 'json' // important
             }).then((response) => {
-                let backupData = response.data.data;
-                console.log('backupData', backupData);
-                // Get a new write batch
-                let batch = db.batch();
-                for (let collectionName in backupData) {
-                    console.log('col', collectionName, _.keys(collectionName).length);
-                    for (let doc in backupData[collectionName]) {
-                        if (backupData[collectionName].hasOwnProperty(doc)) {
-                            let docRef = db.collection(collectionName).doc(doc);
-                            batch.set(docRef, backupData[collectionName][doc], {merge: true});                            
-                        }
-                    }
-                }
-                //Commit the batch
-                batch.commit().then(() => {
-                    resolve();
-                })
-                .catch((error) => {
-                    reject(error);
-                });
+                resolve(response.data.data);
             }).catch(error => {
                 reject(error);
             });
         }).catch(error => {
             reject(error);
         });
-        
     });
     return promise;
 }

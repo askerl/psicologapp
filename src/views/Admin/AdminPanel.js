@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Col, Row, Button } from 'reactstrap';
-import Respaldos from '../Respaldos/respaldos';
-import { pacientePrepaga, prepagasById } from '../../config/constants';
-import db from '../../fire';
+import Respaldos from './Respaldos/respaldos';
+import Prepagas from './Prepagas/prepagas';
 
 	
 class AdminPanel extends Component {
@@ -21,6 +20,7 @@ class AdminPanel extends Component {
 				<Row>
 					<Col>
 						<Respaldos/>
+						<Prepagas/>
 					</Col>
 				</Row>
 			</div>

@@ -107,3 +107,6 @@ export const initialSizes = {
     lg: false,
     xl: false
 };
+
+// max amount of writes per batch
+export const maxBatch = 500;

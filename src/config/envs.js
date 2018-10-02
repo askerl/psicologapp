@@ -4,4 +4,4 @@ export const envs = {
     PROD: 'PROD'
 };
 // current env
-export const env = envs.PROD;
+export const env = envs.TEST;
