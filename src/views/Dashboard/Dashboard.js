@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import LoadingOverlay from 'react-loading-overlay';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, Col, Row } from 'reactstrap';
+import { Card, CardBody, Col, Row, UncontrolledAlert } from 'reactstrap';
 import { overlay, prepagas } from '../../config/constants';
-import { getEstadisticas, setSession } from '../../utils/utils';
+import { getEstadisticas, setSession, recordatorioRespaldo } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
 import { Callout, StatItem } from '../Widgets/WidgetsAuxiliares';
+import { getRespaldos } from '../../utils/backup';
 	
 class Dashboard extends Component {
   
@@ -13,7 +14,9 @@ class Dashboard extends Component {
 		super(props);
 		this.state = {
 			loading: false,
-			data: {}
+			data: {},
+			recordarRespaldo: false,
+			msjRecordarRespaldo: ''
 		};
 
 	}
@@ -24,8 +27,12 @@ class Dashboard extends Component {
 
 	componentDidMount(){
 		this.loading(true);
-		getEstadisticas().then( data => {
-			this.setState({data});
+
+		Promise.all([getEstadisticas(), getRespaldos()]).then(values => { 
+			let data = values[0];
+			let {recordarRespaldo, msjRecordarRespaldo} = recordatorioRespaldo(values[1]);			
+
+			this.setState({data, recordarRespaldo, msjRecordarRespaldo});
 			this.loading(false);
 		});
 	}
@@ -43,6 +50,11 @@ class Dashboard extends Component {
 					<Row>
 						<Col>
 							<Card className="mainCard">
+								{ this.state.recordarRespaldo &&
+								<UncontrolledAlert color="warning">
+									{this.state.msjRecordarRespaldo}
+								</UncontrolledAlert>
+								}
 								<CardBody>
 									<div className="mb-3"><span className="h6">Pacientes</span></div>
 									<Row>

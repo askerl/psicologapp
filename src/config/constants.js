@@ -110,3 +110,6 @@ export const initialSizes = {
 
 // max amount of writes per batch
 export const maxBatch = 500;
+
+// recordatorio de respaldos cada X dias
+export const diasRespaldo = 30;

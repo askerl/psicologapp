@@ -1,3 +1,5 @@
+import { diasRespaldo } from "./constants";
+
 export const errores = {
     nombreVacio: "Ingrese el nombre",
     apellidoVacio: "Ingrese el apellido",
@@ -25,5 +27,7 @@ export const mensajes = {
     okDelete: 'Los datos han sido eliminados',
     okRestore: 'Los datos han sido restaurados',
     warningArchivo: 'El archivo del respaldo no pudo ser eliminado. Contacte al Administrador.',
-    warningRestore: 'Algunos datos no pudieron ser restaurados. Contacte al Administrador.'
+    warningRestore: 'Algunos datos no pudieron ser restaurados. Contacte al Administrador.',
+    primerRespaldo: 'Se sugiere realizar su primer respaldo de datos accediendo al menú Administración.',
+    recordatorioRespaldo: `Han pasado más de ${diasRespaldo} días desde su último respaldo. Se sugiere realizar un nuevo respaldo desde el menú Administración.`
 }

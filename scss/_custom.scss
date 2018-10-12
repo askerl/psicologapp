@@ -240,6 +240,12 @@ span.thTitle{
     }
 }
 
+.dashboard {
+    .alert-dismissible {
+        margin-bottom: 0;
+    }
+}
+
 // mobile
 @include media-breakpoint-down(xs) {
     .mainCard {

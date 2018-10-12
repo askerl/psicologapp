@@ -1,10 +1,11 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { pacientePrivado, pacientePrepaga, prepagas, estadosPaciente, fechaFormat } from '../config/constants';
+import { pacientePrivado, pacientePrepaga, prepagas, estadosPaciente, fechaFormat, diasRespaldo } from '../config/constants';
 import { mailHabilitados } from '../config/firebaseConfig';
 import db, { backupRef } from '../fire';
 import axios from 'axios';
 import FileSaver from 'file-saver';
+import { mensajes } from '../config/mensajes';
 
 // ---------------------- SESSION HANDLER --------------------------------
 
@@ -358,5 +359,26 @@ export const deleteFile = (fileName) => {
     });
     return promise;
 };
+
+// ---------------------- RESPALDOS --------------------------------
+
+export const recordatorioRespaldo = backups => {
+    let recordarRespaldo = false, msjRecordarRespaldo = '';
+    if (backups.length > 0) {
+        // obtengo fecha de último respaldo y me fijo si es mayor a la cantidad de días configurada
+        let today = moment(),
+            backupDate = moment.unix(backups[0].fecha.seconds);        
+        let diff = today.diff(backupDate,'days');
+        if (diff > diasRespaldo) {
+            recordarRespaldo = true;
+            msjRecordarRespaldo = mensajes.recordatorioRespaldo;
+        }
+    } else {
+        // muestro mensaje para que realice su primer respaldo
+        recordarRespaldo = true;
+        msjRecordarRespaldo = mensajes.primerRespaldo;
+    }
+    return {recordarRespaldo, msjRecordarRespaldo}
+}
 
 
