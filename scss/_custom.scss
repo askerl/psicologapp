@@ -234,6 +234,12 @@ span.thTitle{
     color: white;
 }
 
+.graficas-footer {
+    .graficas-footer-section-title {
+        font-size: 90%;
+    }
+}
+
 // mobile
 @include media-breakpoint-down(xs) {
     .mainCard {

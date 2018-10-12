@@ -6,10 +6,10 @@ import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Form, FormGroup, Input, InputGroup, Label, Progress, Row } from 'reactstrap';
 import { breakpoints, meses, mesesFormat, overlay, prepagas } from '../../config/constants';
-import { errores, mensajes } from '../../config/mensajes';
+import { errores } from '../../config/mensajes';
 import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
 import { tablasFormatter } from '../../utils/formatters';
-import { round } from '../../utils/utils';
+import { percentage } from '../../utils/utils';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
 import _ from 'lodash';
 import Spinner from '../../components/Spinner/Spinner';
@@ -163,29 +163,41 @@ class Facturaciones extends Component {
 
 		const expandRow = {
 			renderer: rowData => {
+				console.log(rowData);
+				let liPrivados, liPrepagas, liCopagos;
+				if (rowData.totalPrivado > 0) {
+					liPrivados =
+					<li>
+						<StatItem title="Privados" icon="fa fa-user-o" value={`$ ${rowData.totalPrivado}`} porc={percentage(rowData.totalPrivado,rowData.total)} color="warning"/>
+					</li>;
+				}
 				if (rowData.totalPrepaga > 0) {
 					let auxPrepagas = Object.assign({}, prepagas);
 					_.forEach(auxPrepagas, item => {
 						item.valor 	= rowData.prepagas[item.id];
-						item.porc	= round(item.valor / rowData.totalPrepaga * 100, 2);
+						item.porc	= percentage(item.valor, rowData.total);
 					});
-					let li = _.chain(auxPrepagas).sortBy('valor').reverse().map(item => {
+					liPrepagas = _.chain(auxPrepagas).sortBy('valor').reverse().map(item => {
 						return(
 							<li key={item.id}><StatItem title={item.nombre} value={`$ ${item.valor}`} porc={`${item.porc}`} color="info" icon={item.icono} /></li>
 						)
 					}).value();
-					return (
-						<div>
-							<ul className="horizontal-bars type-2">
-							{li}
-							</ul>
-						</div>
-					);
-				} else {
-					return(
-						<div className="small">{mensajes.noFacturacionPrepaga}</div>
-					);
 				}
+				if (rowData.totalCopago > 0) {
+					liCopagos =
+					<li>
+						<StatItem title="Copagos" icon="fa fa-money" value={`$ ${rowData.totalCopago}`} porc={percentage(rowData.totalCopago,rowData.total)} color="teal"/>
+					</li>;
+				}
+				return(
+					<div>
+						<ul className="horizontal-bars type-2">
+							{liPrivados}
+							{liPrepagas}
+							{liCopagos}
+						</ul>
+					</div>
+				);
 			},
 			showExpandColumn: true,
 			expandHeaderColumnRenderer: ({ isAnyExpands }) => {
@@ -279,31 +291,58 @@ class Facturaciones extends Component {
 										<Bar data={this.state.grafica} options={this.state.optsGrafica} height={300} />
 									</div>
 								</CardBody>
-								<CardFooter>
-									<div className="small text-muted text-center">Totales del período</div>
+								<CardFooter className="graficas-footer">
+									<div className="small text-muted text-center graficas-footer-section-title">Totales del período</div>
 									<hr className="mt-1 mb-3"/>
 									<Row>
 										<Col xs="6" sm="3">
-											<div className="text-muted">Global</div>
+											<div className="text-muted">Total Global</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumTotal}</strong>
-											<Progress className="progress-xs mt-2" color="success" value="100" />
+											<Progress className="progress-xs mt-2 mb-2" color="success" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
-											<div className="text-muted">Privados</div>
+											<div className="text-muted">Total Privados</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrivados}</strong>
-											<Progress className="progress-xs mt-2" color="warning" value="100" />
+											<Progress className="progress-xs mt-2 mb-2" color="warning" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
-											<div className="text-muted">Prepagas</div>
+											<div className="text-muted">Total Prepagas</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrepagas}</strong>
-											<Progress className="progress-xs mt-2" color="info" value="100" />
+											<Progress className="progress-xs mt-2 mb-2" color="info" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
-											<div className="text-muted">Copagos</div>
+											<div className="text-muted">Total Copagos</div>
 											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumCopagos}</strong>
-											<Progress className="progress-xs mt-2" color="teal" value="100" />
+											<Progress className="progress-xs mt-2 mb-2" color="teal" value="100" />
 										</Col>
 									</Row>
+
+									<div className="small text-muted text-center graficas-footer-section-title mt-3">Promedios del período</div>
+									<hr className="mt-1 mb-3"/>
+									<Row>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Promedio Global</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.avgTotal}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="success" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Promedio Privados</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.avgPrivados}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="warning" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Promedio Prepagas</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.avgPrepagas}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="info" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Promedio Copagos</div>
+											<strong><i className="fa fa-usd"></i> {this.state.grafica.avgCopagos}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="teal" value="100" />
+										</Col>
+									</Row>
+
+
 								</CardFooter>
 							</Card>
 						</Col>

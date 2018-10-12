@@ -165,6 +165,12 @@ function armarGrafica(facturaciones) {
         sumCopagos: round(_.sum(data.copagos),2)
     }
 
+    // seteo promedios
+    grafica.avgTotal = round(grafica.sumTotal / facturaciones.length,2);
+    grafica.avgPrivados = round(grafica.sumPrivados / facturaciones.length,2);
+    grafica.avgPrepagas = round(grafica.sumPrepagas / facturaciones.length,2);
+    grafica.avgCopagos = round(grafica.sumCopagos / facturaciones.length,2);
+
     let facChartOpts = {
         maintainAspectRatio: false,
         legend: {
