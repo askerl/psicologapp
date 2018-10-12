@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardHeader, Col, Row, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { NotificationManager } from 'react-notifications';
-import { backupData, getRespaldos, deleteBackup, getBackupData } from '../../../utils/backup';
+import { backupData, getRespaldos, deleteBackup, restoreBackup } from '../../../utils/backup';
 import { errores, mensajes } from '../../../config/mensajes';
 import Spinner from '../../../components/Spinner/Spinner';
 import { overlay, breakpoints } from '../../../config/constants';
@@ -9,7 +9,6 @@ import { tablasFormatter } from '../../../utils/formatters';
 import LoadingOverlay from 'react-loading-overlay';
 import BootstrapTable from 'react-bootstrap-table-next';
 import { downloadFile, removeSession, clearSession } from '../../../utils/utils';
-import db from '../../../fire';
 	
 class Respaldos extends Component {
   
@@ -65,14 +64,14 @@ class Respaldos extends Component {
 
 	respaldar() {
 		this.setState({respaldando: true});
-		backupData().then( data =>{
+		backupData().then( () => {
             NotificationManager.success(mensajes.okBackup);
-            this.setState({respaldando: false});
+            this.setState({ respaldando: false });
             // limpio sesión para que recarge los respaldos de la DB
             removeSession('respaldos');
             // cargo datos de respaldos
             this.cargarRespaldos();
-		}).catch( error => {
+        }).catch( error => {
             console.log('Error al respaldar los datos', error);
 			NotificationManager.error(errores.errorBackup, 'Error');
 		});
@@ -133,53 +132,29 @@ class Respaldos extends Component {
         this.loading(true);
         let fileName = this.state.selectedFileName;
 
-        getBackupData(fileName).then( (backupData) => {
-            console.log('BackupData', backupData);
-            console.log('Pacientes', Object.keys(backupData['pacientes']).length);
-            console.log('Sesiones', Object.keys(backupData['sesiones']).length);
-            let i = 0, total = Object.keys(backupData['pacientes']).length + Object.keys(backupData['sesiones']).length;
-            console.log('Total de registros', total);
-            for (let collectionName in backupData) {
-                for (let doc in backupData[collectionName]) {
-                    if (backupData[collectionName].hasOwnProperty(doc)) {
-                        let docRef = db.collection(collectionName).doc(doc);
-                        docRef.set(backupData[collectionName][doc], {merge: true}).then(() => {
-                            i += 1;
-                            console.log(collectionName + ' OK');
-                            if (i >= total) {
-                                NotificationManager.success(mensajes.okRestore);
-                                this.setState({
-                                    showRestoreModal: false,
-                                    idBackup : '',
-                                    selectedFileName: ''
-                                });
-                                // limpio sesión para que recarge todos los datos de la DB
-                                clearSession();
-                                this.cargarRespaldos();
-                            }
-                        }).catch(error => {
-                            i += 1;
-                            console.log(collectionName + ' ERROR', error);
-                            if (i >= total) {
-                                NotificationManager.error(mensajes.errorRestore);
-                                this.setState({
-                                    showRestoreModal: false,
-                                    idBackup : '',
-                                    selectedFileName: ''
-                                });
-                                // limpio sesión para que recarge todos los datos de la DB
-                                clearSession();
-                                this.cargarRespaldos();
-                            }
-                        });
-                    }
-                }
+        restoreBackup(fileName).then( hayError => {
+            if (hayError) {
+                NotificationManager.warning(mensajes.warningRestore);
+            } else {
+                NotificationManager.success(mensajes.okRestore);
             }
+            this.setState({
+                showRestoreModal: false,
+                idBackup : '',
+                selectedFileName: ''
+            });
+            // limpio sesión para que recarge todos los datos de la DB
+            clearSession();
+            this.cargarRespaldos();
 
         }).catch( error => {
-            console.log('Error al obtener datos del respaldo', error);
+            console.log('Error al realizar el respaldo', error);
             NotificationManager.error(errores.errorRestore, 'Error');
         });
+
+    }
+
+    finRespaldo() {
 
     }
     
@@ -271,8 +246,8 @@ class Respaldos extends Component {
                         <Modal isOpen={this.state.showRestoreModal} toggle={this.toggleRestore} className={'modal-lg modal-purple'}>
                             <ModalHeader toggle={this.toggleRestore}>Restaurar Respaldo</ModalHeader>
                             <ModalBody>
-                                Al restaurar el respaldo se reemplazarán todos los datos actuales por los del respaldo seleccionado.<br/>
-                                Los pacientes y sesiones ingresados que no estén incluidos en el respaldo se mantendrán inalterados.<br/>
+                                Al restaurar el respaldo se agregarán todos los datos del respaldo seleccionado que no se encuentren en los datos actuales (pacientes y sesiones que hayan sido eliminados).<br/>
+                                Cualquier dato modificado o ingresado con fecha posterior al respaldo se mantendrá inalterado.<br/>
                                 Esta acción no podrá deshacerse.
                             </ModalBody>
                             <ModalFooter>
@@ -280,7 +255,7 @@ class Respaldos extends Component {
                                 <Button color="purple" size="sm" onClick={this.restaurarRespaldo}>
                                     {this.state.loading && <Spinner/>}{this.state.loading ? 'Restaurando' : 'Restaurar'}
 						        </Button>
-                                <Button color="secondary" size="sm" onClick={this.toggleRestore}>Cancelar</Button>
+                                <Button color="secondary" size="sm" onClick={this.toggleRestore} disabled={this.state.loading}>Cancelar</Button>
                             </ModalFooter>
                         </Modal>
                     </CardBody>

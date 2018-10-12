@@ -153,3 +153,50 @@ export const getBackupData = (fileName) => {
     return promise;
 }
 
+export const restoreBackup = (fileName) => {
+    let promise = new Promise( (resolve, reject) => {
+        getBackupData(fileName).then( backupData => {
+            console.log('BackupData', backupData);
+            console.log('Pacientes', Object.keys(backupData['pacientes']).length);
+            console.log('Sesiones', Object.keys(backupData['sesiones']).length);
+            let i = 0, total = Object.keys(backupData['pacientes']).length + Object.keys(backupData['sesiones']).length;
+            let hayError = false;
+            console.log('Total de registros', total);
+            for (let collectionName in backupData) {
+                for (let doc in backupData[collectionName]) {
+                    if (backupData[collectionName].hasOwnProperty(doc)) {
+                        let docRef = db.collection(collectionName).doc(doc);
+                        docRef.get().then( docSnap => {
+                            // chequeo si el documento existe, si no existe no hago nada
+                            if ( !docSnap.exists ) {
+                                docRef.set(backupData[collectionName][doc], {merge: true}).then(() => {
+                                    i += 1;
+                                    console.log(collectionName + ' OK');
+                                    if (i >= total) {
+                                        resolve(hayError);
+                                    }
+                                }).catch(error => {
+                                    i += 1;
+                                    hayError = true;
+                                    console.log(collectionName + ' ERROR', error);
+                                    if (i >= total) {
+                                        resolve(hayError);
+                                    }
+                                });
+                            } else {
+                                i += 1;
+                                if (i >= total) {
+                                    resolve(hayError);
+                                }
+                            }
+
+                        });           
+                    }
+                }
+            }
+        }).catch(error => {
+            reject(error);
+        });
+    });
+    return promise;
+}

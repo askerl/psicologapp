@@ -512,7 +512,7 @@ class Paciente extends Component {
                             </Form>
                             <hr className="mt-3 mb-3"/>
                             <div id="botonesPaciente">
-                                <Button type="submit" color="success" onClick={() => this.savePaciente()}>
+                                <Button type="submit" color="primary" onClick={() => this.savePaciente()}>
                                     {this.state.loading && <Spinner/>}Guardar
                                 </Button>
                                 {!this.state.nuevo &&
@@ -536,7 +536,7 @@ class Paciente extends Component {
                             <Button color="danger" size="sm" onClick={this.deletePaciente}>
                                 {this.state.loading && <Spinner />}Eliminar
                             </Button>
-                            <Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleDelete} disabled={this.state.loading}>Cancelar</Button>
                         </ModalFooter>
                     </Modal>
                     <Modal isOpen={this.state.showActivarModal} toggle={this.toggleActivar} className={'modal-md ' + (this.state.setActivo ? 'modal-success' : 'modal-warning')}>
@@ -548,7 +548,7 @@ class Paciente extends Component {
                             <Button color={this.state.setActivo ? 'success' : 'warning'} size="sm" onClick={this.savePaciente}>
                                 {this.state.loading && <Spinner />}Aceptar
                             </Button>
-                            <Button color="secondary" size="sm" onClick={this.toggleActivar}>Cancelar</Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleActivar} disabled={this.state.loading}>Cancelar</Button>
                         </ModalFooter>
                     </Modal>
                 </LoadingOverlay>

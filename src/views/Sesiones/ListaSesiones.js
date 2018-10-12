@@ -299,7 +299,7 @@ class ListaSesiones extends Component {
 						<Button color="danger" size="sm" onClick={this.deleteSesiones}>
 							{this.state.loading && <Spinner />}Borrar
 						</Button>
-						<Button color="secondary" size="sm" onClick={this.toggleDelete}>Cancelar</Button>
+						<Button color="secondary" size="sm" onClick={this.toggleDelete} disabled={this.state.loading}>Cancelar</Button>
 					</ModalFooter>
 				</Modal>
 			</div>

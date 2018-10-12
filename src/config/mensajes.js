@@ -24,5 +24,6 @@ export const mensajes = {
     okBackup: 'Los datos han sido respaldados',
     okDelete: 'Los datos han sido eliminados',
     okRestore: 'Los datos han sido restaurados',
-    warningArchivo: 'El archivo del respaldo no pudo ser eliminado. Contacte al Administrador.'
+    warningArchivo: 'El archivo del respaldo no pudo ser eliminado. Contacte al Administrador.',
+    warningRestore: 'Algunos datos no pudieron ser restaurados. Contacte al Administrador.'
 }

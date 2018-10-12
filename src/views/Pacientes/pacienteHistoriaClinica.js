@@ -200,7 +200,7 @@ class HistoriaClinica extends Component {
                             <Button color="success" size="sm" onClick={this.updateEvolucion}>
                                 {this.state.loading && <Spinner />}Guardar
 						</Button>
-                            <Button color="secondary" size="sm" onClick={this.toggleEdit}>Cancelar</Button>
+                            <Button color="secondary" size="sm" onClick={this.toggleEdit} disabled={this.state.loading}>Cancelar</Button>
                         </ModalFooter>
                     </Modal>
             </div>

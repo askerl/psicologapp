@@ -263,7 +263,14 @@ span.thTitle{
         justify-content: space-between;
         flex-wrap: wrap;
         .btn {
-            width: 50%;
+            width: 100%;
+        }
+        button {
+            margin-right: 0;
+            margin-bottom: 10px;
+            &:last-child {
+                margin-bottom: 0;
+            }
         }
     }
 }

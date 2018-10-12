@@ -36,7 +36,7 @@ class Prepagas extends Component {
                     <CardBody>
                         <Row>
                             <Col>
-                              Coming soon...
+                              Próximamente...
                             </Col>
                         </Row>
                     </CardBody>

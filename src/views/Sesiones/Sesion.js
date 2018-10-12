@@ -236,7 +236,7 @@ class Sesion extends Component {
                                     <Button type="submit" color="primary" onClick={ e => this.saveSesion(e)}>
                                         {this.state.loading && <Spinner/>}Guardar
                                     </Button>
-                                    <Button type="reset" color="secondary" onClick={this.goBack}>Cancelar</Button>
+                                    <Button type="reset" color="secondary" onClick={this.goBack} disabled={this.state.loading}>Cancelar</Button>
                                 </CardFooter>
                             </Card>
                         </Col>
