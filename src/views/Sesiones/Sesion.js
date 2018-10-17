@@ -189,9 +189,9 @@ class Sesion extends Component {
                             <Card className="mainCard">
                                 <CardHeader>
                                     <i className="fa fa-comments-o fa-lg"></i>
-                                    <strong>Sesión</strong>                                
+                                    <strong>Sesiones</strong>                                
                                     { this.state.nuevo &&
-                                        <a><Badge color="success" className="badge-pill ml-2">Nueva</Badge></a>
+                                        <a><Badge color="success" className="badge-pill ml-2">Nuevas</Badge></a>
                                     }                                    
                                 </CardHeader>
                                 <CardBody>

@@ -8,7 +8,19 @@ export default {
     {
       name: 'Administración',
       url: '/admin',
-      icon: 'icon-settings'
+      icon: 'icon-settings',
+      children: [
+        {
+          name: 'Prepagas',
+          url: '/admin/prepagas',
+          icon: 'fa fa-hospital-o',
+        },
+        {
+          name: 'Respaldos',
+          url: '/admin/respaldos',
+          icon: 'fa fa-database',
+        },
+      ]
     },
     {
       name: 'Pacientes',

@@ -32,10 +32,16 @@
 
 .nav-tabs {  
     .nav-link {
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
         &:hover {
             cursor: pointer;
         }
     }
+}
+
+.tab-content {
+    border-radius: 0 0 .25rem .25rem;
 }
 
 .linkCard {
@@ -244,6 +250,10 @@ span.thTitle{
     .alert-dismissible {
         margin-bottom: 0;
     }
+}
+
+.modal-footer {
+    justify-content: space-between;
 }
 
 // mobile

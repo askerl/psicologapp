@@ -31,12 +31,21 @@ class Prepagas extends Component {
 			<div>
                 <Card>
                     <CardHeader>
-                        <i className="fa fa-database fa-lg"></i> Prepagas
+                        <i className="fa fa-hospital-o fa-lg"></i> Prepagas
                     </CardHeader>
                     <CardBody>
                         <Row>
+                            <Col xs="12" sm="6">
+                                <div className="d-flex flex-row mb-2 mr-auto">										
+                                    <Button color="success" size="sm" title="Nueva Prepaga" onClick={() => console.log('Nueva Prepaga')} disabled={this.state.loading}>
+                                        {this.state.loading ? <Spinner/> : <i className="fa fa-plus mr-2"></i>}Nueva Prepaga
+                                    </Button>                                    
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row>
                             <Col>
-                              Próximamente...
+                              En construcción...
                             </Col>
                         </Row>
                     </CardBody>

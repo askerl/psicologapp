@@ -241,7 +241,7 @@ class ListaSesiones extends Component {
 								<Row>
 									<Col xs="12" sm="6">
 										<div className="d-flex flex-row mb-2 mr-auto">
-											<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus mr-2"></i>Nueva sesión</Button>
+											<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus mr-2"></i>Agregar sesiones</Button>
 											<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser mr-2"></i>Borrar sesiones</Button>
 										</div>
 									</Col>

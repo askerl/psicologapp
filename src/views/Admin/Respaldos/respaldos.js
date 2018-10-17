@@ -251,10 +251,10 @@ class Respaldos extends Component {
                                 Esta acción no podrá deshacerse.
                             </ModalBody>
                             <ModalFooter>
-                                <span className="text-muted mr-auto">{this.state.selectedFileName}</span>
                                 <Button color="purple" size="sm" onClick={this.restaurarRespaldo}>
                                     {this.state.loading && <Spinner/>}{this.state.loading ? 'Restaurando' : 'Restaurar'}
 						        </Button>
+                                <span className="text-muted mr-auto">{this.state.selectedFileName}</span>
                                 <Button color="secondary" size="sm" onClick={this.toggleRestore} disabled={this.state.loading}>Cancelar</Button>
                             </ModalFooter>
                         </Modal>
