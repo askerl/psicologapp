@@ -13,7 +13,8 @@ class Prepagas extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-            loading: false
+            loading: false,
+            prepagas: []
         };
 	}
 
@@ -26,6 +27,22 @@ class Prepagas extends Component {
     }
     
 	render() {
+
+        const columns = [{
+			dataField: 'id',
+			text: '',
+            headerAttrs: { width: '88px' },
+            formatter: tablasFormatter.actionsPrepaga
+		}, {
+			dataField: 'nombre',
+			text: 'Nombre',
+            sort: true
+        }, {
+			dataField: 'pagoAusencia',
+            text: 'Pago por ausencia',
+            align: 'right', headerAlign: 'right',
+            formatter: tablasFormatter.precio
+        }];
 
 		return (
 			<div>
@@ -45,7 +62,24 @@ class Prepagas extends Component {
                         </Row>
                         <Row>
                             <Col>
-                              En construcción...
+                                <LoadingOverlay
+                                    active={this.state.loading}
+                                    animate
+                                    spinner
+                                    color={overlay.color}
+                                    background={overlay.background}>
+                                    <BootstrapTable
+                                        keyField='id'
+                                        data={this.state.prepagas}
+                                        columns={columns}
+                                        classes="tablaPrepagas"
+                                        noDataIndication='No hay prepagas registradas'
+                                        bootstrap4
+                                        bordered={false}
+                                        striped
+                                        hover 
+                                    />
+                                </LoadingOverlay>
                             </Col>
                         </Row>
                     </CardBody>
