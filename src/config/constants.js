@@ -16,21 +16,20 @@ auxfiltroTipoPaciente[pacientePrepaga] = tipoPaciente[0].name;
 auxfiltroTipoPaciente[pacientePrivado] = tipoPaciente[1].name;
 export const filtroTipoPaciente = auxfiltroTipoPaciente;
 
+export const iconoPrepaga = 'fa fa-hospital-o';
+
 export const prepagasById = {
     "galeno": {
         nombre: "Galeno",
-        pagos: [15, 200, 475], // ya no se usan
-        icono: "fa fa-hospital-o"
+        pagos: [15, 200, 475] // ya no se usan
     },
     "ososs": {
         nombre: "OSOSS",
-        pagos: [230], // ya no se usan
-        icono: "fa fa-hospital-o"
+        pagos: [230] // ya no se usan
     },
     "ospacp": {
         nombre: "O.S.P.A.C.P",
-        pagos: [230], // ya no se usan
-        icono: "fa fa-hospital-o"
+        pagos: [230] // ya no se usan
     }
 }
 // armo arrays auxiliares para filtrar y cargar combos

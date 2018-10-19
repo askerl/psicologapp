@@ -5,7 +5,7 @@ import { Bar } from 'react-chartjs-2';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Form, FormGroup, Input, InputGroup, Label, Progress, Row } from 'reactstrap';
-import { breakpoints, meses, mesesFormat, overlay, prepagas } from '../../config/constants';
+import { breakpoints, meses, mesesFormat, overlay, prepagas, iconoPrepaga } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
 import { tablasFormatter } from '../../utils/formatters';
@@ -179,7 +179,7 @@ class Facturaciones extends Component {
 					});
 					liPrepagas = _.chain(auxPrepagas).sortBy('valor').reverse().map(item => {
 						return(
-							<li key={item.id}><StatItem title={item.nombre} value={`$ ${item.valor}`} porc={`${item.porc}`} color="info" icon={item.icono} /></li>
+							<li key={item.id}><StatItem title={item.nombre} value={`$ ${item.valor}`} porc={`${item.porc}`} color="info" icon={iconoPrepaga} /></li>
 						)
 					}).value();
 				}

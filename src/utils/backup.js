@@ -46,53 +46,59 @@ export const backupData = () => {
         let backup = {
             nombre: fileName,
             data: {
+                prepagas: {},
                 pacientes: {},
                 sesiones: {}
             }
         };
 
-        backupCollection('pacientes').then(pacientes => {
-            // guardo datos de pacientes
-            backup.data['pacientes'] = pacientes;
-            backupCollection('sesiones').then(sesiones => {
-                // guardo datos de sesiones
-                backup.data['sesiones'] = sesiones;
-                // guardo archivo en Cloud Storage
-                fileRef.putString(JSON.stringify(backup)).then( snapshot => {
-                    // Update metadata properties
-                    fileRef.updateMetadata({contentType: "application/json"}).then( metadata => {
-                        let respaldo = {
-                            nombre: metadata.name,
-                            fecha: new Date(
-                                fechaBackup.year(), fechaBackup.month(), fechaBackup.date(),
-                                fechaBackup.hour(), fechaBackup.minute(), fechaBackup.second()
-                            ),
-                            size: metadata.size,
-                            pacientes: Object.keys(backup.data['pacientes']).length,
-                            sesiones: Object.keys(backup.data['sesiones']).length,
-                            url: metadata.downloadURLs[0] 
-                        };
-                        // guardo respaldo en DB
-                        db.collection("respaldos").add(respaldo).then( docRef => {
-                            resolve();
+        backupCollection('prepagas').then(prepagas => {
+            backup.data['prepagas'] = prepagas;
+            backupCollection('pacientes').then(pacientes => {
+                backup.data['pacientes'] = pacientes;
+                backupCollection('sesiones').then(sesiones => {
+                    backup.data['sesiones'] = sesiones;
+                    // guardo archivo en Cloud Storage
+                    fileRef.putString(JSON.stringify(backup)).then( snapshot => {
+                        // Update metadata properties
+                        fileRef.updateMetadata({contentType: "application/json"}).then( metadata => {
+                            let respaldo = {
+                                nombre: metadata.name,
+                                fecha: new Date(
+                                    fechaBackup.year(), fechaBackup.month(), fechaBackup.date(),
+                                    fechaBackup.hour(), fechaBackup.minute(), fechaBackup.second()
+                                ),
+                                size: metadata.size,
+                                prepagas: Object.keys(backup.data['prepagas']).length,
+                                pacientes: Object.keys(backup.data['pacientes']).length,
+                                sesiones: Object.keys(backup.data['sesiones']).length,
+                                url: metadata.downloadURLs[0] 
+                            };
+                            // guardo respaldo en DB
+                            db.collection("respaldos").add(respaldo).then( docRef => {
+                                resolve();
+                            }).catch( error => {
+                                console.error("Error guardando respaldo: ", error);
+                                reject(error);
+                            });
                         }).catch( error => {
-                            console.error("Error guardando respaldo: ", error);
+                            console.log('Error obteniendo URL de archivo: ', error);
                             reject(error);
                         });
                     }).catch( error => {
-                        console.log('Error obteniendo URL de archivo: ', error);
+                        console.log('Error guardando respaldo en DB: ', error);
                         reject(error);
                     });
-                }).catch( error => {
-                    console.log('Error guardando respaldo en DB: ', error);
+                }).catch(error => {
+                    console.log('Error respaldando Sesiones: ', error);
                     reject(error);
                 });
             }).catch(error => {
-                console.log('Error respaldando Sesiones: ', error);
+                console.log('Error respaldando Pacientes: ', error);
                 reject(error);
             });
         }).catch(error => {
-            console.log('Error respaldando Pacientes: ', error);
+            console.log('Error respaldando Prepagas: ', error);
             reject(error);
         });
     });
@@ -157,9 +163,13 @@ export const restoreBackup = (fileName) => {
     let promise = new Promise( (resolve, reject) => {
         getBackupData(fileName).then( backupData => {
             console.log('BackupData', backupData);
+            console.log('Prepagas', Object.keys(backupData['prepagas']).length);
             console.log('Pacientes', Object.keys(backupData['pacientes']).length);
             console.log('Sesiones', Object.keys(backupData['sesiones']).length);
-            let i = 0, total = Object.keys(backupData['pacientes']).length + Object.keys(backupData['sesiones']).length;
+            let i = 0;
+            let total = Object.keys(backupData['pacientes']).length +
+                         Object.keys(backupData['sesiones']).length +
+                         Object.keys(backupData['prepagas']).length
             let hayError = false;
             console.log('Total de registros', total);
             for (let collectionName in backupData) {

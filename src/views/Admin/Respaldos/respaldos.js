@@ -176,13 +176,18 @@ class Respaldos extends Component {
             formatter: tablasFormatter.fechaHora,
             sort: true
         }, {
-			dataField: 'pacientes',
+            dataField: 'pacientes',
             text: 'Pacientes',
             align: 'right', headerAlign: 'right',
             hidden: this.state.size < breakpoints.sm
         }, {
 			dataField: 'sesiones',
             text: 'Sesiones',
+            align: 'right', headerAlign: 'right',
+            hidden: this.state.size < breakpoints.sm
+        }, {
+			dataField: 'prepagas',
+            text: 'Prepagas',
             align: 'right', headerAlign: 'right',
             hidden: this.state.size < breakpoints.sm
         }, {
@@ -246,7 +251,7 @@ class Respaldos extends Component {
                         <Modal isOpen={this.state.showRestoreModal} toggle={this.toggleRestore} className={'modal-lg modal-purple'}>
                             <ModalHeader toggle={this.toggleRestore}>Restaurar Respaldo</ModalHeader>
                             <ModalBody>
-                                Al restaurar el respaldo se agregarán todos los datos del respaldo seleccionado que no se encuentren en los datos actuales (pacientes y sesiones que hayan sido eliminados).<br/>
+                                Al restaurar el respaldo se agregarán todos los datos del respaldo seleccionado que no se encuentren en los datos actuales (pacientes, sesiones y prepagas que hayan sido eliminados).<br/>
                                 Cualquier dato modificado o ingresado con fecha posterior al respaldo se mantendrá inalterado.<br/>
                                 Esta acción no podrá deshacerse.
                             </ModalBody>

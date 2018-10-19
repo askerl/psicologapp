@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import LoadingOverlay from 'react-loading-overlay';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, Col, Row, UncontrolledAlert } from 'reactstrap';
-import { overlay, prepagas } from '../../config/constants';
+import { overlay, prepagas, iconoPrepaga } from '../../config/constants';
 import { getEstadisticas, setSession, recordatorioRespaldo } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
 import { Callout, StatItem } from '../Widgets/WidgetsAuxiliares';
@@ -89,7 +89,7 @@ class Dashboard extends Component {
 													<StatItem title="Obra social" icon="icon-user-follow" value={data.obraSocialActivos} porc={data.porcObrasocial} color="primary"/>
 												</li>
 												<li className="divider"></li>
-												{ prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon={item.icono} value={data[item.id]} porc={item.porc} color="info"/></li>)}
+												{ prepagas.map(item => <li key={item.id}><StatItem title={item.nombre} icon={iconoPrepaga} value={data[item.id]} porc={item.porc} color="info"/></li>)}
 											</ul>
 										</Col>
 									</Row>
