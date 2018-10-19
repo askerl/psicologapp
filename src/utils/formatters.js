@@ -25,6 +25,11 @@ export const tablasFormatter = {
             </div>
         );
     },
+    actionsPrepaga(cell, row, rowIndex, formatExtraData) {
+        return (
+            <i className="fa fa-edit fa-lg mr-1" title="Editar prepaga" onClick={() => formatExtraData(cell)}></i>
+        );
+    },
     nombrePaciente(cell, row){
         if (row.activo) {
             return (

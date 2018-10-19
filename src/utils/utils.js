@@ -5,22 +5,16 @@ import { mailHabilitados } from '../config/firebaseConfig';
 import db, { backupRef } from '../fire';
 import axios from 'axios';
 import FileSaver from 'file-saver';
-import { mensajes } from '../config/mensajes';
+import { mensajes, errores } from '../config/mensajes';
 
 // ---------------------- SESSION HANDLER --------------------------------
 
 export const getSession = (key) => {
-    if (key === 'pacientes' || key === 'sesiones' || key === 'respaldos') {
-        return JSON.parse(localStorage.getItem(key));
-    }
-    return localStorage.getItem(key);
+    return JSON.parse(localStorage.getItem(key));
 }
 
 export const setSession = (key, value) => {
-    if (key === 'pacientes' || key === 'sesiones' || key === 'respaldos') {
-        value = JSON.stringify(value);
-    }
-    return localStorage.setItem(key, value);
+    return localStorage.setItem(key, JSON.stringify(value));
 }
 
 export const removeSession = (key) => {
@@ -33,6 +27,7 @@ export const clearSession = () => {
     removeSession('sesiones');
     removeSession('filtroEstado');
     removeSession('respaldos');
+    removeSession('prepagas');
 }
 
 export const removeSessionSesionesMes = (mes, anio) => {
@@ -180,7 +175,7 @@ export const getPacientes = () => {
                 let result = loadPacientes(querySnapshot);
                 console.log('Pacientes DB', result);
                 // almaceno pacientes en sesion para cache
-                setSession('pacientes',result);
+                setSession('pacientes', result);
                 resolve(result);
             });
         }
@@ -285,7 +280,7 @@ export const getSesionesMes = (mes, anio) => {
                         sesiones.push(sesion);
                     });
                     sesionesStorage[key] = sesiones;
-                    setSession('sesiones',sesionesStorage);
+                    setSession('sesiones', sesionesStorage);
                     resolve(sesiones);
                 });
             });
@@ -381,4 +376,74 @@ export const recordatorioRespaldo = backups => {
     return {recordarRespaldo, msjRecordarRespaldo}
 }
 
+// ---------------------- PREPAGAS --------------------------------
 
+export const generateIdPrepaga = nombre => {
+    return _.chain(nombre).deburr().trim().lowerCase().words().join("").value();
+}
+
+export const getPrepagas = () => {
+    let promise = new Promise( (resolve, reject) => {
+
+        // chequeo si ya tengo prepagas cargados en sesion (cache)
+        let prepagas = getSession('prepagas');
+
+        if (prepagas) {
+            console.log('Prepagas cache', prepagas);
+            resolve(prepagas);
+        } else {
+            db.collection("prepagas").orderBy("nombre","asc").get().then( querySnapshot => {
+                let prepagas = [];
+                querySnapshot.docs.forEach( doc => {            
+                    let prepaga = doc.data();
+                    prepaga.id = doc.id;
+                    prepagas.push(prepaga);
+                });
+                console.log('Prepagas DB', prepagas);
+                // almaceno prepagas en sesion para cache
+                setSession('prepagas', prepagas);
+                resolve(prepagas);
+            });
+        }
+    });
+    return promise;
+}
+
+export const getPrepaga = (id) => {
+    let promise = new Promise( (resolve, reject) => {
+        getPrepagas().then( prepagas => {
+            let prepaga = _.find(prepagas, {'id': id});           
+            resolve(prepaga);
+        });
+    });
+    return promise;
+}
+
+export const borrarPrepaga = (id) => {
+    let promise = new Promise( (resolve, reject) => {
+        
+        // chequeo si la prepaga tiene algún paciente
+        getPacientes().then( pacientes => {
+            let paciente = _.find(pacientes, {'prepaga': id});           
+            if (paciente) {
+                reject(errores.errorBorrarPrepagaPaciente);
+            } else {
+                // chequeo si la prepaga tiene alguna sesión ingresada
+                db.collection("sesiones").where('prepaga','==',id).limit(1).get().then( result => {
+                    if (result.docs.length > 0) {
+                        reject(errores.errorBorrarPrepagaSesiones);
+                    } else {
+                        // puedo borrar ya que no hay ni pacientes si sesiones asociadas
+                        db.collection("prepagas").doc(id).delete().then(() => {
+                            resolve();
+                        }).catch( error => {
+                            reject(error);
+                        });
+                    }
+                });
+            }
+        });
+
+    });
+    return promise;
+}

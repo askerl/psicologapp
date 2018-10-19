@@ -7,8 +7,9 @@ import { overlay, breakpoints } from '../../../config/constants';
 import { tablasFormatter } from '../../../utils/formatters';
 import LoadingOverlay from 'react-loading-overlay';
 import BootstrapTable from 'react-bootstrap-table-next';
-	
-class Prepagas extends Component {
+import { getPrepagas } from '../../../utils/utils';
+
+class ListaPrepagas extends Component {
   
 	constructor(props) {
 		super(props);
@@ -16,6 +17,9 @@ class Prepagas extends Component {
             loading: false,
             prepagas: []
         };
+        this.cargarPrepagas = this.cargarPrepagas.bind(this);
+        this.nuevaPrepaga = this.nuevaPrepaga.bind(this);
+        this.editarPrepaga = this.editarPrepaga.bind(this);
 	}
 
 	loading(val){
@@ -23,7 +27,24 @@ class Prepagas extends Component {
 	}
 
 	componentDidMount() {
+        // cargo datos de respaldos
+        this.cargarPrepagas();
+    }
 
+    cargarPrepagas() {
+        this.loading(true);
+        getPrepagas().then( prepagas => {
+			this.setState({prepagas});
+			this.loading(false);
+		});
+    }
+
+    nuevaPrepaga() {
+		this.props.history.push("/admin/prepagas/new");
+    }
+    
+    editarPrepaga(id) {
+        this.props.history.push(`/admin/prepagas/${id}`);
     }
     
 	render() {
@@ -31,8 +52,9 @@ class Prepagas extends Component {
         const columns = [{
 			dataField: 'id',
 			text: '',
-            headerAttrs: { width: '88px' },
-            formatter: tablasFormatter.actionsPrepaga
+            headerAttrs: { width: '36px' },
+            formatter: tablasFormatter.actionsPrepaga,
+            formatExtraData: this.editarPrepaga
 		}, {
 			dataField: 'nombre',
 			text: 'Nombre',
@@ -54,7 +76,7 @@ class Prepagas extends Component {
                         <Row>
                             <Col xs="12" sm="6">
                                 <div className="d-flex flex-row mb-2 mr-auto">										
-                                    <Button color="success" size="sm" title="Nueva Prepaga" onClick={() => console.log('Nueva Prepaga')} disabled={this.state.loading}>
+                                    <Button color="success" size="sm" title="Nueva Prepaga" onClick={this.nuevaPrepaga} disabled={this.state.loading}>
                                         {this.state.loading ? <Spinner/> : <i className="fa fa-plus mr-2"></i>}Nueva Prepaga
                                     </Button>                                    
                                 </div>
@@ -89,4 +111,4 @@ class Prepagas extends Component {
 	}
 }
 
-export default Prepagas;
+export default ListaPrepagas;

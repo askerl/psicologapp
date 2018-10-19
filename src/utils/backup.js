@@ -26,7 +26,7 @@ export const getRespaldos = () => {
                 });
                 // almaceno pacientes en sesion para cache
                 console.log('Respaldos DB', respaldos);
-                setSession('respaldos',respaldos);
+                setSession('respaldos', respaldos);
                 resolve(respaldos);
             });
         }

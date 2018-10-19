@@ -14,7 +14,8 @@ import ListaPacientes from '../../views/Pacientes/listaPacientes';
 import PacienteTabs from '../../views/Pacientes/pacienteTabs';
 import ListaSesiones from '../../views/Sesiones/listaSesiones';
 import Sesion from '../../views/Sesiones/sesion';
-import Prepagas from '../../views/Admin/Prepagas/prepagas';
+import ListaPrepagas from '../../views/Admin/Prepagas/listaPrepagas';
+import Prepaga from '../../views/Admin/Prepagas/prepaga';
 import Respaldos from '../../views/Admin/Respaldos/respaldos';
 
 class Full extends Component {
@@ -61,8 +62,9 @@ class Full extends Component {
 								<Route exact path="/sesiones" name="Sesiones" component={ListaSesiones} />
 								<Route path='/sesiones/:id' name="Sesion" component={Sesion} />
 								<Route exact path="/facturaciones" name="Facturaciones" component={Facturaciones} />
-								<Route path="/admin/prepagas" name="Prepagas" component={Prepagas} />
-								<Route path="/admin/respaldos" name="Respaldos" component={Respaldos} />
+								<Route exact path="/admin/prepagas" name="Prepagas" component={ListaPrepagas} />
+								<Route path='/admin/prepagas/:id' name="Prepaga" component={Prepaga} />
+								<Route exact path="/admin/respaldos" name="Respaldos" component={Respaldos} />
 								<Redirect from="/" to="/dashboard" />
 							</Switch>
 							<NotificationContainer enterTimeout={200} />

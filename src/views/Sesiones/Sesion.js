@@ -32,7 +32,7 @@ class Sesion extends Component {
     }
 
     componentDidMount(){
-        // id del paciente
+        // id de la sesión
         let id = this.props.match.params.id;
         let nuevo = id === 'new';
         this.setState({id, nuevo});
@@ -212,22 +212,21 @@ class Sesion extends Component {
                                         </Row>
                                         <Row>
                                             <Col>
-                                            <FormGroup className="errorAddon">
-                                                <Label htmlFor="pacientes">Pacientes</Label>
-                                                <Select
-                                                    multi={true}
-                                                    placeholder="Seleccione pacientes..."
-                                                    name="pacientes"
-                                                    value={this.state.selectedOption}
-                                                    onChange={this.handleChange}
-                                                    options={this.state.pacientes}                                                    
-                                                />
-                                                <FormText>{`Seleccionados: ${this.state.selectedOption.length}`}</FormText> 
-                                                {this.state.errorPacientes &&
-                                                    <div className="invalid-feedback">{errores.pacientesVacios}</div>
-                                                }
-                                            </FormGroup>
-                                            
+                                                <FormGroup className="errorAddon">
+                                                    <Label htmlFor="pacientes">Pacientes</Label>
+                                                    <Select
+                                                        multi={true}
+                                                        placeholder="Seleccione pacientes..."
+                                                        name="pacientes"
+                                                        value={this.state.selectedOption}
+                                                        onChange={this.handleChange}
+                                                        options={this.state.pacientes}                                                    
+                                                    />
+                                                    <FormText>{`Seleccionados: ${this.state.selectedOption.length}`}</FormText> 
+                                                    {this.state.errorPacientes &&
+                                                        <div className="invalid-feedback">{errores.pacientesVacios}</div>
+                                                    }
+                                                </FormGroup>
                                             </Col>
                                         </Row>
                                     </Form>
