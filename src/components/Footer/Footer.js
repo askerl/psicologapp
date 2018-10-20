@@ -7,7 +7,9 @@ class Footer extends Component {
     const test = env == envs.TEST;
     return (
       <footer className={"app-footer " + (test ? 'testFooter': '')}>
-        <div className="mr-auto"><small><a href="#">Alfredo Skerl</a> &copy; 2017.</small></div>
+        <div className="mr-auto">
+          <small><a href="https://www.linkedin.com/in/alfredo-skerl/" target="_blank">Alfredo Skerl <i className="fa fa-linkedin-square mr-1" title="Linkedin"></i></a> &copy; 2018.</small>
+        </div>
         { test &&
           <div className="mr-1"><small><strong>{`${env} - `}</strong></small></div>
         }

@@ -177,9 +177,14 @@ export const restoreBackup = (fileName) => {
                     if (backupData[collectionName].hasOwnProperty(doc)) {
                         let docRef = db.collection(collectionName).doc(doc);
                         docRef.get().then( docSnap => {
-                            // chequeo si el documento existe, si no existe no hago nada
+                            // chequeo si el documento existe, si existe no hago nada
                             if ( !docSnap.exists ) {
-                                docRef.set(backupData[collectionName][doc], {merge: true}).then(() => {
+                                let docData = backupData[collectionName][doc]; 
+                                // ajusto fechas de sesiones
+                                if (collectionName === 'sesiones') {
+                                    docData.fecha = new Date(docData.anio, docData.mes-1, docData.dia);
+                                }
+                                docRef.set(docData, {merge: true}).then(() => {
                                     i += 1;
                                     console.log(collectionName + ' OK');
                                     if (i >= total) {

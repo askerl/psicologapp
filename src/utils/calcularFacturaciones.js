@@ -1,8 +1,8 @@
 // calculo de facturaciones
-import db from '../fire';
-import { prepagasById, pacientePrivado, brandColors, mesesFormat } from '../config/constants';
-import { round, convertHex, formatMonth } from '../utils/utils';
 import _ from 'lodash';
+import { brandColors, mesesFormat, pacientePrivado } from '../config/constants';
+import db from '../fire';
+import { convertHex, formatMonth, getSession, round } from '../utils/utils';
 
 export const getFacturacionesPeriodo = (mesIni, anioIni, mesFin, anioFin) => {
 
@@ -36,9 +36,10 @@ function getEmpyFac(mes, anio) {
         prepagas: {}
     };
     // key para prepagas
-    for (const key in prepagasById) {            
-        emptyFac.prepagas[key] = 0;
-    }
+    let prepagas = getSession('prepagas');
+    prepagas.forEach( prepaga => {
+        emptyFac.prepagas[prepaga.id] = 0;
+    });
     return emptyFac;
 }
 

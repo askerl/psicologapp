@@ -1,8 +1,8 @@
 import moment from 'moment';
 import React from 'react';
-import { Progress, Badge } from 'reactstrap';
-import { filtroTipoPaciente, pacientePrepaga, pacientePrivado, prepagasById, fechaFormat } from '../config/constants';
-import { formatMonth, getColorPorcentaje, round, getSession } from './utils';
+import { Badge, Progress } from 'reactstrap';
+import { fechaFormat, filtroTipoPaciente, pacientePrepaga, pacientePrivado } from '../config/constants';
+import { formatMonth, getColorPorcentaje, getSession, round } from './utils';
 
 export const tablasFormatter = {
     filterClass: 'form-control-sm',

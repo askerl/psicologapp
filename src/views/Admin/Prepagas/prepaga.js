@@ -38,29 +38,24 @@ class Prepaga extends Component {
 
         this.loading(true);
 
-        if (!nuevo){
-            // cargo prepaga
-            getPrepaga(id).then( prepaga => {
-                // cargo datos en pantalla
-                this.inputNombre.value  = prepaga.nombre;
-                this.inputPagoAusencia.value = prepaga.pagoAusencia;
-                // cargo prepagas para la verificación de nombre
-                this.setState({prepagas: getSession('prepagas')});
-                this.loading(false);
-            }).catch(error => { 
-                console.log('Error al cargar los datos de la prepaga', error);
-                NotificationManager.error(errores.errorCargarDatosPrepaga, 'Error');
-                this.loading(false);
-                this.goBack();
-            });
-        } else {
-            getPrepagas().then( () => {
-                // cargo prepagas para la verificación de nombre
-                this.setState({prepagas: getSession('prepagas')});
-                this.loading(false);
-            });
-        }
+        getPrepagas().then( prepagas => {            
+            this.setState({prepagas});
 
+            if (!nuevo) {
+                let prepaga = _.find(prepagas, {'id': id});
+                if (prepaga) {
+                    // cargo datos de la prepaga
+                    this.inputNombre.value  = prepaga.nombre;
+                    this.inputPagoAusencia.value = prepaga.pagoAusencia;
+                } else {
+                    console.log('Error al cargar los datos de la prepaga', error);
+                    NotificationManager.error(errores.errorCargarDatosPrepaga, 'Error');
+                    this.goBack();
+                }
+            }
+
+			this.loading(false);
+		});
     }
 
     loading(val){

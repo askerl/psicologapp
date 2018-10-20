@@ -4,11 +4,11 @@ import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import Select from 'react-select';
 import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
-import { overlay, pacientePrivado, prepagasById, pacientePrepaga } from '../../config/constants';
+import Spinner from '../../components/Spinner/Spinner';
+import { overlay, pacientePrepaga } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { createFechaSesion, getPacientes, removeSession, removeSessionSesionesMes } from '../../utils/utils';
-import Spinner from '../../components/Spinner/Spinner';
 
 class Sesion extends Component {
 

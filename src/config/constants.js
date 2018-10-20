@@ -18,32 +18,6 @@ export const filtroTipoPaciente = auxfiltroTipoPaciente;
 
 export const iconoPrepaga = 'fa fa-hospital-o';
 
-export const prepagasById = {
-    "galeno": {
-        nombre: "Galeno",
-        //pagos: [15, 200, 475] // ya no se usan
-    },
-    "ososs": {
-        nombre: "OSOSS",
-        //pagos: [230] // ya no se usan
-    },
-    "ospacp": {
-        nombre: "O.S.P.A.C.P",
-        //pagos: [230] // ya no se usan
-    }
-}
-// armo arrays auxiliares para filtrar y cargar combos
-let auxfiltroPrepagas = {}, auxprepagas = [];
-for (const prop in prepagasById) {
-    let prepaga = prepagasById[prop];
-    prepaga.id = prop; 
-    auxfiltroPrepagas[prop] = prepaga.nombre;
-    auxprepagas.push(prepaga);
-}
-
-export const filtroPrepagas = auxfiltroPrepagas;
-export const prepagas = auxprepagas;
-
 export const estadosPaciente = [
     { value: 'T', title: 'Todos' },
     { value: 'A', title: 'Activos' },

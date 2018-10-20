@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import moment from 'moment';
 import React, { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
@@ -5,14 +6,13 @@ import { Bar } from 'react-chartjs-2';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Form, FormGroup, Input, InputGroup, Label, Progress, Row } from 'reactstrap';
-import { breakpoints, meses, mesesFormat, overlay, prepagas, iconoPrepaga } from '../../config/constants';
+import Spinner from '../../components/Spinner/Spinner';
+import { breakpoints, iconoPrepaga, meses, mesesFormat, overlay } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
 import { tablasFormatter } from '../../utils/formatters';
-import { percentage } from '../../utils/utils';
+import { getPrepagas, percentage } from '../../utils/utils';
 import { StatItem } from '../Widgets/WidgetsAuxiliares';
-import _ from 'lodash';
-import Spinner from '../../components/Spinner/Spinner';
 
 class Facturaciones extends Component {
 	constructor(props) {
@@ -37,6 +37,10 @@ class Facturaciones extends Component {
 		this.initFiltros();
 		window.addEventListener("resize", this.resize);
 		this.resize();
+		// cargo prepagas
+		getPrepagas().then( prepagas => {
+			this.prepagas = prepagas;
+		});
 	}
 	
 	componentWillUnmount() {
@@ -109,6 +113,8 @@ class Facturaciones extends Component {
 	}
 
 	render() {
+
+		const prepagas = this.prepagas;
 
 		const options = {
 			noDataText: 'No hay datos para el período seleccionado',
