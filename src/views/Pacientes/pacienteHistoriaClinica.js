@@ -50,13 +50,13 @@ class HistoriaClinica extends Component {
 
     cargarHC() {
         let id = this.state.id;
-        getPaciente(id).then( paciente => {
-            this.setState({paciente});
-        }).then(getSesionesPaciente(id).then( sesiones => {
-            // console.log('sesiones del paciente', sesionesPaciente);
-            this.setState({sesiones});
+
+        Promise.all([getPaciente(id), getSesionesPaciente(id)]).then(values => { 
+            let paciente = values[0],
+                sesiones = values[1];            
+            this.setState({paciente, sesiones});
             this.loading(false);
-        })).catch(error => { 
+        }).catch(error => { 
             console.log('Error al cargar los datos del paciente', error);
             NotificationManager.error(errores.errorCargarDatosPaciente, 'Error');
             this.loading(false);

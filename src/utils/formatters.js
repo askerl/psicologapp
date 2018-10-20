@@ -2,7 +2,7 @@ import moment from 'moment';
 import React from 'react';
 import { Progress, Badge } from 'reactstrap';
 import { filtroTipoPaciente, pacientePrepaga, pacientePrivado, prepagasById, fechaFormat } from '../config/constants';
-import { formatMonth, getColorPorcentaje, round } from './utils';
+import { formatMonth, getColorPorcentaje, round, getSession } from './utils';
 
 export const tablasFormatter = {
     filterClass: 'form-control-sm',
@@ -73,7 +73,7 @@ export const tablasFormatter = {
         }
     },
     prepaga(cell) {
-        return cell ? prepagasById[cell].nombre : '';
+        return cell ? _.get(_.find(getSession('prepagas'), {'id': cell}), 'nombre','') : '';
     },
     fecha(cell) {
         return moment.unix(cell).format(fechaFormat.fecha);

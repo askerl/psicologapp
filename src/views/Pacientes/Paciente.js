@@ -5,12 +5,12 @@ import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import Toggle from 'react-toggle';
 import { Alert, Button, Col, Form, FormFeedback, FormGroup, FormText, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { pacientePrepaga, pacientePrivado, prepagas, tipoPaciente, overlay, fechaFormat } from '../../config/constants';
+import Spinner from '../../components/Spinner/Spinner';
+import { fechaFormat, overlay, pacientePrepaga, pacientePrivado, tipoPaciente } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
-import { calcPorcentajesSesiones, getPaciente, getPacientes, getSession, removeSession, borrarPaciente } from '../../utils/utils';
+import { borrarPaciente, calcPorcentajesSesiones, getPacientes, getPrepagas, removeSession } from '../../utils/utils';
 import { WidgetSesionesRestantes, WidgetSesionesUsadas } from '../Widgets/WidgetsAuxiliares';
-import Spinner from '../../components/Spinner/Spinner';
 
 class Paciente extends Component {
 
@@ -63,25 +63,27 @@ class Paciente extends Component {
         
         this.loading(true);
 
-        if (!nuevo){
-            // cargo paciente y sus sesiones
-            getPaciente(id).then( pac => {
-                this.loadPaciente(pac);
-                // cargo pacientes para la verificación de nombre
-                this.pacientes = getSession('pacientes'); 
-                this.loading(false);
-            }).catch(error => { 
-                console.log('Error al cargar los datos del paciente', error);
-                NotificationManager.error(errores.errorCargarDatosPaciente, 'Error');
-                this.loading(false);
-                this.goBack();
-            });
-        } else {
-            getPacientes().then( () => {
-                this.pacientes = getSession('pacientes'); 
-                this.loading(false);
-            });
-        }
+        Promise.all([getPrepagas(), getPacientes()]).then(values => { 
+            let prepagas = values[0],
+                pacientes = values[1];
+
+            this.prepagas = prepagas;
+
+            if (!nuevo) {
+                let paciente = _.find(pacientes, {'id': id});
+                if (paciente) {
+                    // cargo datos del paciente
+                    this.loadPaciente(paciente);
+                } else {
+                    console.log('Error al cargar los datos del paciente', error);
+                    NotificationManager.error(errores.errorCargarDatosPaciente, 'Error');
+                    this.goBack();
+                }
+            }
+
+            this.pacientes = pacientes;
+			this.loading(false);
+		});
     }
 
     loading(val){
@@ -300,6 +302,7 @@ class Paciente extends Component {
     }
 
     render() {
+        let prepagas = this.prepagas;
         return (
             <div className="paciente">
                 <LoadingOverlay
