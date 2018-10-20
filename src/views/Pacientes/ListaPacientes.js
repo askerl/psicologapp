@@ -5,9 +5,9 @@ import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
 import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
 import ExportCSV from '../../components/ExportCSV/exportCSV';
-import { breakpoints, estadosPaciente, filtroPrepagas, filtroTipoPaciente, overlay } from '../../config/constants';
+import { breakpoints, estadosPaciente, filtroTipoPaciente, overlay } from '../../config/constants';
 import { tablasFormatter, csvFormatter } from '../../utils/formatters';
-import { filterPacientesEstado, getPacientes, getSession, setSession } from '../../utils/utils';
+import { filterPacientesEstado, getPacientes, getSession, setSession, getFiltroPrepagas } from '../../utils/utils';
 
 class ListaPacientes extends Component {
 	constructor(props) {
@@ -15,6 +15,7 @@ class ListaPacientes extends Component {
 		this.state = {
 			pacientes: [],
 			filtroEstado: getSession('filtroEstado') || estadosPaciente[1].value, //activos por defecto,
+			filtroPrepagas: {},
 			loading: true,
 			size: ''
 		};
@@ -29,6 +30,10 @@ class ListaPacientes extends Component {
 	componentDidMount(){
 		// set initial filter state
 		this.filtroEstado.value = this.state.filtroEstado;
+		// cargo filtro de prepagas
+		getFiltroPrepagas().then( filtroPrepagas => {
+			this.setState({filtroPrepagas});
+		});
 		// resize listener
 		window.addEventListener("resize", this.resize);
 		this.resize();
@@ -71,7 +76,6 @@ class ListaPacientes extends Component {
 	}
 	
 	render() {
-
 		const columns = [{
 			dataField: 'id',
 			text: '',
@@ -142,7 +146,7 @@ class ListaPacientes extends Component {
 			csvFormatter: tablasFormatter.prepaga,
 			sort: true,
 			filter: selectFilter({
-				options: filtroPrepagas,
+				options: this.state.filtroPrepagas,
 				placeholder: 'Todas',
 				className:tablasFormatter.filterClass
 			}),

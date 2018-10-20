@@ -87,14 +87,17 @@ export const getEstadisticas = () => {
             privadosActivos: 0,
             obraSocialActivos: 0
         }
-        // initialize prepagas counters
-        data.prepagas = prepagas;
-        data.prepagas.forEach( i => {
-            data[i.id] = 0;
-        });
 
-        // con GET Pacientes
-        getPacientes().then( pacientes => {
+        Promise.all([getPrepagas(), getPacientes()]).then(values => { 
+            let prepagas = values[0],
+                pacientes = values[1];
+
+            // inicializo contador de prepagas
+            data.prepagas = prepagas;
+            data.prepagas.forEach( i => {
+                data[i.id] = 0;
+            });
+    
             pacientes.forEach( pac => {
                 data.total += 1;
                 pac.activo ? data.activos += 1 : data.inactivos += 1;
@@ -125,6 +128,9 @@ export const getEstadisticas = () => {
             });
     
             resolve(data);
+        })
+        .catch( error => {
+            reject(error);
         });
 
     });
@@ -444,6 +450,19 @@ export const borrarPrepaga = (id) => {
             }
         });
 
+    });
+    return promise;
+}
+
+export const getFiltroPrepagas = () => {
+    let promise = new Promise( (resolve, reject) => {
+        getPrepagas().then( prepagas => {
+            let filtroPrepagas = {};
+            prepagas.forEach( prepaga => {
+                filtroPrepagas[prepaga.id] = prepaga.nombre;
+            });
+            resolve(filtroPrepagas);
+        });
     });
     return promise;
 }

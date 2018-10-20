@@ -21,15 +21,15 @@ export const iconoPrepaga = 'fa fa-hospital-o';
 export const prepagasById = {
     "galeno": {
         nombre: "Galeno",
-        pagos: [15, 200, 475] // ya no se usan
+        //pagos: [15, 200, 475] // ya no se usan
     },
     "ososs": {
         nombre: "OSOSS",
-        pagos: [230] // ya no se usan
+        //pagos: [230] // ya no se usan
     },
     "ospacp": {
         nombre: "O.S.P.A.C.P",
-        pagos: [230] // ya no se usan
+        //pagos: [230] // ya no se usan
     }
 }
 // armo arrays auxiliares para filtrar y cargar combos
