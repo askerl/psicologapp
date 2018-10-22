@@ -161,8 +161,7 @@ class ListaPacientes extends Component {
 		},{
 			dataField: 'facturaPrepaga',
 			text: 'Factura prepaga',
-			csvFormatter: tablasFormatter.factura,
-			formatExtraData: tablasFormatter.boolFormatter,
+			csvFormatter: tablasFormatter.booleano,
 			hidden: true
 		},{
 			dataField: 'valorConsulta',

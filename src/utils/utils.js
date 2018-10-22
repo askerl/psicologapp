@@ -205,7 +205,7 @@ function loadPacientes(querySnapshot) {
         paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : '';
         // datos para options en select
         paciente.value = paciente.id;
-        paciente.label = paciente.nombreCompleto;		
+        paciente.label = paciente.nombreCompleto;
         // agrego paciente a la colección final
         pacientes.push(paciente);
     });

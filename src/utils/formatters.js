@@ -1,8 +1,13 @@
 import moment from 'moment';
 import React from 'react';
-import { Badge, Progress } from 'reactstrap';
+import { Badge, Input, Progress } from 'reactstrap';
 import { fechaFormat, filtroTipoPaciente, pacientePrepaga, pacientePrivado } from '../config/constants';
 import { formatMonth, getColorPorcentaje, getSession, round } from './utils';
+
+const boolFormatter = {
+    true: 'Sí',
+    false: 'No' 
+};
 
 export const tablasFormatter = {
     filterClass: 'form-control-sm',
@@ -40,6 +45,14 @@ export const tablasFormatter = {
                 <span className="text-danger"><strong>{cell}</strong></span>
             );
         }
+    },
+    nombrePacienteSesion(cell, row){
+        if (cell) {
+            return (
+                <span className="text-danger">{row.label}</span>
+            );
+        }
+        return row.label;
     },
     sesionesRestantes(cell, row) {
         if (!cell) {
@@ -90,12 +103,8 @@ export const tablasFormatter = {
             return '';
         }
     },
-    factura(cell, row, rowIndex, formatExtraData) {
-        return cell ? formatExtraData[cell] : '';
-    },
-    boolFormatter: {
-        true: 'Sí',
-        false: 'No' 
+    booleano(cell) {
+        return _.isBoolean(cell) ? boolFormatter[cell] : '';
     },
     mes(cell, row, rowIndex, formatExtraData) {
         return _.capitalize(formatMonth(cell, formatExtraData));
@@ -115,7 +124,19 @@ export const tablasFormatter = {
             return round(cell/(k*k),2) + ' MB';
         }
         return cell;
+    },
+    faltoPaciente(cell, row, rowIndex, formatExtraData){
+        return (
+            <div>
+                <Input className="form-control-sm" type="select" name={"ausencia"+rowIndex} id={"ausencia"+rowIndex} 
+                    defaultValue={row.ausencia} onChange={() => this.formatExtraData(row.id)}>
+                    <option value="false">No</option>
+                    <option value="true">Sí</option>
+                </Input>
+            </div>
+        );
     }
+    
 };
 
 export const csvFormatter = {

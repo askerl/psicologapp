@@ -212,8 +212,7 @@ class ListaSesiones extends Component {
 			text: 'Factura',
 			headerAttrs: { width: '80px' },
 			align: 'center', headerAlign: 'center',
-			formatter: tablasFormatter.factura,
-			formatExtraData: tablasFormatter.boolFormatter,
+			formatter: tablasFormatter.booleano,
 			hidden: this.state.size < breakpoints.lg
 		}, {
 			dataField: 'valor',

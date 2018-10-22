@@ -1,5 +1,6 @@
 import moment from 'moment';
 import React, { Component } from 'react';
+import BootstrapTable from 'react-bootstrap-table-next';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import Select from 'react-select';
@@ -9,6 +10,7 @@ import { overlay, pacientePrepaga } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { createFechaSesion, getPacientes, removeSession, removeSessionSesionesMes } from '../../utils/utils';
+import { tablasFormatter } from '../../utils/formatters';
 
 class Sesion extends Component {
 
@@ -29,6 +31,7 @@ class Sesion extends Component {
         this.saveSesion = this.saveSesion.bind(this);
         this.loading = this.loading.bind(this);
         this.changeFecha = this.changeFecha.bind(this);
+        this.faltoPaciente = this.faltoPaciente.bind(this);
     }
 
     componentDidMount(){
@@ -40,6 +43,9 @@ class Sesion extends Component {
 
         this.loading(true);
         getPacientes().then( pacientes => {
+            pacientes.forEach(p =>{
+                p.ausencia = false;
+            });
             this.setState({pacientes});
             this.loading(false);
         });
@@ -153,7 +159,7 @@ class Sesion extends Component {
     }
 
     handleChange(selectedOption) {
-        //console.log('Pacientes seleccionados:', selectedOption);
+        console.log('Pacientes seleccionados:', selectedOption);
         this.setState({ selectedOption, errorPacientes: false } );
     }
 
@@ -175,7 +181,40 @@ class Sesion extends Component {
 
     }
 
+    faltoPaciente(id) {
+        console.log('falto paciente', id);
+        let paciente = _.find(this.state.selectedOption, {'id': id});
+        console.log('paciente', paciente);
+        paciente.ausencia = !paciente.ausencia;
+        this.setState({selectedOption: this.state.selectedOption});
+    }
+
     render() {
+
+        const columns = [{
+			dataField: 'ausencia',
+            text: 'Paciente', 
+            formatter: tablasFormatter.nombrePacienteSesion,           
+            sort: true
+        }, {
+			dataField: 'tipo',
+            text: 'Tipo',
+            formatter: tablasFormatter.tipoPaciente,
+            sort: true,
+        }, {
+			dataField: 'id',
+            text: 'Faltó',
+            headerAttrs: { width: '80px' },
+            align: 'center', headerAlign: 'center',
+            formatter: tablasFormatter.faltoPaciente,
+            formatExtraData: this.faltoPaciente
+        }];
+
+        const defaultSorted = [{
+            dataField: 'label',
+            order: 'asc'
+        }];
+
         return (
             <div className="animated fadeIn sesion"> 
                 <LoadingOverlay
@@ -229,6 +268,22 @@ class Sesion extends Component {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+                                        {this.state.selectedOption.length > 0 &&
+                                        <Row>
+                                            <Col>
+                                                <BootstrapTable
+                                                    keyField='id'
+                                                    data={this.state.selectedOption}
+                                                    columns={columns} 
+                                                    defaultSorted={defaultSorted}
+                                                    noDataIndication='No hay pacientes seleccionados'
+                                                    bordered={false}
+                                                    bootstrap4
+                                                    striped
+                                                    hover />
+                                            </Col>
+                                        </Row>
+                                        }
                                     </Form>
                                 </CardBody>
                                 <CardFooter>

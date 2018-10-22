@@ -94,6 +94,12 @@ div {
     }
 }
 
+.sesion {
+    .table td{
+        vertical-align: middle;
+    }
+}
+
 td:focus{
     outline: none;
 }
@@ -223,7 +229,7 @@ span.thTitle{
             cursor: pointer;
         }
     }
-    .fa-times-circle {
+    .fa-times-circle, .fa-user-times {
         color: $red;
         &:hover {
             color: $pink;
