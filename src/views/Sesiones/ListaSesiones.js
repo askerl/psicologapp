@@ -196,7 +196,8 @@ class ListaSesiones extends Component {
 			formatter: tablasFormatter.fecha
 		}, {
 			dataField: 'nombreCompleto',
-			text: 'Paciente'
+			text: 'Paciente',
+			formatter: tablasFormatter.nombrePacienteSesiones
 		}, {
 			dataField: 'tipo',
 			text: 'Tipo',
@@ -211,13 +212,6 @@ class ListaSesiones extends Component {
 		}, {
 			dataField: 'credencial',
 			text: 'Credencial',
-			hidden: this.state.size < breakpoints.lg
-		}, {
-			dataField: 'facturaPrepaga',
-			text: 'Factura',
-			headerAttrs: { width: '80px' },
-			align: 'center', headerAlign: 'center',
-			formatter: tablasFormatter.booleano,
 			hidden: this.state.size < breakpoints.lg
 		}, {
 			dataField: 'valor',

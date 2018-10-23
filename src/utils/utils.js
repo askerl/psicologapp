@@ -269,7 +269,8 @@ export const getSesionesMes = (mes, anio) => {
             resolve(sesionesMes);
         } else {
             console.log('Sesiones ' + key + ' DB', sesionesStorage);
-            getPacientes().then( pacientes => {
+            Promise.all([getPrepagas(), getPacientes()]).then(values => { 
+                let pacientes = values[1];
                 db.collection("sesiones")
                 .where("mes","==",parseInt(mes))
                 .where("anio","==",parseInt(anio))		

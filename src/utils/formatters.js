@@ -46,6 +46,17 @@ export const tablasFormatter = {
             );
         }
     },
+    nombrePacienteSesiones(cell, row){
+        if (row.ausencia) {
+            return (
+                <div>
+                    <span className="d-block">{cell}</span>
+                    <small className="text-danger font-weight-bold d-block">Faltó{!row.facturaAusencia ? ' (No factura)' : ''}</small>
+                </div>
+            );
+        }
+        return cell;
+    },
     nombrePacienteFacturaAusencia(cell, row){
         if (!cell) {
             return (
