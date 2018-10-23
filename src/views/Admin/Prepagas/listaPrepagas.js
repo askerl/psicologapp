@@ -57,12 +57,11 @@ class ListaPrepagas extends Component {
             formatExtraData: this.editarPrepaga
 		}, {
 			dataField: 'nombre',
-			text: 'Nombre',
+            text: 'Nombre',
             sort: true
         }, {
 			dataField: 'pagoAusencia',
             text: 'Pago por ausencia',
-            align: 'right', headerAlign: 'right',
             formatter: tablasFormatter.precio
         }];
 

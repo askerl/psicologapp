@@ -34,6 +34,7 @@ class ListaSesiones extends Component {
 		this.changePeriodo = this.changePeriodo.bind(this);
 		this.initFiltros = this.initFiltros.bind(this);
 		this.resize = this.resize.bind(this);
+		this.nuevaAusencia = this.nuevaAusencia.bind(this);
 	}
 	
 	componentDidMount(){
@@ -69,7 +70,11 @@ class ListaSesiones extends Component {
 	}
 	
 	nuevaSesion(){
-		this.props.history.push('/sesiones/new');
+		this.props.history.push('/sesiones/new/sesion');
+	}
+
+	nuevaAusencia(){
+		this.props.history.push('/sesiones/new/ausencia');
 	}
 
 	borrarSesiones(){
@@ -241,6 +246,7 @@ class ListaSesiones extends Component {
 									<Col xs="12" sm="6">
 										<div className="d-flex flex-row mb-2 mr-auto">
 											<Button color="primary" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus mr-2"></i>Agregar sesiones</Button>
+											<Button color="dark" size="sm" onClick={this.nuevaAusencia}><i className="fa fa-calendar-times-o mr-2"></i>Agregar ausencias</Button>
 											<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser mr-2"></i>Borrar sesiones</Button>
 										</div>
 									</Col>

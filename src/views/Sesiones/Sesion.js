@@ -18,7 +18,9 @@ class Sesion extends Component {
         super(props);
         this.state = {
             loading: false,
-            id: '',
+            id: props.match.params.id,
+            nuevo: props.match.params.id === 'new',
+            isAusencia: props.match.params.type === 'ausencia',
             selectedOption: [],
             nuevo: true,
             pacientes: [],
@@ -31,25 +33,20 @@ class Sesion extends Component {
         this.saveSesion = this.saveSesion.bind(this);
         this.loading = this.loading.bind(this);
         this.changeFecha = this.changeFecha.bind(this);
-        this.faltoPaciente = this.faltoPaciente.bind(this);
+        this.facturarAusencia = this.facturarAusencia.bind(this);
     }
 
     componentDidMount(){
-        // id de la sesión
-        let id = this.props.match.params.id;
-        let nuevo = id === 'new';
-        this.setState({id, nuevo});
         this.inputFecha.value = moment().format('YYYY-MM-DD');
 
         this.loading(true);
         getPacientes().then( pacientes => {
             pacientes.forEach(p =>{
-                p.ausencia = false;
+                p.facturaAusencia = true; // por defecto se facturan las ausencias
             });
             this.setState({pacientes});
             this.loading(false);
         });
-
     }
 
     loading(val){
@@ -136,7 +133,9 @@ class Sesion extends Component {
             paciente: p.value,
             tipo: p.tipo,
             evolucion: '',
-            valor: p.valorConsulta
+            valor: p.valorConsulta,
+            ausencia: this.state.isAusencia,
+            facturaAusencia: p.facturaAusencia
         }
 
         if (p.tipo == pacientePrepaga){
@@ -181,38 +180,34 @@ class Sesion extends Component {
 
     }
 
-    faltoPaciente(id) {
-        console.log('falto paciente', id);
+    facturarAusencia(id) {
+        console.log('facturar ausencia', id);
         let paciente = _.find(this.state.selectedOption, {'id': id});
         console.log('paciente', paciente);
-        paciente.ausencia = !paciente.ausencia;
+        paciente.facturaAusencia = !paciente.facturaAusencia;
         this.setState({selectedOption: this.state.selectedOption});
     }
 
     render() {
 
+        const titleIcon = this.state.isAusencia ? 'fa-calendar-times-o' : 'fa-comments-o';
+        const titleText = this.state.isAusencia ? 'Ausencias' : 'Sesiones';
+        const showResumen = this.state.isAusencia && this.state.selectedOption.length > 0;
+
         const columns = [{
-			dataField: 'ausencia',
+			dataField: 'facturaAusencia',
             text: 'Paciente', 
-            formatter: tablasFormatter.nombrePacienteSesion,           
-            sort: true
+            formatter: tablasFormatter.nombrePacienteFacturaAusencia
         }, {
 			dataField: 'tipo',
             text: 'Tipo',
-            formatter: tablasFormatter.tipoPaciente,
-            sort: true,
+            formatter: tablasFormatter.tipoPaciente
         }, {
 			dataField: 'id',
-            text: 'Faltó',
-            headerAttrs: { width: '80px' },
+            text: 'Facturar ausencia',
             align: 'center', headerAlign: 'center',
-            formatter: tablasFormatter.faltoPaciente,
-            formatExtraData: this.faltoPaciente
-        }];
-
-        const defaultSorted = [{
-            dataField: 'label',
-            order: 'asc'
+            formatter: tablasFormatter.facturarAusencia,
+            formatExtraData: this.facturarAusencia
         }];
 
         return (
@@ -226,12 +221,11 @@ class Sesion extends Component {
                     <Row>
                         <Col>
                             <Card className="mainCard">
-                                <CardHeader>
-                                    <i className="fa fa-comments-o fa-lg"></i>
-                                    <strong>Sesiones</strong>                                
-                                    { this.state.nuevo &&
+                                <CardHeader>                                   
+                                    <i className={`fa ${titleIcon} fa-lg mr-2`}></i><strong>{titleText}</strong>
+                                    {/* { this.state.nuevo &&
                                         <a><Badge color="success" className="badge-pill ml-2">Nuevas</Badge></a>
-                                    }                                    
+                                    } */}
                                 </CardHeader>
                                 <CardBody>
                                     <Form>
@@ -268,14 +262,14 @@ class Sesion extends Component {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
-                                        {this.state.selectedOption.length > 0 &&
+                                        {showResumen &&
                                         <Row>
                                             <Col>
                                                 <BootstrapTable
                                                     keyField='id'
                                                     data={this.state.selectedOption}
                                                     columns={columns} 
-                                                    defaultSorted={defaultSorted}
+                                                    classes="tablaAusencias"
                                                     noDataIndication='No hay pacientes seleccionados'
                                                     bordered={false}
                                                     bootstrap4

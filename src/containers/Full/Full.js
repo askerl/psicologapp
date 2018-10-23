@@ -60,7 +60,7 @@ class Full extends Component {
 								<Route exact path="/pacientes" name="Pacientes" component={ListaPacientes} />
 								<Route path='/pacientes/:id' name="Paciente" component={PacienteTabs} />
 								<Route exact path="/sesiones" name="Sesiones" component={ListaSesiones} />
-								<Route path='/sesiones/:id' name="Sesion" component={Sesion} />
+								<Route path='/sesiones/:id/:type?' name="Sesion" component={Sesion} />
 								<Route exact path="/facturaciones" name="Facturaciones" component={Facturaciones} />
 								<Route exact path="/admin/prepagas" name="Prepagas" component={ListaPrepagas} />
 								<Route path='/admin/prepagas/:id' name="Prepaga" component={Prepaga} />

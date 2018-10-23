@@ -94,9 +94,10 @@ div {
     }
 }
 
-.sesion {
-    .table td{
-        vertical-align: middle;
+.tablaAusencias {
+    select {
+        max-width: 50px;
+        margin: 0 auto;
     }
 }
 
@@ -204,6 +205,11 @@ span.thTitle{
 }
 
 // React Bootstrap Table customizations
+.react-bootstrap-table {
+    td {
+        vertical-align: middle;
+    }
+}
 
 .react-bootstrap-table>table>thead>tr>th .date-filter-comparator, .react-bootstrap-table>table>thead>tr>th .number-filter-comparator{
     max-width: 45px;

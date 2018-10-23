@@ -46,8 +46,8 @@ export const tablasFormatter = {
             );
         }
     },
-    nombrePacienteSesion(cell, row){
-        if (cell) {
+    nombrePacienteFacturaAusencia(cell, row){
+        if (!cell) {
             return (
                 <span className="text-danger">{row.label}</span>
             );
@@ -125,13 +125,13 @@ export const tablasFormatter = {
         }
         return cell;
     },
-    faltoPaciente(cell, row, rowIndex, formatExtraData){
+    facturarAusencia(cell, row, rowIndex, formatExtraData){
         return (
             <div>
-                <Input className="form-control-sm" type="select" name={"ausencia"+rowIndex} id={"ausencia"+rowIndex} 
-                    defaultValue={row.ausencia} onChange={() => this.formatExtraData(row.id)}>
-                    <option value="false">No</option>
+                <Input className="form-control-sm" type="select" name={"facAusencia"+rowIndex} id={"facAusencia"+rowIndex} 
+                    defaultValue={row.facturaAusencia} onChange={() => this.formatExtraData(row.id)}>
                     <option value="true">Sí</option>
+                    <option value="false">No</option>
                 </Input>
             </div>
         );
