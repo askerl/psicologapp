@@ -72,15 +72,20 @@ function armarFacturaciones(data, mesIni, anioIni, mesFin, anioFin) {
                 anio = sesion.anio;                
             }
 
-            let valor = parseFloat(sesion.valor);            
-            if (sesion.tipo === pacientePrivado) {
-                fac.totalPrivado += valor;
-            } else {
-                // sesion prepaga
-                fac.totalCopago += parseFloat(sesion.copago);
-                if (sesion.facturaPrepaga === true){
-                    fac.totalPrepaga += valor;
-                    fac.prepagas[sesion.prepaga] = fac.prepagas[sesion.prepaga] ? fac.prepagas[sesion.prepaga] += valor : valor;
+            // facturo una sesión si NO es ausencia, o si es ausencia y se factura
+            const facturarSesion = !sesion.ausencia || (sesion.ausencia && sesion.facturaAusencia);
+
+            if (facturarSesion) {
+                let valor = parseFloat(sesion.valor);            
+                if (sesion.tipo === pacientePrivado) {
+                    fac.totalPrivado += valor;
+                } else {
+                    // sesion prepaga
+                    fac.totalCopago += parseFloat(sesion.copago);
+                    if (sesion.facturaPrepaga === true){
+                        fac.totalPrepaga += valor;
+                        fac.prepagas[sesion.prepaga] = fac.prepagas[sesion.prepaga] ? fac.prepagas[sesion.prepaga] += valor : valor;
+                    }
                 }
             }
 
