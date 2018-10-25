@@ -3,45 +3,16 @@
     background-color: #20c997;
 }
 
-.card {
-    border-radius: .25rem;
-    .card-header:first-child {
-        border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
-    }
-    .card-footer:last-child {
-        border-radius: 0 0 calc(.25rem - 1px) calc(.25rem - 1px);
-    }
-}
-
-.form-control, .input-group-text, .btn {
-    border-radius: .25rem;
-}
-
-.input-group>.form-control:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-.input-group>.input-group-append:last-child>.btn:not(:last-child):not(.dropdown-toggle), .input-group>.input-group-append:last-child>.input-group-text:not(:last-child), .input-group>.input-group-append:not(:last-child)>.btn, .input-group>.input-group-append:not(:last-child)>.input-group-text, .input-group>.input-group-prepend>.btn, .input-group>.input-group-prepend>.input-group-text {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
 .progress {
     border-radius: 10rem;
 }
 
 .nav-tabs {  
     .nav-link {
-        border-top-left-radius: .25rem;
-        border-top-right-radius: .25rem;
         &:hover {
             cursor: pointer;
         }
     }
-}
-
-.tab-content {
-    border-radius: 0 0 .25rem .25rem;
 }
 
 .linkCard {
@@ -124,7 +95,7 @@ span.thTitle{
 
 // select styles
 .Select-control{
-    border-radius: .25rem;
+    // border-radius: .25rem;
 }
 
 .Select.is-focused:not(.is-open) > .Select-control{
@@ -156,21 +127,35 @@ span.thTitle{
     hr{
         margin: 0;
     }
-    .filtros{
-        .anio{
-            width: 70px;
-            border-radius: .25rem;
-        }
-        .mes{
-            width: 100px;
-        }
-    }
+   
 }
 
 .listaPacientes {
     .filtros {
         .filtroEstado {
             width: 80px;
+        }
+    }
+}
+
+.facturaciones {
+    .filtros {
+        .mes{
+            width: 65%;
+        }
+        .anio{
+            width: 30%;
+        }
+    }
+}
+
+.listaSesiones {
+    .filtros {
+        .mes{
+            width: 105px;
+        }
+        .anio{
+            width: 70px;
         }
     }
 }
@@ -275,6 +260,10 @@ span.thTitle{
     justify-content: space-between;
 }
 
+.breadcrumb {
+    border-radius: 0;
+}
+
 // mobile
 @include media-breakpoint-down(xs) {
     .breadcrumb {
@@ -307,8 +296,6 @@ span.thTitle{
         flex-wrap: wrap;
         .btn {
             width: 100%;
-        }
-        button {
             margin-right: 0;
             margin-bottom: 10px;
             &:last-child {
@@ -332,9 +319,34 @@ span.thTitle{
             }
         }
     }
+    .listaSesiones {
+        .accionesLista {
+            .btn-success {
+                width: 100%;
+                margin-right: 0;
+            }
+            .btn-dark {
+                width: 49%;
+                margin-right: 1%;
+            }
+            .btn-danger {
+                width: 49%;
+                margin-left: 1%;
+                margin-right: 0;
+            }
+        }
+        .filtros {
+            .mes{
+                width: 50%;
+            }
+            .anio{
+                width: 50%;
+            }
+        }
+    }
     .facturaciones {
         .filtros {
-            button {
+            .btn {
                 width: 100%;
             }
         }

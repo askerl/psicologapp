@@ -233,24 +233,20 @@ class Facturaciones extends Component {
 									<Row>
 										<Col xs="12" sm="6">
 											<FormGroup>
-												<Label htmlFor="mesIni">Desde</Label>
-												<InputGroup>
-													<Input className="mes" type="select" bsSize="sm" name="mesIni" id="mesIni" innerRef={el => this.mesIni = el}>
-														{optionsMes}
-													</Input>
-													<Input className="anio ml-2" type="number" bsSize="sm" name="anioIni" id="anioIni" innerRef={el => this.anioIni = el} />
-												</InputGroup>
+												<Label className="d-block" htmlFor="mesIni">Desde</Label>
+												<Input className="mes d-inline" type="select" bsSize="sm" name="mesIni" id="mesIni" innerRef={el => this.mesIni = el}>
+													{optionsMes}
+												</Input>
+												<Input className="anio d-inline ml-2" type="number" bsSize="sm" name="anioIni" id="anioIni" innerRef={el => this.anioIni = el} />
 											</FormGroup>
 										</Col>
 										<Col xs="12" sm="6">
 											<FormGroup>
-												<Label htmlFor="mesFin">Hasta</Label>
-												<InputGroup>
-													<Input className="mes" type="select" bsSize="sm" name="mesFin" id="mesFin" innerRef={el => this.mesFin = el}>
-														{optionsMes}
-													</Input>
-													<Input className="anio ml-2" type="number" bsSize="sm" name="anioFin" id="anioFin" innerRef={el => this.anioFin = el} />
-												</InputGroup>
+												<Label className="d-block" htmlFor="mesFin">Hasta</Label>											
+												<Input className="mes d-inline" type="select" bsSize="sm" name="mesFin" id="mesFin" innerRef={el => this.mesFin = el}>
+													{optionsMes}
+												</Input>
+												<Input className="anio d-inline ml-2" type="number" bsSize="sm" name="anioFin" id="anioFin" innerRef={el => this.anioFin = el} />											
 											</FormGroup>
 										</Col>
 									</Row>

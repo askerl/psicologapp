@@ -237,15 +237,15 @@ class ListaSesiones extends Component {
 								</CardHeader>
 							<CardBody>
 								<Row>
-									<Col xs="12" sm="6">
-										<div className="d-flex flex-row mb-2 mr-auto">
-											<Button color="success" size="sm" onClick={this.nuevaSesion}><i className="fa fa-plus mr-2"></i>Agregar sesiones</Button>
+									<Col sm="12" md="8">
+										<div className="accionesLista d-flex flex-row flex-wrap mb-2 justify-content-sm-start">
+											<Button color="success" size="sm" className="mb-2 mb-sm-0" onClick={this.nuevaSesion}><i className="fa fa-plus mr-2"></i>Agregar sesiones</Button>
 											<Button color="dark" size="sm" onClick={this.nuevaAusencia}><i className="fa fa-calendar-times-o mr-2"></i>Agregar ausencias</Button>
 											<Button color="danger" size="sm" onClick={this.borrarSesiones}><i className="fa fa-eraser mr-2"></i>Borrar sesiones</Button>
 										</div>
 									</Col>
-									<Col xs="12" sm="6">
-										<div className="filtros d-flex flex-row mb-2 justify-content-sm-end">
+									<Col sm="12" md="4">
+										<div className="filtros d-flex flex-row mb-2 justify-content-md-end">
 											<Input className="mes" type="select" bsSize="sm" name="mes" id="mes" innerRef={el => this.inputMes = el} onChange={this.changePeriodo}>
 												{meses.map((value, index) => <option key={index} value={index + 1}>{value}</option>)}
 											</Input>

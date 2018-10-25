@@ -224,13 +224,13 @@ class ListaPacientes extends Component {
 									<div>
 										<Row>
 											<Col xs="12" sm="6">
-												<div className="accionesLista d-flex flex-row mb-2 mr-auto">										
+												<div className="accionesLista d-flex flex-row mb-2">										
 													<Button color="success" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>													
 													<ExportCSV { ...props.csvProps } />
 												</div>
 											</Col>
 											<Col xs="12" sm="6">
-												<ButtonGroup className="filtros d-flex flex-row mb-2">
+												<ButtonGroup className="filtros d-flex flex-row justify-content-sm-end mb-2">
 													<Button color={todos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[0].value)} active={todos}>Todos</Button>
 													<Button color={activos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[1].value)} active={activos}>Activos</Button>
 													<Button color={inactivos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[2].value)} active={inactivos}>Inactivos</Button>
