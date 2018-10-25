@@ -15,6 +15,11 @@ class Sidebar extends Component {
     e.target.parentElement.classList.toggle('open');
   }
 
+  clickItem(e) {
+    e.preventDefault();
+    document.body.classList.remove('sidebar-mobile-show');
+  }
+
   activeRoute(routeName, props) {
     // return this.props.location.pathname.indexOf(routeName) > -1 ? 'nav-item nav-dropdown open' : 'nav-item nav-dropdown';
     return props.location.pathname.indexOf(routeName) > -1 ? 'nav-item nav-dropdown open' : 'nav-item nav-dropdown';
@@ -26,12 +31,12 @@ class Sidebar extends Component {
   //   return this.props.location.pathname.indexOf(routeName) > -1 ? "nav nav-second-level collapse in" : "nav nav-second-level collapse";
   // }
 
-
   render() {
 
     const props = this.props;
     const activeRoute = this.activeRoute;
     const handleClick = this.handleClick;
+    const clickItem = this.clickItem;
 
     // badge addon to NavItem
     const badge = (badge) => {
@@ -61,9 +66,9 @@ class Sidebar extends Component {
       }
       const variant = classNames( "nav-link", item.variant ? `nav-link-${item.variant}` : "");
       return (
-        <NavItem key={key} className={classes}>
+        <NavItem key={key} className={classes} onClick={clickItem.bind(this)}>
           { isExternal(item.url) ?
-              <RsNavLink href={item.url} className={variant} active>
+              <RsNavLink href={item.url} className={variant} active >
                 <i className={item.icon}></i>{item.name}{badge(item.badge)}
               </RsNavLink>
             :
