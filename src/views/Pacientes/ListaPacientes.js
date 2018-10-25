@@ -3,7 +3,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { numberFilter, selectFilter, textFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
-import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, Col, Input, Row, ButtonGroup } from 'reactstrap';
 import ExportCSV from '../../components/ExportCSV/exportCSV';
 import { breakpoints, estadosPaciente, filtroTipoPaciente, overlay } from '../../config/constants';
 import { tablasFormatter, csvFormatter } from '../../utils/formatters';
@@ -29,7 +29,7 @@ class ListaPacientes extends Component {
 
 	componentDidMount(){
 		// set initial filter state
-		this.filtroEstado.value = this.state.filtroEstado;
+		//this.filtroEstado.value = this.state.filtroEstado;
 		// cargo filtro de prepagas
 		getFiltroPrepagas().then( filtroPrepagas => {
 			this.setState({filtroPrepagas});
@@ -51,7 +51,7 @@ class ListaPacientes extends Component {
 	cargarPacientes() {
 		this.loading(true);
 		getPacientes().then( result => {
-			let pacientes = filterPacientesEstado(result, this.filtroEstado.value);
+			let pacientes = filterPacientesEstado(result, this.state.filtroEstado);
 			this.setState({pacientes: [...pacientes].concat([])});
 			this.loading(false);
 		});
@@ -69,9 +69,9 @@ class ListaPacientes extends Component {
 		this.props.history.push(`/pacientes/${id}`);
 	}
 
-	changeEstado(){
-		setSession('filtroEstado', this.filtroEstado.value);
-		this.setState({filtroEstado: this.filtroEstado.value});
+	changeEstado(filtroEstado){
+		setSession('filtroEstado', filtroEstado);
+		this.setState({filtroEstado});
 		this.cargarPacientes();
 	}
 	
@@ -197,6 +197,13 @@ class ListaPacientes extends Component {
 			hidden: true
 		}];
 
+		let todos = this.state.filtroEstado === estadosPaciente[0].value,
+			activos = this.state.filtroEstado === estadosPaciente[1].value,
+			inactivos = this.state.filtroEstado === estadosPaciente[2].value;
+
+		let filtroActivo = "teal",
+			filtroInactivo = "secondary";
+
 		return (
 			<div className="animated fadeIn listaPacientes">
 				<Row>
@@ -217,18 +224,17 @@ class ListaPacientes extends Component {
 									<div>
 										<Row>
 											<Col xs="12" sm="6">
-												<div className="d-flex flex-row mb-2 mr-auto">										
+												<div className="accionesLista d-flex flex-row mb-2 mr-auto">										
 													<Button color="success" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>													
 													<ExportCSV { ...props.csvProps } />
 												</div>
 											</Col>
 											<Col xs="12" sm="6">
-												<div className="filtros d-flex flex-row mb-2 justify-content-sm-end">
-													<Input id="filtroEstado" className="filtroEstado" type="select" title="Filtrar por estado"
-														bsSize="sm" name="filtroEstado" innerRef={el => this.filtroEstado = el} onChange={this.changeEstado}>
-														{estadosPaciente.map((item, index) => <option key={index} value={item.value}>{item.title}</option>)}
-													</Input>
-												</div>
+												<ButtonGroup className="filtros d-flex flex-row mb-2">
+													<Button color={todos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[0].value)} active={todos}>Todos</Button>
+													<Button color={activos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[1].value)} active={activos}>Activos</Button>
+													<Button color={inactivos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[2].value)} active={inactivos}>Inactivos</Button>
+												</ButtonGroup>
 											</Col>
 										</Row>
 										<Row>

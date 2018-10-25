@@ -62,6 +62,12 @@ button{
     margin-right: 5px;
 }
 
+.btn-group {
+    .btn {
+        margin-right: 0;
+    }
+}
+
 div {
     button:last-child{
         margin-right: 0px;
@@ -314,6 +320,18 @@ span.thTitle{
 
     }
     // botones de Listas en Mobile
+    .listaPacientes {
+        .accionesLista {
+            .btn {
+                width: 50%;
+            }
+        }
+        .filtros {
+            .btn {
+                width: 100%;
+            }
+        }
+    }
     .facturaciones {
         .filtros {
             button {
