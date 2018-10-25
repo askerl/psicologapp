@@ -514,7 +514,7 @@ class Paciente extends Component {
                                 </Row>
                             </Form>
                             <hr className="mt-3 mb-3"/>
-                            <div id="botonesPaciente">
+                            <div className="botonesPaciente">
                                 <Button type="submit" color="primary" onClick={() => this.savePaciente()}>
                                     {this.state.loading && <Spinner/>}Guardar
                                 </Button>

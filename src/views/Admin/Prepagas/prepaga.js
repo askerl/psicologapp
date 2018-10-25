@@ -220,7 +220,7 @@ class Prepaga extends Component {
                                         </Row>
                                     </Form>
                                 </CardBody>
-                                <CardFooter>
+                                <CardFooter className="botonesCard">
                                     <Button type="submit" color="primary" onClick={ e => this.savePrepaga(e)}>
                                         {this.state.loading && <Spinner/>}Guardar
                                     </Button>

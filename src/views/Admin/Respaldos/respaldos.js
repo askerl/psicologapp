@@ -199,8 +199,8 @@ class Respaldos extends Component {
         }];
 
 		return (
-			<div>
-                <Card>
+			<div className="animated fadeIn listaRespaldos">
+                <Card className="mainCard">
                     <CardHeader>
                         <i className="fa fa-database fa-lg"></i> Respaldos
                     </CardHeader>

@@ -66,8 +66,8 @@ class ListaPrepagas extends Component {
         }];
 
 		return (
-			<div>
-                <Card>
+			<div className="animated fadeIn listaPrepagas">
+                <Card className="mainCard">
                     <CardHeader>
                         <i className="fa fa-hospital-o fa-lg"></i> Prepagas
                     </CardHeader>

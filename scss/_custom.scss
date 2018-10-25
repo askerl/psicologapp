@@ -1,6 +1,6 @@
 // Here you can add other styles
 .app-header.navbar.testHeader, .app-header.navbar.testHeader .navbar-brand, .testFooter {
-    background-color: aquamarine;
+    background-color: #20c997;
 }
 
 .card {
@@ -153,6 +153,7 @@ span.thTitle{
     .filtros{
         .anio{
             width: 70px;
+            border-radius: .25rem;
         }
         .mes{
             width: 100px;
@@ -270,10 +271,14 @@ span.thTitle{
 
 // mobile
 @include media-breakpoint-down(xs) {
+    .breadcrumb {
+        margin-bottom: 0.8rem;
+    }
     .mainCard {
         border-left: none;
         border-right: none;
         border-radius: 0;
+        margin-bottom: 1rem;
         .card-body {
             padding: 1rem;
         }
@@ -282,19 +287,16 @@ span.thTitle{
         .nav-item:first-child {
             .active.nav-link {
                 border-left: none;
+                border-top-left-radius: 0;
             }
         }
     }
     .tab-content {
         border-left: none;
         border-right: none;
+        border-radius: 0;
     }
-    // .tablaPacientes {
-    //     td, th {
-    //         padding: 0.3rem;
-    //     }
-    // }
-    #botonesPaciente {
+    .botonesPaciente {
         justify-content: space-between;
         flex-wrap: wrap;
         .btn {
@@ -305,6 +307,17 @@ span.thTitle{
             margin-bottom: 10px;
             &:last-child {
                 margin-bottom: 0;
+            }
+        }
+    }
+    .botonesCard {
+
+    }
+    // botones de Listas en Mobile
+    .facturaciones {
+        .filtros {
+            button {
+                width: 100%;
             }
         }
     }
