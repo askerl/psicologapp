@@ -280,7 +280,7 @@ class Sesion extends Component {
                                         }
                                     </Form>
                                 </CardBody>
-                                <CardFooter>
+                                <CardFooter className="botonesFooter">
                                     <Button type="submit" color="primary" onClick={ e => this.saveSesion(e)}>
                                         {this.state.loading && <Spinner/>}Guardar
                                     </Button>

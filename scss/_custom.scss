@@ -268,6 +268,7 @@ span.thTitle{
 @include media-breakpoint-down(xs) {
     .breadcrumb {
         margin-bottom: 0.8rem;
+        padding: 0.3rem 1rem;
     }
     .mainCard {
         border-left: none;
@@ -291,9 +292,11 @@ span.thTitle{
         border-right: none;
         border-radius: 0;
     }
-    .botonesPaciente {
-        justify-content: space-between;
-        flex-wrap: wrap;
+    .botonesFooter {
+        &.card-footer {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
         .btn {
             width: 100%;
             margin-right: 0;
@@ -302,9 +305,6 @@ span.thTitle{
                 margin-bottom: 0;
             }
         }
-    }
-    .botonesCard {
-
     }
     // botones de Listas en Mobile
     .listaPacientes {

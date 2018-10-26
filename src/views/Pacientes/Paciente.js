@@ -514,12 +514,12 @@ class Paciente extends Component {
                                 </Row>
                             </Form>
                             <hr className="mt-3 mb-3"/>
-                            <div className="botonesPaciente">
+                            <div className="botonesFooter">
                                 <Button type="submit" color="primary" onClick={() => this.savePaciente()}>
                                     {this.state.loading && <Spinner/>}Guardar
                                 </Button>
                                 {!this.state.nuevo &&
-                                    <Button type="submit" color={this.state.activo ? 'warning' : 'success'} onClick={this.toggleActivar}>
+                                    <Button type="submit" color={this.state.activo ? 'dark' : 'success'} onClick={this.toggleActivar}>
                                         {this.state.activo ? 'Desactivar' : 'Activar'}
                                     </Button>
                                 }
@@ -542,7 +542,7 @@ class Paciente extends Component {
                             <Button color="secondary" size="sm" onClick={this.toggleDelete} disabled={this.state.loading}>Cancelar</Button>
                         </ModalFooter>
                     </Modal>
-                    <Modal isOpen={this.state.showActivarModal} toggle={this.toggleActivar} className={'modal-md ' + (this.state.setActivo ? 'modal-success' : 'modal-warning')}>
+                    <Modal isOpen={this.state.showActivarModal} toggle={this.toggleActivar} className={'modal-md ' + (this.state.setActivo ? 'modal-success' : 'modal-dark')}>
                         <ModalHeader toggle={this.toggleActivar}>{this.state.setActivo ? 'Activar' : 'Desactivar'} Paciente</ModalHeader>
                         <ModalBody>
                             Esta acción {this.state.setActivo ? 'activará' : 'desactivará'} al Paciente y se guardarán los cambios realizados.

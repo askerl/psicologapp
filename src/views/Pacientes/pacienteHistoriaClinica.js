@@ -142,12 +142,12 @@ class HistoriaClinica extends Component {
         
         return (
             <div className="animated fadeIn historiaClinica">
-                    <Row>
+                    <Row className="mb-3">
                         <Col>
-                            <div className="d-flex align-items-center mb-3">
-                                <h5 className="mr-2 mb-0">{paciente.nombreCompleto}</h5>
+                            <div className="d-sm-inline-block mr-sm-2"><h5 className="mb-0">{paciente.nombreCompleto}</h5></div>
+                            <div className="d-sm-inline-block align-text-bottom">
                                 {tablasFormatter.tipoPaciente(paciente.tipo)}
-                                <Badge color="purple" className="badge-pill ml-2">{totalSesiones}</Badge>
+                                <Badge color="purple" className="badge-pill ml-2">{totalSesiones} Sesiones</Badge>
                             </div>
                         </Col>
                     </Row>
@@ -162,10 +162,10 @@ class HistoriaClinica extends Component {
                                 {
                                     props => (
                                         <div>
-                                            <div className="hcToolbar d-flex">
+                                            <div className="hcToolbar d-flex mb-2">
                                                 <SearchBar {...props.searchProps}
                                                     placeholder="Buscar..."
-                                                    className={`${tablasFormatter.filterClass} mb-2 mr-2`} />
+                                                    className={`${tablasFormatter.filterClass} mr-2`} />
                                                 <ExportCSV { ...props.csvProps } />
                                             </div>
                                             <LoadingOverlay
@@ -195,9 +195,9 @@ class HistoriaClinica extends Component {
                         <ModalHeader toggle={this.toggleEdit}>{this.state.evolucion ? 'Editar' : 'Agregar'} Evolución</ModalHeader>
                         <ModalBody>
                             <Input type="textarea" id="evolucion" defaultValue={this.state.evolucion} innerRef={el => this.inputEvolucion = el} rows="5" />  
-					</ModalBody>
+					    </ModalBody>
                         <ModalFooter>
-                            <Button color="success" size="sm" onClick={this.updateEvolucion}>
+                            <Button color="teal" size="sm" onClick={this.updateEvolucion}>
                                 {this.state.loading && <Spinner />}Guardar
 						</Button>
                             <Button color="secondary" size="sm" onClick={this.toggleEdit} disabled={this.state.loading}>Cancelar</Button>
