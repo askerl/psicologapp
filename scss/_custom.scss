@@ -264,7 +264,13 @@ span.thTitle{
     border-radius: 0;
 }
 
-// mobile
+label.required::after {
+    content: " *"; 
+    color: $red;
+}
+
+// ************* MOBILE styles *******************
+
 @include media-breakpoint-down(xs) {
     .breadcrumb {
         margin-bottom: 0.8rem;

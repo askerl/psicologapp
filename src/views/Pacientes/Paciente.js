@@ -244,11 +244,9 @@ class Paciente extends Component {
             isFormValid = false;
         }
 
-        if (this.state.tipo === pacientePrivado){
-            if ((!field || field == "valorConsulta") && !this.inputValorConsulta.value) {
-                this.setState({errorValorConsulta: true});
-                isFormValid = false;
-            }
+        if ((!field || field == "valorConsulta") && !this.inputValorConsulta.value) {
+            this.setState({errorValorConsulta: true});
+            isFormValid = false;
         }
 
         if (this.state.tipo === pacientePrepaga){
@@ -322,7 +320,7 @@ class Paciente extends Component {
                                 <Row>
                                     <Col xs="12" sm="6">
                                         <FormGroup>
-                                            <Label for="nombre">Nombre(s)</Label>
+                                            <Label for="nombre" className="required">Nombre(s)</Label>
                                             <Input type="text" name="nombre" id="nombre" innerRef={el => this.inputNombre = el} required
                                                 className={this.state.errorNombre ? 'is-invalid' : ''} onChange={this.changeNombre} onBlur={this.checkExistePaciente} />
                                             <FormFeedback>{errores.nombreVacio}</FormFeedback>
@@ -330,7 +328,7 @@ class Paciente extends Component {
                                     </Col>
                                     <Col xs="12" sm="6">
                                         <FormGroup>
-                                            <Label htmlFor="apellido">Apellido(s)</Label>
+                                            <Label htmlFor="apellido" className="required">Apellido(s)</Label>
                                             <Input type="text" id="apellido" innerRef={el => this.inputApellido = el} required
                                                 className={this.state.errorApellido ? 'is-invalid' : ''} onChange={this.changeApellido} onBlur={this.checkExistePaciente} />
                                             <FormFeedback>{errores.apellidoVacio}</FormFeedback>
@@ -407,7 +405,7 @@ class Paciente extends Component {
                                 <Row>
                                     <Col>
                                         <FormGroup>
-                                            <Label htmlFor="tipo">Tipo de Paciente</Label>
+                                            <Label htmlFor="tipo" className="required">Tipo de Paciente</Label>
                                             <Input type="select" name="tipoPaciente" id="tipo" innerRef={el => this.inputTipo = el} required onChange={this.changeTipoPaciente}
                                                 className={this.state.errorTipo ? 'is-invalid' : ''}>
                                                 <option value="">Seleccione...</option>
@@ -421,7 +419,7 @@ class Paciente extends Component {
                                     <Row>
                                         <Col xs="12" sm="6">
                                             <FormGroup>
-                                                <Label htmlFor="prepaga">Prepaga</Label>
+                                                <Label htmlFor="prepaga" className="required">Prepaga</Label>
                                                 <Input type="select" name="prepaga" id="prepaga" innerRef={el => this.inputPrepaga = el} required
                                                     onChange={this.changePrepaga} className={this.state.errorPrepaga ? 'is-invalid' : ''}>
                                                     <option value="">Seleccione prepaga...</option>
@@ -446,7 +444,7 @@ class Paciente extends Component {
                                 <Row>
                                     <Col xs="12" sm={this.state.tipo === pacientePrepaga ? "6" : "12"}>
                                         <FormGroup className="errorAddon">
-                                            <Label htmlFor="valorConsulta">{this.state.tipo === pacientePrivado ? 'Valor de consulta' : 'Pago por paciente'}</Label>
+                                            <Label htmlFor="valorConsulta" className="required">{this.state.tipo === pacientePrepaga ? 'Pago por paciente' : 'Valor de consulta'}</Label>
                                             <InputGroup>
                                                 <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
                                                 <Input type="number" id="valorConsulta" name="valorConsulta" innerRef={el => this.inputValorConsulta = el} required

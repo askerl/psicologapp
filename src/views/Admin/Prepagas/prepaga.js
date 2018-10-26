@@ -200,7 +200,7 @@ class Prepaga extends Component {
                                         <Row>                                                                                    
                                             <Col xs="12" sm="6">
                                                 <FormGroup>
-                                                    <Label for="nombre">Nombre</Label>
+                                                    <Label for="nombre" className="required">Nombre</Label>
                                                     <Input type="text" name="nombre" id="nombre" innerRef={el => this.inputNombre = el} required
                                                         className={this.state.errorNombre ? 'is-invalid' : ''} onChange={this.changeNombre}/>
                                                     <FormFeedback>{errores.nombreVacio}</FormFeedback>

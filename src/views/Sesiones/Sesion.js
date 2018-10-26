@@ -232,7 +232,7 @@ class Sesion extends Component {
                                         <Row>                                                                                    
                                             <Col xs="12" sm="6">
                                                 <FormGroup className="errorAddon">
-                                                    <Label htmlFor="fchNac">Fecha</Label>
+                                                    <Label htmlFor="fchNac" className="required">Fecha</Label>
                                                     <InputGroup className="input-group-fecha">
                                                         <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-calendar"></i></InputGroupText></InputGroupAddon>
                                                         <Input type="date" id="fecha" name="Fecha" innerRef={el => this.inputFecha = el} onChange={this.changeFecha} />                                                        
@@ -246,7 +246,7 @@ class Sesion extends Component {
                                         <Row>
                                             <Col>
                                                 <FormGroup className="errorAddon">
-                                                    <Label htmlFor="pacientes">Pacientes</Label>
+                                                    <Label htmlFor="pacientes" className="required">Pacientes</Label>
                                                     <Select
                                                         multi={true}
                                                         placeholder="Seleccione pacientes..."
