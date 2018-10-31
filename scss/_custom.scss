@@ -3,10 +3,6 @@
     background-color: #20c997;
 }
 
-.progress {
-    border-radius: 10rem;
-}
-
 .nav-tabs {  
     .nav-link {
         &:hover {
@@ -23,6 +19,9 @@
     }
     &.dangerCard .card{
         border-color: theme-color("danger");
+    }
+    &.warningCard .card{
+        border-color: theme-color("warning");
     }
     &:hover {
         text-decoration: none;
@@ -93,11 +92,11 @@ span.thTitle{
     height: 25px;
 }
 
-// select styles
-.Select-control{
-    // border-radius: .25rem;
+.progress {
+    background-color: gainsboro;
 }
 
+// select styles
 .Select.is-focused:not(.is-open) > .Select-control{
     border-color: #8ad4ee;
     box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.25);

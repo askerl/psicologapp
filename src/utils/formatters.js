@@ -1,5 +1,5 @@
-import moment from 'moment';
 import React from 'react';
+import moment from 'moment';
 import { Badge, Input, Progress } from 'reactstrap';
 import { fechaFormat, filtroTipoPaciente, pacientePrepaga, pacientePrivado } from '../config/constants';
 import { formatMonth, getColorPorcentaje, getSession, round } from './utils';
@@ -36,15 +36,14 @@ export const tablasFormatter = {
         );
     },
     nombrePaciente(cell, row){
-        if (row.activo) {
-            return (
-                <span><strong>{cell}</strong></span>
-            );
-        } else {
-            return (
-                <span className="text-danger"><strong>{cell}</strong></span>
-            );
-        }
+        const deuda = row.deuda > 0;
+        return (
+            <div>
+                <span className={"d-block" + (!row.activo ? ' text-danger' : '')}>{cell}</span>
+                {!row.activo && <small className="text-dark d-block">Inactivo</small>}
+                {deuda && <small className="text-danger font-weight-bold d-block">Debe ${row.deuda}</small>}
+            </div>
+        );
     },
     nombrePacienteSesiones(cell, row){
         if (row.ausencia) {
@@ -70,19 +69,9 @@ export const tablasFormatter = {
             return '';
         }
         let color = getColorPorcentaje(row.porcRestantes);
-        if (cell <= 0) {
-            return (
-                <div className="d-flex flex-column">
-                    <Progress color={color} value={100}><strong>{cell}</strong></Progress>
-                </div>
-            )
-        } else {
-            return (
-                <div className="d-flex flex-column">
-                    <Progress color={color} value={row.porcRestantes}><strong>{cell}</strong></Progress>
-                </div>
-            )
-        }
+        return (
+            <Progress color={color} value={cell <= 0 ? 100 : row.porcRestantes}><strong>{cell <= 0 ? 'Consumidas' : cell}</strong></Progress>
+        );
     },
     tipoPaciente(cell) {
         if (cell === pacientePrivado) {
@@ -160,10 +149,7 @@ export const csvFormatter = {
     sesiones(cell) {
         return cell || '';
     },
-    valorConsulta(cell) {   
+    importe(cell) {   
         return cell > 0 ? parseFloat(cell) : '';
-    },
-    copago(cell) {
-        return cell > 0 ? cell : '';
-    },
+    }
 };

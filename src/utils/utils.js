@@ -82,10 +82,12 @@ export const getEstadisticas = () => {
             total: 0,
             activos: 0,
             inactivos: 0,
+            deudores: 0,
             privados: 0,
             obraSocial: 0,
             privadosActivos: 0,
-            obraSocialActivos: 0
+            obraSocialActivos: 0,
+            totalDeuda: 0
         }
 
         Promise.all([getPrepagas(), getPacientes()]).then(values => { 
@@ -113,6 +115,10 @@ export const getEstadisticas = () => {
                         data.privados += 1;
                         if (pac.activo) data.privadosActivos += 1 ;
                         break;
+                }
+                if (pac.deuda > 0) {
+                    data.deudores += 1;
+                    data.totalDeuda += pac.deuda;
                 }
             });
             // percentages
@@ -245,8 +251,15 @@ export const filterPacientesEstado = (pacientes, estado) => {
         // no aplicó filtro, devuelvo todos
         return pacientes;
     } else { //si filtro por algun estado
-        let activo = estado === 'A';
-        return _.filter(pacientes, {'activo': activo});
+        return _.filter(pacientes, p => {
+            if (estado === estadosPaciente[3].value) {// deudores
+                return p.deuda > 0;
+            } else {
+                // filtró por activo/inactivo
+                let activo = estado === estadosPaciente[1].value;
+                return p.activo === activo;
+            }
+        });
     }
 }
 
@@ -320,12 +333,14 @@ export const createFechaSesion = (value) =>{
 
 export const getColorPorcentaje = (p) => {
     let color;
-    if (p > 50) {
+    if (p >= 50) {
         color = "success";
-    } else if (p > 10) {
+    } else if (p >= 10) {
         color = "warning";
-    } else {
+    } else if (p >= 0) {
         color = "danger";
+    } else {
+        color = "dark";
     }
     return color;
 }

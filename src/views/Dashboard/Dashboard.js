@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import LoadingOverlay from 'react-loading-overlay';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, Col, Row, UncontrolledAlert } from 'reactstrap';
+import { Badge, Card, CardBody, Col, Row, UncontrolledAlert } from 'reactstrap';
 import { overlay, iconoPrepaga } from '../../config/constants';
 import { getEstadisticas, setSession, recordatorioRespaldo } from '../../utils/utils';
 import Widget02 from '../Widgets/Widget02';
@@ -58,16 +58,21 @@ class Dashboard extends Component {
 								</UncontrolledAlert>
 								}
 								<CardBody>
-									<div className="mb-3"><span className="h6">Pacientes</span></div>
+									<div className="mb-3"><span className="h6">Pacientes</span><Badge color="primary" className="badge-pill ml-2">{data.total}</Badge></div>
 									<Row>
-										<Col xs="12" sm="6">
+										<Col xs="12" sm="4">
 											<Link to={'/pacientes'} title="Ver pacientes activos" className="linkCard successCard" onClick={() => setSession('filtroEstado', 'A')}>
-												<Widget02 header={`${data.activos}`} mainText="Activos" icon="icon-people icons" color="success" variant="1"/>
+												<Widget02 header={`${data.activos}`} mainText="Activos" icon="icon-user-following icons" color="success" variant="1"/>
 											</Link>
 										</Col>
-										<Col xs="12" sm="6">
+										<Col xs="12" sm="4">
 											<Link to={'/pacientes'} title="Ver pacientes inactivos" className="linkCard dangerCard" onClick={() => setSession('filtroEstado', 'I')}>
 												<Widget02 header={`${data.inactivos}`} mainText="Inactivos" icon="icon-user-unfollow icons" color="danger" variant="1"/>
+											</Link>
+										</Col>
+										<Col xs="12" sm="4">
+											<Link to={'/pacientes'} title="Ver pacientes con deuda" className="linkCard warningCard" onClick={() => setSession('filtroEstado', 'D')}>
+												<Widget02 header={`${data.deudores}`} mainText={'Deudores' + (data.deudores > 0 ? `: $${data.totalDeuda}` : '')} icon="icon-wallet icons" color="warning" variant="1"/>
 											</Link>
 										</Col>
 									</Row>

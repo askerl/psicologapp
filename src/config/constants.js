@@ -21,7 +21,8 @@ export const iconoPrepaga = 'fa fa-hospital-o';
 export const estadosPaciente = [
     { value: 'T', title: 'Todos' },
     { value: 'A', title: 'Activos' },
-    { value: 'I', title: 'Inactivos' }
+    { value: 'I', title: 'Inactivos' },
+    { value: 'D', title: 'Deudores' }
 ];
 
 export const tipoLoader = "ball-scale-ripple-multiple";

@@ -28,8 +28,6 @@ class ListaPacientes extends Component {
 	}
 
 	componentDidMount(){
-		// set initial filter state
-		//this.filtroEstado.value = this.state.filtroEstado;
 		// cargo filtro de prepagas
 		getFiltroPrepagas().then( filtroPrepagas => {
 			this.setState({filtroPrepagas});
@@ -157,7 +155,7 @@ class ListaPacientes extends Component {
 			csvFormatter: csvFormatter.credencial,
 			sort: true,
 			filter: textFilter({placeholder:' ', className:tablasFormatter.filterClass}),
-			hidden: this.state.size < breakpoints.md
+			hidden: this.state.size < breakpoints.lg
 		},{
 			dataField: 'facturaPrepaga',
 			text: 'Factura prepaga',
@@ -166,12 +164,12 @@ class ListaPacientes extends Component {
 		},{
 			dataField: 'valorConsulta',
 			text: 'Valor consulta',
-			csvFormatter: csvFormatter.valorConsulta,
+			csvFormatter: csvFormatter.importe,
 			hidden: true
 		},{
 			dataField: 'copago',
 			text: 'Copago',
-			csvFormatter: csvFormatter.copago,
+			csvFormatter: csvFormatter.importe,
 			hidden: true
 		},{
 			dataField: 'sesiones',
@@ -182,24 +180,29 @@ class ListaPacientes extends Component {
 			dataField: 'sesionesRestantes',
 			text: 'Sesiones restantes',
 			formatter: tablasFormatter.sesionesRestantes,
+			formatExtraData: this.state.size,
 			csvFormatter: csvFormatter.sesiones,
 			sort: true,
 			filter: numberFilter({
 				placeholder:' ', 
 				comparatorClassName: tablasFormatter.filterClass,
 				numberClassName: tablasFormatter.filterClass
-			}),
-			hidden: this.state.size < breakpoints.lg
+			})
 		},{
 			dataField: 'sesionesAut',
 			text: 'Autorizadas',
 			csvFormatter: csvFormatter.sesiones,
+			hidden: true,
+		},{
+			dataField: 'deuda',
+			text: 'Deuda',
+			csvFormatter: csvFormatter.importe,
+			hidden: true,
+		},{
+			dataField: 'notas',
+			text: 'Notas',
 			hidden: true
 		}];
-
-		let todos = this.state.filtroEstado === estadosPaciente[0].value,
-			activos = this.state.filtroEstado === estadosPaciente[1].value,
-			inactivos = this.state.filtroEstado === estadosPaciente[2].value;
 
 		let filtroActivo = "teal",
 			filtroInactivo = "secondary";
@@ -231,9 +234,12 @@ class ListaPacientes extends Component {
 											</Col>
 											<Col xs="12" sm="6">
 												<ButtonGroup className="filtros d-flex flex-row justify-content-sm-end mb-2">
-													<Button color={todos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[0].value)} active={todos}>Todos</Button>
-													<Button color={activos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[1].value)} active={activos}>Activos</Button>
-													<Button color={inactivos ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(estadosPaciente[2].value)} active={inactivos}>Inactivos</Button>
+													{estadosPaciente.map(item => {
+														const active = this.state.filtroEstado === item.value;
+														return (
+															<Button key={item.value} color={active ? filtroActivo : filtroInactivo} size="sm" onClick={() => this.changeEstado(item.value)} active={active}>{item.title}</Button>
+														)
+													})}
 												</ButtonGroup>
 											</Col>
 										</Row>

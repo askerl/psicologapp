@@ -102,14 +102,14 @@ class Paciente extends Component {
         this.inputNotas.value       = p.notas;
         this.inputTipo.value        = p.tipo;
         this.inputValorConsulta.value = p.valorConsulta;
+        this.inputDeuda.value       = p.deuda;
         this.setState({activo: p.activo, setActivo: p.activo, tipo: this.inputTipo.value, sesiones: p.sesiones});
         if (p.tipo === pacientePrepaga){
             this.inputPrepaga.value     = p.prepaga;
-            this.setState({facturaPrepaga: p.facturaPrepaga});
             this.inputCopago.value      = p.copago;
             this.inputCredencial.value  = p.credencial;
             this.inputSesiones.value    = p.sesionesAut;
-            this.setState({sesionesAut: p.sesionesAut});
+            this.setState({facturaPrepaga: p.facturaPrepaga, sesionesAut: p.sesionesAut});
             this.porcentajesSesiones(p.sesionesAut, p.sesiones);
         }
     }
@@ -170,7 +170,8 @@ class Paciente extends Component {
                 notas: _.trim(this.inputNotas.value) || '',
                 tipo: this.inputTipo.value || null,
                 email: _.trim(this.inputEmail.value) || '',
-                valorConsulta: parseFloat(this.inputValorConsulta.value) || 0
+                valorConsulta: parseFloat(this.inputValorConsulta.value) || 0,
+                deuda: parseFloat(this.inputDeuda.value) || 0
             };
 
             if (this.state.tipo === pacientePrepaga){
@@ -442,7 +443,7 @@ class Paciente extends Component {
                                     </Row>
                                 }
                                 <Row>
-                                    <Col xs="12" sm={this.state.tipo === pacientePrepaga ? "6" : "12"}>
+                                    <Col xs="12" sm="6" >
                                         <FormGroup className="errorAddon">
                                             <Label htmlFor="valorConsulta" className="required">{this.state.tipo === pacientePrepaga ? 'Pago por paciente' : 'Valor de consulta'}</Label>
                                             <InputGroup>
@@ -461,7 +462,7 @@ class Paciente extends Component {
                                             <Label htmlFor="copago">Copago</Label>
                                             <InputGroup>
                                                 <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
-                                                <Input type="number" id="copago" name="copago" innerRef={el => this.inputCopago = el} onChange={this.changeCopago} />
+                                                <Input type="number" id="copago" name="copago" innerRef={el => this.inputCopago = el} />
                                             </InputGroup>
                                         </FormGroup>
                                     </Col>
@@ -499,6 +500,17 @@ class Paciente extends Component {
                                         </Col>
                                     </Row>
                                 }
+                                <Row>
+                                    <Col xs="12" sm="6">
+                                        <FormGroup>
+                                            <Label htmlFor="deuda">Deuda</Label>
+                                            <InputGroup>
+                                                <InputGroupAddon addonType="prepend"><InputGroupText><i className="fa fa-usd"></i></InputGroupText></InputGroupAddon>
+                                                <Input type="number" id="deuda" name="deuda" innerRef={el => this.inputDeuda = el} />
+                                            </InputGroup>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
                                 <Row>
                                     <Col xs="12">
                                         <FormGroup>
