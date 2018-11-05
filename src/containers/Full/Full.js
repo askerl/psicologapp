@@ -17,6 +17,7 @@ import Sesion from '../../views/Sesiones/sesion';
 import ListaPrepagas from '../../views/Admin/Prepagas/listaPrepagas';
 import Prepaga from '../../views/Admin/Prepagas/prepaga';
 import Respaldos from '../../views/Admin/Respaldos/respaldos';
+import ActualizarValores from '../../views/Pacientes/actualizarValores';
 
 class Full extends Component {
 
@@ -58,6 +59,7 @@ class Full extends Component {
 							<Switch>
 								<Route path="/dashboard" name="Dashboard" component={Dashboard} />
 								<Route exact path="/pacientes" name="Pacientes" component={ListaPacientes} />
+								<Route exact path='/pacientes/importes' name="Actualizar Importes" component={ActualizarValores} />
 								<Route path='/pacientes/:id' name="Paciente" component={PacienteTabs} />
 								<Route exact path="/sesiones" name="Sesiones" component={ListaSesiones} />
 								<Route path='/sesiones/:id/:type?' name="Sesion" component={Sesion} />

@@ -22,7 +22,8 @@ export const errores = {
     errorRestore: "Ocurrió un error al restaurar los datos",
     existePrepagaNombre: "Ya existe una Prepaga con ese nombre",
     errorBorrarPrepagaPaciente: "Existen Pacientes con esta Prepaga asociada",
-    errorBorrarPrepagaSesiones: "Existen Sesiones ingresadas para esta Prepaga"
+    errorBorrarPrepagaSesiones: "Existen Sesiones ingresadas para esta Prepaga",
+    valorActualVacio: "Seleccione el valor actual"
 }
 
 export const mensajes = {

@@ -25,6 +25,7 @@ class ListaPacientes extends Component {
 		this.changeEstado = this.changeEstado.bind(this);
 		this.loading = this.loading.bind(this);
 		this.resize = this.resize.bind(this);
+		this.actualizarImportes = this.actualizarImportes.bind(this);
 	}
 
 	componentDidMount(){
@@ -65,6 +66,10 @@ class ListaPacientes extends Component {
 
 	editarPaciente(id) {
 		this.props.history.push(`/pacientes/${id}`);
+	}
+
+	actualizarImportes() {
+		this.props.history.push('/pacientes/importes');
 	}
 
 	changeEstado(filtroEstado){
@@ -227,8 +232,9 @@ class ListaPacientes extends Component {
 									<div>
 										<Row>
 											<Col xs="12" sm="6">
-												<div className="accionesLista d-flex flex-row mb-2">										
-													<Button color="success" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>													
+												<div className="accionesLista d-flex flex-row flex-wrap mb-2 justify-content-sm-start">
+													<Button color="success" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>
+													<Button color="warning" size="sm" onClick={this.actualizarImportes}><i className="fa fa-money mr-2"></i>Actualizar Valores</Button>
 													<ExportCSV { ...props.csvProps } />
 												</div>
 											</Col>

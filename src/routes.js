@@ -2,6 +2,7 @@ const routes = {
   '/': 'Inicio',
   '/pacientes': 'Pacientes',
   '/pacientes/new': 'Nuevo Paciente',
+  '/pacientes/valores': 'Actualizar Valores',
   '/sesiones': 'Sesiones',
   '/sesiones/new/sesion': 'Agregar Sesiones',
   '/sesiones/new/ausencia': 'Agregar Ausencias',
