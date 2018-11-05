@@ -87,3 +87,71 @@ export const maxBatch = 500;
 
 // recordatorio de respaldos cada X dias
 export const diasRespaldo = 30;
+
+
+// opciones para graficas
+
+export const configGraficas = {
+    chartFacturaciones: {
+        maintainAspectRatio: false,
+        legend: {
+            display: true
+        },
+        tooltips: {
+            mode: 'label'
+        },
+        scales: {
+            xAxes: [{
+                gridLines: {
+                    drawOnChartArea: false,
+                },
+                stacked: true
+            }],
+            yAxes: [{
+                stacked: true
+            }]
+        },
+        elements: {
+            point: {
+                radius: 0,
+                hitRadius: 10,
+                hoverRadius: 4,
+                hoverBorderWidth: 3,
+            },
+            line: {
+                fill: false
+            }
+        }
+    },
+    chartAusencias: {
+        maintainAspectRatio: false,
+        legend: {
+            display: false
+        },
+        tooltips: {
+            mode: 'label'
+        },
+        scales: {
+            xAxes: [{
+                gridLines: {
+                    drawOnChartArea: false,
+                },
+                stacked: false
+            }],
+            yAxes: [{
+                stacked: false
+            }]
+        },
+        elements: {
+            point: {
+                radius: 0,
+                hitRadius: 10,
+                hoverRadius: 4,
+                hoverBorderWidth: 3,
+            },
+            line: {
+                fill: false
+            }
+        }
+    }
+}

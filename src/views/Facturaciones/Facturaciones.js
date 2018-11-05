@@ -7,7 +7,7 @@ import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Form, FormGroup, Input, InputGroup, Label, Progress, Row } from 'reactstrap';
 import Spinner from '../../components/Spinner/Spinner';
-import { breakpoints, iconoPrepaga, meses, mesesFormat, overlay } from '../../config/constants';
+import { breakpoints, iconoPrepaga, meses, mesesFormat, overlay, configGraficas } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import { getFacturacionesPeriodo } from '../../utils/calcularFacturaciones';
 import { tablasFormatter } from '../../utils/formatters';
@@ -19,8 +19,7 @@ class Facturaciones extends Component {
 		super(props);
 		this.state = {
 			facturaciones: [],
-			grafica: {},
-			optsGrafica: {},
+			graficas: {},
 			showResultados: false,
 			loading: false,
 			periodo: '',
@@ -77,8 +76,10 @@ class Facturaciones extends Component {
 		// valido periodo
 		if (this.validarPeriodo(mesIni, anioIni, mesFin, anioFin)) {
 	
-			getFacturacionesPeriodo(mesIni, anioIni, mesFin, anioFin).then( result => {			
-				this.setState({showResultados: true, facturaciones: result.facturaciones, grafica: result.grafica.grafica, optsGrafica: result.grafica.optsGrafica});
+			getFacturacionesPeriodo(mesIni, anioIni, mesFin, anioFin).then( result => {
+				let facturaciones = result.facturaciones,
+					graficas = result.graficas;
+				this.setState({showResultados: true, facturaciones, graficas});
 				this.loading(false);
 			});
 
@@ -214,6 +215,9 @@ class Facturaciones extends Component {
 			}
 		}
 
+		let graficaFacturaciones = this.state.graficas.facturaciones,
+			graficaAusencias = this.state.graficas.ausencias;
+
 		return (
 			<div className="animated fadeIn facturaciones">
 				<LoadingOverlay
@@ -226,7 +230,7 @@ class Facturaciones extends Component {
 					<Col>
 						<Card className="mainCard">
 							<CardHeader>
-								<i className="fa fa-book fa-lg"></i> Facturaciones
+								<i className="fa fa-book fa-lg"></i>Consulta de Facturaciones
 								</CardHeader>
 							<CardBody>
 								<Form className="filtros">
@@ -278,19 +282,19 @@ class Facturaciones extends Component {
 						</Card>
 					</Col>
 				</Row>
-				{this.state.showResultados && this.state.grafica !== null &&
+				{this.state.showResultados && graficaFacturaciones !== null &&
 					<Row>
 						<Col>
 							<Card className="mainCard">
 								<CardBody>
 									<Row>
 										<Col>
-											<CardTitle className="mb-0">Gráfica</CardTitle>
+											<CardTitle className="mb-1"><i className="fa fa-bar-chart fa-lg mr-2"></i>Facturaciones</CardTitle>
 											<div className="text-muted">{this.state.periodo}</div>
 										</Col>
 									</Row>
 									<div className="chart-wrapper">
-										<Bar data={this.state.grafica} options={this.state.optsGrafica} height={300} />
+										<Bar data={graficaFacturaciones} options={configGraficas.chartFacturaciones}/>
 									</div>
 								</CardBody>
 								<CardFooter className="graficas-footer">
@@ -299,22 +303,22 @@ class Facturaciones extends Component {
 									<Row>
 										<Col xs="6" sm="3">
 											<div className="text-muted">Total Global</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumTotal}</strong>
+											<strong><i className="fa fa-usd"></i> {graficaFacturaciones.sumTotal}</strong>
 											<Progress className="progress-xs mt-2 mb-2" color="success" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
 											<div className="text-muted">Total Privados</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrivados}</strong>
+											<strong><i className="fa fa-usd"></i> {graficaFacturaciones.sumPrivados}</strong>
 											<Progress className="progress-xs mt-2 mb-2" color="warning" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
 											<div className="text-muted">Total Prepagas</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumPrepagas}</strong>
+											<strong><i className="fa fa-usd"></i> {graficaFacturaciones.sumPrepagas}</strong>
 											<Progress className="progress-xs mt-2 mb-2" color="info" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
 											<div className="text-muted">Total Copagos</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.sumCopagos}</strong>
+											<strong><i className="fa fa-usd"></i> {graficaFacturaciones.sumCopagos}</strong>
 											<Progress className="progress-xs mt-2 mb-2" color="teal" value="100" />
 										</Col>
 									</Row>
@@ -324,27 +328,95 @@ class Facturaciones extends Component {
 									<Row>
 										<Col xs="6" sm="3">
 											<div className="text-muted">Promedio Global</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.avgTotal}</strong>
+											<strong><i className="fa fa-usd"></i> {graficaFacturaciones.avgTotal}</strong>
 											<Progress className="progress-xs mt-2 mb-2" color="success" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
 											<div className="text-muted">Promedio Privados</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.avgPrivados}</strong>
+											<strong><i className="fa fa-usd"></i> {graficaFacturaciones.avgPrivados}</strong>
 											<Progress className="progress-xs mt-2 mb-2" color="warning" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
 											<div className="text-muted">Promedio Prepagas</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.avgPrepagas}</strong>
+											<strong><i className="fa fa-usd"></i> {graficaFacturaciones.avgPrepagas}</strong>
 											<Progress className="progress-xs mt-2 mb-2" color="info" value="100" />
 										</Col>
 										<Col xs="6" sm="3">
 											<div className="text-muted">Promedio Copagos</div>
-											<strong><i className="fa fa-usd"></i> {this.state.grafica.avgCopagos}</strong>
+											<strong><i className="fa fa-usd"></i> {graficaFacturaciones.avgCopagos}</strong>
 											<Progress className="progress-xs mt-2 mb-2" color="teal" value="100" />
 										</Col>
 									</Row>
+								</CardFooter>
+							</Card>
+						</Col>
+					</Row>
+				}
+				{this.state.showResultados && graficaAusencias !== null && graficaAusencias.sumAusencias > 0 &&
+					<Row>
+						<Col>
+							<Card className="mainCard">
+								<CardBody>
+									<Row>
+										<Col>
+											<CardTitle className="mb-1"><i className="fa fa-bar-chart fa-lg mr-2"></i>Ausencias <small className="text-muted">(no facturadas)</small></CardTitle>
+											<div className="text-muted">{this.state.periodo}</div>
+											<div className="chart-wrapper">
+												<Bar data={graficaAusencias} options={configGraficas.chartAusencias}/>
+											</div>
+										</Col>
+									</Row>
+								</CardBody>
+								<CardFooter className="graficas-footer">
+									<div className="small text-muted text-center graficas-footer-section-title">Totales del período</div>
+									<hr className="mt-1 mb-3"/>
+									<Row>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Total Ausencias</div>
+											<strong>{graficaAusencias.sumAusencias}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="info" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Total Facturadas</div>
+											<strong>{graficaAusencias.sumFacturadas}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="success" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Total No Facturadas</div>
+											<strong>{graficaAusencias.sumNoFacturadas}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="warning" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Total No Facturado</div>
+											<strong><i className="fa fa-usd mr-1"></i>{graficaAusencias.sumTotalNoFacturado}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="danger" value="100" />
+										</Col>
+									</Row>
 
-
+									<div className="small text-muted text-center graficas-footer-section-title mt-3">Promedios del período</div>
+									<hr className="mt-1 mb-3"/>
+									<Row>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Promedio Ausencias</div>
+											<strong>{graficaAusencias.avgAusencias}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="info" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Promedio Facturadas</div>
+											<strong>{graficaAusencias.avgFacturadas}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="success" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Promedio No Facturadas</div>
+											<strong>{graficaAusencias.avgNoFacturadas}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="warning" value="100" />
+										</Col>
+										<Col xs="6" sm="3">
+											<div className="text-muted">Promedio No Facturado</div>
+											<strong><i className="fa fa-usd mr-1"></i>{graficaAusencias.avgMontoNoFacturado}</strong>
+											<Progress className="progress-xs mt-2 mb-2" color="danger" value="100" />
+										</Col>
+									</Row>
 								</CardFooter>
 							</Card>
 						</Col>

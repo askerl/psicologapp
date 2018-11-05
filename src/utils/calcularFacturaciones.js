@@ -4,6 +4,31 @@ import { brandColors, mesesFormat, pacientePrivado } from '../config/constants';
 import db from '../fire';
 import { convertHex, formatMonth, getSession, round } from '../utils/utils';
 
+// genero un mes de facturación vació
+function getEmpyFac(mes, anio) {
+    let emptyFac = {
+        id: `${anio}-${mes}`,
+        mes,
+        anio,
+        total: 0,
+        totalPrepaga: 0,
+        totalPrivado: 0,
+        totalCopago: 0,
+        prepagas: {},
+        ausencias: 0,
+        ausenciasFacturadas: 0,
+        ausenciasNoFacturadas: 0,
+        totalAusenciasFac: 0,
+        totalAusenciasNoFac: 0
+    };
+    // key para prepagas
+    let prepagas = getSession('prepagas');
+    prepagas.forEach( prepaga => {
+        emptyFac.prepagas[prepaga.id] = 0;
+    });
+    return emptyFac;
+}
+
 export const getFacturacionesPeriodo = (mesIni, anioIni, mesFin, anioFin) => {
 
     // armo fechas del período
@@ -17,30 +42,20 @@ export const getFacturacionesPeriodo = (mesIni, anioIni, mesFin, anioFin) => {
 		.orderBy("fecha","asc")
 		.get().then( querySnapshot => {
             let facturaciones = armarFacturaciones(querySnapshot.docs, mesIni, anioIni, mesFin, anioFin);
-            let grafica = facturaciones.length > 1 ? armarGrafica(facturaciones) : {grafica: null};
-			resolve({facturaciones, grafica});
+            let graficas = {
+                facturaciones: null,
+                ausencias: null
+            }
+            // si el período seleccionado es mayor a 1 mes -> muestro gráficas
+            // if (facturaciones.length > 1) {
+                graficas.facturaciones = graficaFacturaciones(facturaciones);
+                graficas.ausencias = graficaAusencias(facturaciones);
+            // }
+            
+			resolve({facturaciones, graficas});
 		});
     });
     return promise;
-}
-
-function getEmpyFac(mes, anio) {
-    let emptyFac = {
-        id: `${anio}-${mes}`,
-        mes,
-        anio,
-        total: 0,
-        totalPrepaga: 0,
-        totalPrivado: 0,
-        totalCopago: 0,
-        prepagas: {}
-    };
-    // key para prepagas
-    let prepagas = getSession('prepagas');
-    prepagas.forEach( prepaga => {
-        emptyFac.prepagas[prepaga.id] = 0;
-    });
-    return emptyFac;
 }
 
 function armarFacturaciones(data, mesIni, anioIni, mesFin, anioFin) {
@@ -72,11 +87,24 @@ function armarFacturaciones(data, mesIni, anioIni, mesFin, anioFin) {
                 anio = sesion.anio;                
             }
 
+            // valor $ de la sesión
+            let valor = parseFloat(sesion.valor);
+
             // facturo una sesión si NO es ausencia, o si es ausencia y se factura
-            const facturarSesion = !sesion.ausencia || (sesion.ausencia && sesion.facturaAusencia);
+            let facturarSesion = true;
+            if (sesion.ausencia) {
+                fac.ausencias += 1;
+                if (sesion.facturaAusencia) {
+                    fac.ausenciasFacturadas += 1;
+                    fac.totalAusenciasFac += valor;
+                } else {
+                    fac.ausenciasNoFacturadas += 1;
+                    fac.totalAusenciasNoFac += valor;
+                    facturarSesion = false;
+                }
+            }
 
             if (facturarSesion) {
-                let valor = parseFloat(sesion.valor);            
                 if (sesion.tipo === pacientePrivado) {
                     fac.totalPrivado += valor;
                 } else {
@@ -99,8 +127,10 @@ function armarFacturaciones(data, mesIni, anioIni, mesFin, anioFin) {
 
         });
 
-        // agrego última facturación
+        // sumo totales
         fac.total = round(fac.totalPrepaga + fac.totalPrivado + fac.totalCopago,2);
+        
+        // agrego última facturación
         facturaciones.push(fac);
 
     }
@@ -128,7 +158,7 @@ function armarFacturaciones(data, mesIni, anioIni, mesFin, anioFin) {
 
 }
 
-function armarGrafica(facturaciones) {
+function graficaFacturaciones(facturaciones) {
     
     let data = {
         totales:    _.map(facturaciones, 'total'),
@@ -139,29 +169,32 @@ function armarGrafica(facturaciones) {
 
     let grafica = {
         labels: facturaciones.map(item => formatMonth(item.mes,mesesFormat.short)),
-        datasets: [
-            {
-                label: 'Privados',
-                backgroundColor: convertHex(brandColors.brandWarning, 90),
-                borderColor: brandColors.brandWarning,
+        datasets: [{
+                label: 'Total',
+                backgroundColor: convertHex(brandColors.brandSuccess, 90),
+                borderColor: brandColors.brandSuccess,
                 pointHoverBackgroundColor: '#fff',
                 borderWidth: 0,
+                data: data.totales,
+                type: 'line',
+                cubicInterpolationMode: 'monotone'
+            },
+            {
+                label: 'Privados',
+                backgroundColor: convertHex(brandColors.brandWarning, 70),
+                borderColor: brandColors.brandWarning,
                 data: data.privados
             },
             {
                 label: 'Prepagas',
-                backgroundColor: convertHex(brandColors.brandInfo, 90),
+                backgroundColor: convertHex(brandColors.brandInfo, 70),
                 borderColor: brandColors.brandInfo,
-                pointHoverBackgroundColor: '#fff',
-                borderWidth: 0,
                 data: data.prepagas
             },
             {
                 label: 'Copagos',
-                backgroundColor: convertHex(brandColors.brandTeal, 90),
+                backgroundColor: convertHex(brandColors.brandTeal, 75),
                 borderColor: brandColors.brandTeal,
-                pointHoverBackgroundColor: '#fff',
-                borderWidth: 0,
                 data: data.copagos
             }
         ],
@@ -177,31 +210,45 @@ function armarGrafica(facturaciones) {
     grafica.avgPrepagas = round(grafica.sumPrepagas / facturaciones.length,2);
     grafica.avgCopagos = round(grafica.sumCopagos / facturaciones.length,2);
 
-    let facChartOpts = {
-        maintainAspectRatio: false,
-        legend: {
-            display: true
-        },
-        scales: {
-            xAxes: [{
-                gridLines: {
-                    drawOnChartArea: false,
-                },
-                stacked: true
-            }],
-            yAxes: [{
-                stacked: true
-            }]
-        },
-        elements: {
-            point: {
-                radius: 0,
-                hitRadius: 10,
-                hoverRadius: 4,
-                hoverBorderWidth: 3,
-            }
-        }
-    }
-
-    return {grafica, optsGrafica: facChartOpts};
+    return grafica;
 }
+
+function graficaAusencias(facturaciones) {
+    
+    let data = {
+        ausencias:    _.map(facturaciones, 'ausencias'),
+        facturadas:   _.map(facturaciones, 'ausenciasFacturadas'),
+        noFacturadas:   _.map(facturaciones, 'ausenciasNoFacturadas'),
+        montoFacturadas: _.map(facturaciones, 'totalAusenciasFac'),
+        montoNoFacturadas: _.map(facturaciones, 'totalAusenciasNoFac'),
+    };
+
+    // inicializo grafica con totales
+    let grafica = {
+        sumAusencias: round(_.sum(data.ausencias),2),
+        sumFacturadas: round(_.sum(data.facturadas),2),
+        sumNoFacturadas: round(_.sum(data.noFacturadas),2),
+        sumTotalFacturado: round(_.sum(data.montoFacturadas),2),
+        sumTotalNoFacturado: round(_.sum(data.montoNoFacturadas),2)
+    };
+    // seteo promedios
+    grafica.avgAusencias = round(grafica.sumAusencias / facturaciones.length,2);
+    grafica.avgFacturadas = round(grafica.sumFacturadas / facturaciones.length,2);
+    grafica.avgNoFacturadas = round(grafica.sumNoFacturadas / facturaciones.length,2);
+    grafica.avgMontoFacturado = round(grafica.sumTotalFacturado / facturaciones.length,2);
+    grafica.avgMontoNoFacturado = round(grafica.sumTotalNoFacturado / facturaciones.length,2);
+
+    grafica.labels = facturaciones.map(item => formatMonth(item.mes,mesesFormat.short)); 
+    grafica.datasets = [
+        {
+            label: '$ No Facturado',
+            backgroundColor: convertHex(brandColors.brandDanger, 60),
+            borderColor: brandColors.brandDanger,
+            data: data.montoNoFacturadas
+        }
+    ];
+
+    return grafica;
+}
+
+
