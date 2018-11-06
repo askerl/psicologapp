@@ -233,8 +233,8 @@ class ListaPacientes extends Component {
 										<Row>
 											<Col xs="12" sm="6">
 												<div className="accionesLista d-flex flex-row flex-wrap mb-2 justify-content-sm-start">
-													<Button color="success" size="sm" onClick={this.nuevoPaciente}><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>
-													{/* <Button color="warning" size="sm" onClick={this.actualizarImportes}><i className="fa fa-money mr-2"></i>Actualizar Valores</Button> */}
+													<Button color="success" size="sm" className="mb-2 mb-sm-0" onClick={this.nuevoPaciente}><i className="fa fa-plus mr-2"></i>Nuevo paciente</Button>
+													<Button color="warning" size="sm" onClick={this.actualizarImportes}><i className="fa fa-money mr-2"></i>Actualizar Valores</Button>
 													<ExportCSV { ...props.csvProps } />
 												</div>
 											</Col>

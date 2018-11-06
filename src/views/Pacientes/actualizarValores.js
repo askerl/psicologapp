@@ -4,6 +4,7 @@ import { tipoPaciente, pacientePrepaga, pacientePrivado } from '../../config/con
 import { errores } from '../../config/mensajes';
 import { getPrepagas, getPacientes } from '../../utils/utils';
 import Spinner from '../../components/Spinner/Spinner';
+import BootstrapTable from 'react-bootstrap-table-next';
 
 class ActualizarValores extends Component {
 
@@ -13,6 +14,8 @@ class ActualizarValores extends Component {
             loading: false,
             tipo: '',
             valoresActuales: [],
+            showResumen: false,
+            pacientesSel: [],
             errorTipo: false,
             errorPrepaga: false,
             errorValorActual: false,
@@ -64,7 +67,16 @@ class ActualizarValores extends Component {
     }
 
     changeValorActual(){
-        this.setState({errorValorActual: false});
+        let pacientesSel = this.state.pacientesSel;
+        let valorActual = this.inputValorActual.value;
+        console.log(valorActual);
+        if (valorActual) {
+            pacientesSel = _.filter(this.pacientes, {'tipo': this.inputTipo.value, 'valorConsulta': parseFloat(valorActual)});
+        } else {
+            pacientesSel = [];
+        }
+        console.log('pacientesSel', pacientesSel);
+        this.setState({pacientesSel, errorValorActual: false});
         this.validate("valorActual");
     }
 
@@ -122,8 +134,20 @@ class ActualizarValores extends Component {
     }
 
     render() {
-        let prepagas = this.prepagas,
-            valoresActuales = this.state.valoresActuales;
+        const prepagas = this.prepagas,
+              valoresActuales = this.state.valoresActuales;
+
+        const showResumen = this.state.showResumen;
+
+        const columns = [{
+			dataField: 'id',
+            text: 'ID paciente', 
+            hidden: true
+        }, {
+			dataField: 'nombreCompleto',
+            text: 'Paciente'
+        }];
+
         return (
             <div className="animated fadeIn">
                 <Card className="mainCard">
@@ -184,14 +208,13 @@ class ActualizarValores extends Component {
                                     </FormGroup>
                                 </Col>
                             </Row>
-                            {/* {showResumen &&
+                            {showResumen &&
                                 <Row>
                                     <Col>
                                         <BootstrapTable
                                             keyField='id'
-                                            data={this.state.selectedOption}
+                                            data={this.state.pacientesSel}
                                             columns={columns}
-                                            classes="tablaAusencias"
                                             noDataIndication='No hay pacientes seleccionados'
                                             bordered={false}
                                             bootstrap4
@@ -199,7 +222,7 @@ class ActualizarValores extends Component {
                                             hover />
                                     </Col>
                                 </Row>
-                            } */}
+                            }
                         </Form>
                     </CardBody>
                     <CardFooter className="botonesFooter">

@@ -7,7 +7,7 @@ const ExportCSV = (props) => {
       props.onExport();
     };
     return (
-        <Button color="info" size="sm" title="Exportar a CSV" onClick={handleClick}><i className="fa fa-file-excel-o mr-2"></i>Exportar a CSV</Button>
+        <Button id="btnExport" color="info" size="sm" title="Exportar a CSV" onClick={handleClick}><i className="fa fa-file-excel-o mr-2"></i>Exportar a CSV</Button>
     );
 };
 

@@ -314,8 +314,18 @@ label.required::after {
     // botones de Listas en Mobile
     .listaPacientes {
         .accionesLista {
-            .btn {
-                width: 50%;
+            .btn-success {
+                width: 100%;
+                margin-right: 0;
+            }
+            .btn-warning, .btn-dark {
+                width: 49%;
+                margin-right: 1%;
+            }
+            #btnExport {
+                width: 49%;
+                margin-left: 1%;
+                margin-right: 0;
             }
         }
         .filtros {

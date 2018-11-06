@@ -209,6 +209,9 @@ function loadPacientes(querySnapshot) {
         let fchNacMoment = moment(paciente.fchNac, fechaFormat.fecha);
         paciente.fchNac = fchNacMoment.isValid() ? paciente.fchNac : '';
         paciente.edad = fchNacMoment.isValid() ? moment().diff(fchNacMoment, 'years') : '';
+        // parseo valores de consulta y copagos
+        paciente.valorConsulta = parseFloat(paciente.valorConsulta);
+        paciente.copago = parseFloat(paciente.copago);
         // datos para options en select
         paciente.value = paciente.id;
         paciente.label = paciente.nombreCompleto;
