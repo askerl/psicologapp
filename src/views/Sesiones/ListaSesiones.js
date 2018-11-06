@@ -5,7 +5,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import LoadingOverlay from 'react-loading-overlay';
 import { NotificationManager } from 'react-notifications';
 import { Button, Card, CardBody, CardHeader, Col, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { meses, overlay, tableColumnClasses, breakpoints } from '../../config/constants';
+import { meses, overlay, tableColumnClasses, breakpoints, filtroTipoPaciente } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
 import { tablasFormatter } from '../../utils/formatters';
@@ -193,20 +193,24 @@ class ListaSesiones extends Component {
 			dataField: 'fecha',
 			text: 'Fecha',
 			headerAttrs: { width: '100px' },
-			formatter: tablasFormatter.fecha
+			formatter: tablasFormatter.fecha,
+			filterValue: tablasFormatter.fecha
 		}, {
 			dataField: 'nombreCompleto',
 			text: 'Paciente',
-			formatter: tablasFormatter.nombrePacienteSesiones
+			formatter: tablasFormatter.nombrePacienteSesiones,
+			filterValue: (cell, row) => cell
 		}, {
 			dataField: 'tipo',
 			text: 'Tipo',
 			headerAttrs: { width: '90px' },
 			formatter: tablasFormatter.tipoPaciente,
+			filterValue: (cell, row) => filtroTipoPaciente[cell],
 			hidden: this.state.size < breakpoints.sm
 		}, {
 			dataField: 'prepaga',
 			text: 'Prepaga',
+			formatter: tablasFormatter.prepaga,
 			formatter: tablasFormatter.prepaga,
 			hidden: this.state.size < breakpoints.lg
 		}, {
@@ -218,12 +222,14 @@ class ListaSesiones extends Component {
 			text: 'Valor',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
+			filterValue: (cell, row) => cell,
 			hidden: this.state.size < breakpoints.sm
 		}, {
 			dataField: 'copago',
 			text: 'Copago',
 			align: 'right', headerAlign: 'right',
 			formatter: tablasFormatter.precio,
+			filterValue: (cell, row) => cell,
 			hidden: this.state.size < breakpoints.sm
 		}];
 
@@ -264,7 +270,8 @@ class ListaSesiones extends Component {
 										keyField='id'
 										data={this.state.sesiones} 
 										columns={columns}
-										search={ {searchFormatted: true} }>
+										search
+									>
 									{
 										props => (
 											<div>

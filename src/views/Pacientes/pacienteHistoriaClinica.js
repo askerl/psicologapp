@@ -113,19 +113,22 @@ class HistoriaClinica extends Component {
             headerAttrs: { width: '36px' },
             formatter: tablasFormatter.actionsHistoriaClinica,
             formatExtraData: this.toggleEdit,
-            csvExport: false
+            csvExport: false,
+            searchable: false
         }, {
 			dataField: 'nro',
 			text: 'Nro.',
             headerAttrs: { width: '60px' },
             align: 'right', headerAlign: 'right',
             sort: true,
+            searchable: false,
             hidden: this.state.size < breakpoints.sm
 		}, {
 			dataField: 'fecha.seconds',
 			text: 'Fecha',
 			headerAttrs: { width: '100px' },
             formatter: tablasFormatter.fecha,
+            filterValue: tablasFormatter.fecha,
             csvFormatter: tablasFormatter.fecha,
             sort: true
 		}, {
@@ -157,7 +160,7 @@ class HistoriaClinica extends Component {
                                 keyField='id'
                                 data={this.state.sesiones}
                                 columns={columns}
-                                search={{searchFormatted: true}}
+                                search
                                 exportCSV={{fileName: csvFileName}}>
                                 {
                                     props => (
