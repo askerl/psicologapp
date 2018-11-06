@@ -26,6 +26,7 @@ class ActualizarValores extends Component {
         this.changeValorActual = this.changeValorActual.bind(this);
         this.changeValorConsulta = this.changeValorConsulta.bind(this);
         this.cargarValoresActuales = this.cargarValoresActuales.bind(this);
+        this.goBack = this.goBack.bind(this);
     }
 
     loading(val){
