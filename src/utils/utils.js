@@ -272,6 +272,31 @@ export const calcPorcentajesSesiones = (sesionesAut, sesiones) => {
     return {porcUsadas, porcRestantes};
 }
 
+export const actualizarValores = (listaPacientes, valorNuevo) => {
+    // actualizo los valores de consulta de los pacientes de la lista con el valor nuevo recibido
+    let promise = new Promise( (resolve, reject) => {
+        
+        // Get a new write batch
+        let batch = db.batch();                
+                
+        listaPacientes.forEach( p => {
+            let refPaciente = db.collection("pacientes").doc(p.id);
+            batch.update(refPaciente, { valorConsulta: parseFloat(valorNuevo) });
+        });
+
+        //Commit the batch
+        batch.commit().then( () => {
+            removeSession('pacientes');
+            resolve();
+        }).catch( error => {
+            console.error("Error actualizando valores de consulta: ", error);
+            reject(error);
+        });
+
+    });
+    return promise;
+}
+
 // ---------------------- SESIONES --------------------------------
 
 export const getSesionesMes = (mes, anio) => {
@@ -485,3 +510,4 @@ export const getFiltroPrepagas = () => {
     });
     return promise;
 }
+

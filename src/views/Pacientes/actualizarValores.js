@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardHeader, CardFooter, Col, Row, Form, FormGroup, FormFeedback, Label, Input, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
 import { tipoPaciente, pacientePrepaga, pacientePrivado } from '../../config/constants';
-import { errores } from '../../config/mensajes';
-import { getPrepagas, getPacientes } from '../../utils/utils';
+import { errores, mensajes } from '../../config/mensajes';
+import { getPrepagas, getPacientes, actualizarValores } from '../../utils/utils';
 import Spinner from '../../components/Spinner/Spinner';
 import BootstrapTable from 'react-bootstrap-table-next';
+import { NotificationManager } from 'react-notifications';
 
 class ActualizarValores extends Component {
 
@@ -14,13 +15,13 @@ class ActualizarValores extends Component {
             loading: false,
             tipo: '',
             valoresActuales: [],
-            showResumen: false,
             pacientesSel: [],
             errorTipo: false,
             errorPrepaga: false,
             errorValorActual: false,
             errorValorConsulta: false,
-            showConfirmModal: false
+            showConfirmModal: false,
+            textoResumen: ''
         }; // <- set up react state
         this.guardar = this.guardar.bind(this);
         this.validate = this.validate.bind(this);
@@ -30,6 +31,9 @@ class ActualizarValores extends Component {
         this.changeValorConsulta = this.changeValorConsulta.bind(this);
         this.cargarValoresActuales = this.cargarValoresActuales.bind(this);
         this.goBack = this.goBack.bind(this);
+        this.toggleConfirm = this.toggleConfirm.bind(this);
+        this.confirmarGuardar = this.confirmarGuardar.bind(this);
+        this.cargarDatos = this.cargarDatos.bind(this);
     }
 
     loading(val){
@@ -38,7 +42,10 @@ class ActualizarValores extends Component {
 
 	componentDidMount() {
         this.loading(true);
+        this.cargarDatos();      
+    }
 
+    cargarDatos() {
         Promise.all([getPrepagas(), getPacientes()]).then(values => { 
             let prepagas = values[0],
                 pacientes = values[1];
@@ -48,11 +55,12 @@ class ActualizarValores extends Component {
 
 			this.loading(false);
 		});
-        
     }
 
     changeTipoPaciente(){
         let tipo = this.inputTipo.value;
+        // reseteo valores seleccionados de prepaga y valor actual
+        this.inputValorActual.value = '';
         if (tipo === pacientePrivado) {
             this.cargarValoresActuales(tipo);
         }
@@ -61,17 +69,23 @@ class ActualizarValores extends Component {
     }
 
     changePrepaga(){
+        // reseteo valor actual seleccionado si cambia prepaga
+        this.inputValorActual.value = '';
         this.cargarValoresActuales(this.inputTipo.value, this.inputPrepaga.value);
         this.setState({errorPrepaga: false});
         this.validate("prepaga");
     }
 
     changeValorActual(){
-        let pacientesSel = this.state.pacientesSel;
-        let valorActual = this.inputValorActual.value;
-        console.log(valorActual);
+        let pacientesSel = this.state.pacientesSel,
+            valorActual = this.inputValorActual.value,
+            tipo = this.inputTipo.value;
+
         if (valorActual) {
-            pacientesSel = _.filter(this.pacientes, {'tipo': this.inputTipo.value, 'valorConsulta': parseFloat(valorActual)});
+            pacientesSel = _.filter(this.pacientes, {'tipo': tipo, 'valorConsulta': parseFloat(valorActual)});
+            if (tipo === pacientePrepaga) {
+                pacientesSel = _.filter(pacientesSel, {'prepaga': this.inputPrepaga.value});
+            }
         } else {
             pacientesSel = [];
         }
@@ -125,8 +139,40 @@ class ActualizarValores extends Component {
 
     }
 
-    guardar() {
+    toggleConfirm(){
+		this.setState({showConfirmModal: !this.state.showConfirmModal});
+	}
 
+    guardar(e) {
+        // valido datos de pantalla
+        if(this.validate()){
+            // muestro diálogo de confirmación con pacientes a actualizar
+            this.setState({textoResumen: `Valor anterior: $${this.inputValorActual.value} - Valor nuevo: $${this.inputValorConsulta.value}`});
+            this.toggleConfirm();
+        }
+    }
+
+    confirmarGuardar() {
+        this.loading(true);
+
+        actualizarValores(this.state.pacientesSel, this.inputValorConsulta.value).then( () => {
+            NotificationManager.success(mensajes.okUpdate);
+            // recargo datos para actualizar valores por si sigue actualizando
+            this.cargarDatos();
+            // limpio pantalla
+            this.inputTipo.value = '';
+            if (this.state.tipo === pacientePrepaga) {
+                this.inputPrepaga.value = '';
+            }
+            this.inputValorActual.value = '';
+            this.inputValorConsulta.value = '';            
+            // cierro diálogo de confirmación
+            this.toggleConfirm();
+        }).catch( error => {
+            NotificationManager.error(errores.errorActualizarValores, 'Error');
+			this.toggleConfirm();
+			this.loading(false);
+        });
     }
 
     goBack(){
@@ -136,8 +182,6 @@ class ActualizarValores extends Component {
     render() {
         const prepagas = this.prepagas,
               valoresActuales = this.state.valoresActuales;
-
-        const showResumen = this.state.showResumen;
 
         const columns = [{
 			dataField: 'id',
@@ -208,30 +252,38 @@ class ActualizarValores extends Component {
                                     </FormGroup>
                                 </Col>
                             </Row>
-                            {showResumen &&
-                                <Row>
-                                    <Col>
-                                        <BootstrapTable
-                                            keyField='id'
-                                            data={this.state.pacientesSel}
-                                            columns={columns}
-                                            noDataIndication='No hay pacientes seleccionados'
-                                            bordered={false}
-                                            bootstrap4
-                                            striped
-                                            hover />
-                                    </Col>
-                                </Row>
-                            }
                         </Form>
                     </CardBody>
                     <CardFooter className="botonesFooter">
-                        <Button type="submit" color="primary" onClick={ e => this.guardar(e)}>
+                        <Button type="submit" color="primary" onClick={ e => this.guardar()}>
                             {this.state.loading && <Spinner/>}Guardar
                         </Button>
                         <Button type="reset" color="secondary" onClick={this.goBack} disabled={this.state.loading}>Cancelar</Button>
                     </CardFooter>
                 </Card>
+                <Modal isOpen={this.state.showConfirmModal} toggle={this.toggleConfirm} className={'modal-lg modal-info'}>
+					<ModalHeader toggle={this.toggleConfirm}>Confirmar actualización</ModalHeader>
+					<ModalBody>
+						Se actualizarán los valores de las consultas para los siguientes pacientes:
+                        <BootstrapTable
+                            keyField='id'
+                            classes="table-sm mt-2 mb-2"
+                            data={this.state.pacientesSel}
+                            columns={columns}
+                            noDataIndication='No hay pacientes seleccionados'
+                            bordered={false}
+                            bootstrap4
+                            striped
+                            hover />
+                        <span className="font-weight-bold">{this.state.textoResumen}</span>    
+					</ModalBody>
+					<ModalFooter>
+						<Button color="info" size="sm" onClick={this.confirmarGuardar}>
+							{this.state.loading && <Spinner />}Confirmar
+						</Button>
+						<Button color="secondary" size="sm" onClick={this.toggleConfirm} disabled={this.state.loading}>Cancelar</Button>
+					</ModalFooter>
+				</Modal>
 			</div>
         )
     }

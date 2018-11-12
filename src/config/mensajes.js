@@ -23,7 +23,8 @@ export const errores = {
     existePrepagaNombre: "Ya existe una Prepaga con ese nombre",
     errorBorrarPrepagaPaciente: "Existen Pacientes con esta Prepaga asociada",
     errorBorrarPrepagaSesiones: "Existen Sesiones ingresadas para esta Prepaga",
-    valorActualVacio: "Seleccione el valor actual"
+    valorActualVacio: "Seleccione el valor actual",
+    errorActualizarValores: "Ocurrió un error al actualizar los valores"
 }
 
 export const mensajes = {
