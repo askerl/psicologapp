@@ -9,7 +9,7 @@ import Spinner from '../../components/Spinner/Spinner';
 import { overlay, pacientePrepaga } from '../../config/constants';
 import { errores } from '../../config/mensajes';
 import db from '../../fire';
-import { createFechaSesion, getPacientes, removeSession, removeSessionSesionesMes } from '../../utils/utils';
+import { createFechaSesion, getPacientes, getPrepagas, removeSession, removeSessionSesionesMes } from '../../utils/utils';
 import { tablasFormatter } from '../../utils/formatters';
 
 class Sesion extends Component {
@@ -24,6 +24,7 @@ class Sesion extends Component {
             selectedOption: [],
             nuevo: true,
             pacientes: [],
+            prepagas: [],
             errorFecha: false,
             errorPacientes: false
         }; // <- set up react state
@@ -40,13 +41,19 @@ class Sesion extends Component {
         this.inputFecha.value = moment().format('YYYY-MM-DD');
 
         this.loading(true);
-        getPacientes().then( pacientes => {
+        
+        Promise.all([getPrepagas(), getPacientes()]).then(values => { 
+            let prepagas = values[0],
+                pacientes = values[1];
+
             pacientes.forEach(p =>{
                 p.facturaAusencia = true; // por defecto se facturan las ausencias
             });
-            this.setState({pacientes});
-            this.loading(false);
-        });
+
+            this.setState({pacientes, prepagas});
+			this.loading(false);
+		});
+
     }
 
     loading(val){
@@ -142,6 +149,16 @@ class Sesion extends Component {
             sesion.prepaga = p.prepaga;
             sesion.facturaPrepaga = p.facturaPrepaga;
             sesion.copago = p.copago;
+
+            if (sesion.ausencia) {
+                let prepaga = _.find(this.state.prepagas, {'id': p.prepaga});
+                sesion.valor = sesion.facturaAusencia ? prepaga.pagoAusencia : sesion.valor;
+            }
+            
+            if (!sesion.facturaPrepaga) {
+                sesion.valor = 0;
+            }
+
         }
 
         return sesion;
